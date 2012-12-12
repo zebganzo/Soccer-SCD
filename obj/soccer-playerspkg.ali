@@ -1,0 +1,159 @@
+V "GNAT Lib v2012"
+A -gnatA
+P SS ZX
+R nnnvvnnnnvnnnnnnnnnnnvnvnvnnnnnvnnnnnnnvnnnnvnnnnnnvnnnnnnvnnnnvnnnvnnvnnnnnnnnnnnnnn
+
+U soccer.playerspkg%b	soccer-playerspkg.adb	e9ade3ae OO PK
+W ada%s			ada.ads			ada.ali
+W ada.calendar.delays%s	a-caldel.adb		a-caldel.ali
+W ada.numerics%s	a-numeri.ads		a-numeri.ali
+W ada.numerics.discrete_random%s
+W ada.tags%s		a-tags.adb		a-tags.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W soccer%s		soccer.ads		soccer.ali
+W soccer.controllerpkg%s  soccer-controllerpkg.adb  soccer-controllerpkg.ali
+Z system%s		system.ads		system.ali
+W system.concat_2%s	s-conca2.adb		s-conca2.ali
+Z system.random_numbers%s  s-rannum.adb		s-rannum.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
+
+U soccer.playerspkg%s	soccer-playerspkg.ads	49635e2d EE NE OO PK
+W ada.real_time%s	a-reatim.adb		a-reatim.ali
+W soccer%s		soccer.ads		soccer.ali
+W soccer.controllerpkg%s  soccer-controllerpkg.adb  soccer-controllerpkg.ali
+W system%s		system.ads		system.ali
+W system.parameters%s	s-parame.adb		s-parame.ali
+W system.task_info%s	s-tasinf.adb		s-tasinf.ali
+W system.tasking%s	s-taskin.adb		s-taskin.ali
+W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
+
+D ada.ads		20120510125803 3ffc8e18
+D a-calend.ads		20120510125748 d86d6c8c
+D a-caldel.ads		20120510125748 9f20b83d
+D a-contai.ads		20120510125751 61e5e089
+D a-convec.ads		20120510125751 0aaf3975
+D a-except.ads		20120510125752 ec1b44c1
+D a-finali.ads		20120510125753 52ecdc1b
+D a-ioexce.ads		20120510125753 8b9de6cd
+D a-iteint.ads		20120510125754 7c7305e9
+D a-numeri.ads		20120510125755 bb51c45a
+D a-nudira.ads		20120510125755 2fef2912
+D a-nudira.adb		20120510125755 e57ce22b
+D a-reatim.ads		20120510125755 63f07669
+D a-stream.ads		20120510125756 2ca4ee37
+D a-tags.ads		20120510125759 6c0509d0
+D a-textio.ads		20120510125800 386df5d4
+D a-unccon.ads		20120510125801 f9eb8f06
+D interfac.ads		20120510125815 129923ea
+D i-c.ads		20120510125814 5421119b
+D i-cstrea.ads		20120510125814 1bd72c32
+D soccer.ads		20121212083641 3a2ff7bb
+D soccer-controllerpkg.ads  20121212083729 ac252e80
+D soccer-playerspkg.ads	20121212084124 df698716
+D soccer-playerspkg.adb	20121212084200 363252a4
+D system.ads		20120510125846 eb6e42ba
+D s-atacco.ads		20120510125819 4c36d12f
+D s-conca2.ads		20120510125823 fbd0f2fc
+D s-crtl.ads		20120510125824 ac77b159
+D s-exctab.ads		20120510125824 66e51330
+D s-ficobl.ads		20120510125825 443b9d66
+D s-finmas.ads		20120510125825 b95bb341
+D s-finroo.ads		20120510125825 4ff27390
+D s-imguns.ads		20120510125826 9ff43cf7
+D s-linux.ads		20120510125827 70c7cb45
+D s-multip.ads		20120510125828 38ac9f73
+D s-oscons.ads		20120511153426 9012934c
+D s-osinte.ads		20120510125829 938b6b03
+D s-parame.ads		20120510125832 b6e20cc0
+D s-pooglo.ads		20120510125832 542f33d0
+D s-rannum.ads		20120510125832 5eb33f0a
+D s-rannum.adb		20120510125832 eb980280
+D s-ransee.ads		20120510125832 01a57b33
+D s-secsta.ads		20120510125833 eea35a36
+D s-soflin.ads		20120510125833 24c8153c
+D s-stache.ads		20120510125834 596fc1b4
+D s-stausa.ads		20120510125834 017a0a05
+D s-stalib.ads		20120510125834 f78bcf95
+D s-stoele.ads		20120510125834 facd7d98
+D s-stoele.adb		20120510125834 afc5dc80
+D s-stopoo.ads		20120510125834 7b8fbeee
+D s-stposu.ads		20120510125834 197be7e5
+D s-stratt.ads		20120510125834 aedef97e
+D s-tasinf.ads		20120510125835 21316953
+D s-taspri.ads		20120510125836 15f617a8
+D s-taprop.ads		20120510125835 1dd2e1b6
+D s-taskin.ads		20120510125836 5e24fb30
+D s-tassta.ads		20120510125836 3a253871
+D s-traent.ads		20120510125838 5221ee41
+D s-unstyp.ads		20120510125838 6ae15c76
+D s-valuns.ads		20120510125839 10a8ed3b
+D s-wchcon.ads		20120510125840 bfeb2e3d
+X 1 ada.ads
+16K9*Ada 19e8 24|1r6 2r5 3r6 4r6 17r31
+X 5 a-convec.ads
+49I12*Extended_Index{integer}
+55R9*Vector
+113V13*Element{22|22P9} 24|29s61[22|34]
+115i7 Index{integer} 24|29r69[22|34]
+283V13*First_Index{integer} 24|28s47[22|34]
+289V13*Last_Index{49I12[22|34]} 24|28s90[22|34]
+X 10 a-numeri.ads
+16K13*Numerics 32e17 24|3w10 4r10 17r35
+X 11 a-nudira.ads
+44k22*Discrete_Random 73e33 24|4w19 17r44
+48R9 Generator 24|18r24[17] 19r24[17]
+50V13 Random{24|16I12} 24|33s58[17] 34s58[17]
+53U14 Reset<40|91p14> 24|31s19[17] 32s19[17]
+X 12 a-nudira.adb
+51V16 Random[40|74]{24|16I12} 41|390b13[24|17]
+X 16 a-textio.ads
+49K13*Text_IO 471e16 24|1w10 2r9
+263U14*Put_Line 24|23s10 29s13
+X 18 interfac.ads
+61M9*Unsigned_32
+64M9*Unsigned_64
+X 21 soccer.ads
+1K9*Soccer 2e11 23|1r6 2r5 4r9 11r5 24|1r19 2r18 6r14 42r5
+X 22 soccer-controllerpkg.ads
+4K16*ControllerPkg 51e25 23|1w13 2r12 24|1w26 2r25 24r19 25r25
+7V13*I2S{string} 24|23s29 29s29
+12I12*utilityRange{integer}
+15R9*CellType 20e17 24|21r33
+17i10*id{integer} 24|29r81
+18i10*coordX{integer} 24|25r61 33m16 33r32 36m29 36r45
+19i10*coordY{integer} 24|26r61 34m16 34r32 37m29 37r45
+22P9*Cell(15R9) 24|11r15
+24V13*getMyPosition{22P9} 24|24s33
+24i28 id{integer} 24|24r47
+27R9*Action 32e17 24|14r17
+29i10*byWho{integer} 24|35m18
+30p10*cellTarget{22P9} 24|21m15 36r18 37r18
+31i10*utility{12I12} 24|38m18
+34K12*Players_Container[5|45] 24|8r8
+40r10*playersInMyZone{5|55R9[34]} 24|28r31 28r74 29r45
+42P9*ReadResult(38R9) 24|12r21
+43V13*readStatus{42P9} 24|25s39
+43i25 x{integer} 24|25r50
+43i41 y{integer} 24|26r50
+43i57 r{integer} 24|27r50
+X 23 soccer-playerspkg.ads
+4K16*PlayersPkg 21|1k9 23|11l12 11e22 24|6b21 42l12 42t22
+9T14*Player 9d22 9d36 24|10b14 41l8 41t14
+9i22 Id{integer} 24|23r33 24r53 35r27
+9i36 Ability{integer} 24|27r55
+X 24 soccer-playerspkg.adb
+11p7 mCell{22|22P9} 24m10 25r55 26r55 33m10 33r10 33r26 34m10 34r10 34r26
+. 36r39 37r39
+12p7 mReadResult{22|42P9} 25m10 28r19 28r62 29r33
+14r7 mAction{22|27R9} 21m7 35m10 36m10 36r10 37m10 37r10 38m10
+16I12 Rand_Range<short_short_integer> 17r60
+17K15 Rand_Int[11|44] 18r15 19r15 31r10 32r10 33r49 34r49
+18r7 seedX{11|48R9[17]} 31r25 33r65
+19r7 seedY{11|48R9[17]} 32r25 34r65
+28i14 i{integer} 29r78
+X 40 s-rannum.ads
+66V13*Random{18|61M9} 41|219i21
+67V13*Random{18|64M9} 41|219i21
+
