@@ -3,8 +3,6 @@ use Ada.Containers;
 
 package Soccer.ControllerPkg is
 
-   -- Integer'Image ...TRICK!
-   function I2S (Num: in Integer) return String;
    procedure PrintField;
 
    fieldMaxX : Integer := 15;

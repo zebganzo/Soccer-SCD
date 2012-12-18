@@ -1,13 +1,10 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Numerics.Generic_Elementary_Functions;
 
-package body Soccer.ControllerPkg is
+with Soccer.ControllerPkg.Referee;
+use Soccer.ControllerPkg.Referee;
 
-   -- Integer'Image ...TRICK!
-   function I2S (Num              : in Integer) return String is
-   begin
-      return Integer'Image(Num);
-   end I2S;
+package body Soccer.ControllerPkg is
 
    type PlayerStatus is
       record
@@ -25,12 +22,8 @@ package body Soccer.ControllerPkg is
    function distance(x1 : in Integer; x2 : in Integer; y1 : in Integer; y2 : in Integer) return Integer is
       dx, dy : float;
    begin
-      -- Put_Line("x1 : " & I2S(x1) & " x2 " & I2S(x2) & " y1 " & I2S(y1) & " y2 " & I2S(y2));
-      -- Put_Line("x2 - x1 : " & I2S(x2 - x1) & " y2 - y1 " & I2S(y2 - y1));
       dx := float(x1 - x2);
       dy := float(y1 - y2);
-      -- Put_Line("Sqrt( dx*dx + dy*dy ) " & Float'Image(Sqrt( dx*dx + dy*dy )));
-      -- Put_Line("Integer(Sqrt( dx*dx + dy*dy )) " & I2S(Integer(Sqrt( dx*dx + dy*dy ))));
       return Integer(Sqrt( dx*dx + dy*dy ));
    end distance;
 

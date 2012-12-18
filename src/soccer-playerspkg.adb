@@ -20,14 +20,13 @@ package body Soccer.PlayersPkg is
    begin
       mAction.cellTarget := new CellType;
       loop
-         Put_Line("Ciao " & I2S(Id));
          mCell := ControllerPkg.getMyPosition(id => Id);
          mReadResult := ControllerPkg.readStatus(x => mCell.coordX,
                                                  y => mCell.coordY,
                                                  r => ability);
-         for i in mReadResult.playersInMyZone.First_Index .. mReadResult.playersInMyZone.Last_Index loop
-            Put_Line("- " & I2S(mReadResult.playersInMyZone.Element(Index => i).id));
-         end loop;
+         --for i in mReadResult.playersInMyZone.First_Index .. mReadResult.playersInMyZone.Last_Index loop
+         --   Put_Line("- " & I2S(mReadResult.playersInMyZone.Element(Index => i).id));
+         --end loop;
          Rand_Int.Reset(seedX);
          Rand_Int.Reset(seedY);
          mCell.coordX := mCell.coordX + Integer(Rand_Int.Random(seedX));
