@@ -4,12 +4,15 @@
 with Soccer.Bridge;
 use Soccer.Bridge;
 
+with Soccer.Server;
+with Soccer.Server.WebServer;
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Soccer.Core_Event.Game_Core_Event.Binary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
 with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 with Soccer.Core_Event; use Soccer.Core_Event;
+
 
 
 procedure Soccer.Main is
@@ -26,6 +29,8 @@ begin
    arr(1) := new Binary_Event;
    arr(2) := new Unary_Event;
    arr(3) := new Match_Event;
+
+   Soccer.Server.WebServer.Start;
 
    --Core_Event.Print(E => arr(1).all);
    --Core_Event.Print(E => arr(2).all);
