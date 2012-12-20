@@ -1,13 +1,16 @@
 --with Soccer.ControllerPkg, Soccer.PlayersPkg;
 --use Soccer.ControllerPkg, Soccer.PlayersPkg;
 
-with Soccer.Root_Event; use Soccer.Root_Event;
-with Soccer.Root_Event.Motion_Root_Event; use Soccer.Root_Event.Motion_Root_Event;
-with Soccer.Root_Event.Game_Root_Event; use Soccer.Root_Event.Game_Root_Event;
-
 with Soccer.Bridge;
+use Soccer.Bridge;
+
 
 with Ada.Text_IO; use Ada.Text_IO;
+with Soccer.Core_Event.Game_Core_Event.Binary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
+with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
+with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+with Soccer.Core_Event; use Soccer.Core_Event;
+
 
 procedure Soccer.Main is
 
@@ -20,13 +23,13 @@ procedure Soccer.Main is
    --Three : Player (Id    => 3, Ability => 5);
 begin
 
-   arr(1) := new Motion_Event;
-   arr(2) := new Game_Event;
-   arr(3) := new Motion_Event;
+   arr(1) := new Binary_Event;
+   arr(2) := new Unary_Event;
+   arr(3) := new Match_Event;
 
-   Root_Event.Print(E => arr(1).all);
-   Root_Event.Print(E => arr(2).all);
-   Root_Event.Print(E => arr(3).all);
+   --Core_Event.Print(E => arr(1).all);
+   --Core_Event.Print(E => arr(2).all);
+   --Core_Event.Print(E => arr(3).all);
 
 --     loop
 --        delay duration (1);

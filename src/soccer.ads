@@ -1,10 +1,11 @@
 package Soccer is
 
-   -- Integer'Image ...TRICK!
    function I2S (Num: in Integer) return String;
 
    fieldMaxX : Integer := 15;
    fieldMaxY : Integer := 10;
+
+   type Formation_Scheme is (O_352, B_442, D_532);
 
    type Coordinate is
       record
