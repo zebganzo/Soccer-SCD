@@ -7,6 +7,8 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
    begin
       Put_Line("binary event");
       Serialized_Obj := Create_Object;
+      Serialized_Obj.Set_Field(Field_Name => "type_of_event",
+                               Field      => "binary");
       Serialized_Obj.Set_Field(Field_Name => "event_id",
                                Field      => Binary_Event_Id'Image(E.Event_Id));
       Serialized_Obj.Set_Field(Field_Name => "player_id_1",

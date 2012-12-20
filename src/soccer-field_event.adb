@@ -7,6 +7,6 @@ package body Soccer.Field_Event is
    begin
       Put_Line("Field_Event event");
 
-      E.Type_Id := Serialized_Obj.Get(Field => "");
+      E.Type_Id := Field_Type_Id'Val(Serialized_Obj.Get(Field => "type_id"));
    end Deserialize;
 end Soccer.Field_Event;
