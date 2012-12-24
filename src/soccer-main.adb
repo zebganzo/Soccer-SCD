@@ -1,5 +1,5 @@
---with Soccer.ControllerPkg, Soccer.PlayersPkg;
---use Soccer.ControllerPkg, Soccer.PlayersPkg;
+with Soccer.ControllerPkg, Soccer.PlayersPkg;
+use Soccer.ControllerPkg, Soccer.PlayersPkg;
 
 with Soccer.Bridge;
 use Soccer.Bridge;
@@ -14,29 +14,25 @@ with Soccer.Core_Event; use Soccer.Core_Event;
 
 procedure Soccer.Main is
 
-   type EventArray is array (1 .. 3) of Event_Ptr;
-
-   arr : EventArray;
-
-   --One   : Player (Id    => 1, Ability => 4);
-   --Two   : Player (Id    => 2, Ability => 2);
-   --Three : Player (Id    => 3, Ability => 5);
+   OneCoord : Coordinate_Ptr := new Coordinate'(coordX => 5,
+                                        coordY => 5);
+   TwoCoord : Coordinate_Ptr := new Coordinate'(coordX => 14,
+                                        coordY => 9);
+--     ThreeCoord : Coordinate_Ptr := new Coordinate'(coordX => 12,
+--                                                    coordY => 3);
+--     FourCoord : Coordinate_Ptr := new Coordinate'(coordX => 12,
+--                                                    coordY => 3);
+--     FiveCoord : Coordinate_Ptr := new Coordinate'(coordX => 12,
+--                                                    coordY => 3);
+--     SixCoord : Coordinate_Ptr := new Coordinate'(coordX => 12,
+--                                          coordY => 3);
+   One   : Player (Id    => 1, Ability => 4, Initial_Coord => OneCoord);
+   Two   : Player (Id    => 2, Ability => 2, Initial_Coord => TwoCoord);
+--     Three : Player (Id    => 3, Ability => 5, Initial_Coord => ThreeCoord);
+--     Four : Player (Id    => 4, Ability => 6, Initial_Coord => FourCoord);
+--     Five : Player (Id    => 5, Ability => 4, Initial_Coord => FiveCoord);
+--     Six : Player (Id    => 6, Ability => 3, Initial_Coord => SixCoord);
 begin
-
-   arr(1) := new Binary_Event;
-   arr(2) := new Unary_Event;
-   arr(3) := new Match_Event;
-
-   --Core_Event.Print(E => arr(1).all);
-   --Core_Event.Print(E => arr(2).all);
-   --Core_Event.Print(E => arr(3).all);
-
---     loop
---        delay duration (1);
---        ControllerPkg.PrintField;
---     end loop;
-   Put_Line("prima");
-   -- Soccer.Bridge.Input.PutStuff;
-   Put_Line("dopo");
+   null;
 end Soccer.Main;
 

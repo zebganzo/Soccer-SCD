@@ -1,22 +1,24 @@
 V "GNAT Lib v2012"
 A -gnatA
+A -mtune=generic
+A -march=x86-64
 P SS ZX
-R nnnvnnnnnnvnnnnnnnvvnvnnvvnnvvnvnnvnnnnnvvvnvnnnnnnvnnnnnnvnnnnvnnnvnnvnnnv2nv2nv1nnnnnn
+R nnnvnnnnnvvnvnnnnnvvnvnvnvnnvvnvnnvnnnnvvvvnvnnnnnnvnnnnnnvnnnnvnnnvnnvnnnv2nv2nv2nnnnnn
 
-U soccer.controllerpkg%b  soccer-controllerpkg.adb  014261b5 OO PK
+U soccer.controllerpkg%b  soccer-controllerpkg.adb  90266524 OO PK
 W ada%s			ada.ads			ada.ali
-W ada.exceptions%s	a-except.adb		a-except.ali
+W ada.calendar.delays%s	a-caldel.adb		a-caldel.ali
 W ada.numerics%s	a-numeri.ads		a-numeri.ali
-Z ada.numerics.aux%s	a-numaux.adb		a-numaux.ali
 W ada.numerics.generic_elementary_functions%s
 W ada.tags%s		a-tags.adb		a-tags.ali
 W ada.text_io%s		a-textio.adb		a-textio.ali
 W soccer%s		soccer.adb		soccer.ali  AD
+W soccer.controllerpkg%s  soccer-controllerpkg.adb  soccer-controllerpkg.ali
+W soccer.controllerpkg.referee%s  soccer-controllerpkg-referee.ads  soccer-controllerpkg-referee.ali
+W soccer.utils%s	soccer-utils.adb	soccer-utils.ali
 W system%s		system.ads		system.ali
 W system.concat_2%s	s-conca2.adb		s-conca2.ali
 W system.concat_3%s	s-conca3.adb		s-conca3.ali
-W system.exn_llf%s	s-exnllf.adb		s-exnllf.ali
-W system.fat_flt%s	s-fatflt.ads		s-fatflt.ali
 W system.finalization_masters%s  s-finmas.adb	s-finmas.ali
 W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
 W system.soft_links%s	s-soflin.adb		s-soflin.ali
@@ -27,7 +29,7 @@ W system.tasking%s	s-taskin.adb		s-taskin.ali
 W system.tasking.rendezvous%s  s-tasren.adb	s-tasren.ali
 W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
 
-U soccer.controllerpkg%s  soccer-controllerpkg.ads  3706f6cb EE OO PF PK
+U soccer.controllerpkg%s  soccer-controllerpkg.ads  124cde42 EE OO PF PK
 W ada%s			ada.ads			ada.ali
 W ada.containers%s	a-contai.ads		a-contai.ali
 Z ada.containers.generic_array_sort%s
@@ -40,6 +42,8 @@ W ada.streams%s		a-stream.ads		a-stream.ali
 W ada.tags%s		a-tags.adb		a-tags.ali
 Z ada.unchecked_deallocation%s
 W soccer%s		soccer.adb		soccer.ali
+W soccer.core_event%s	soccer-core_event.ads	soccer-core_event.ali
+W soccer.core_event.motion_core_event%s  soccer-core_event-motion_core_event.adb  soccer-core_event-motion_core_event.ali
 W system%s		system.ads		system.ali
 W system.finalization_masters%s  s-finmas.adb	s-finmas.ali
 W system.parameters%s	s-parame.adb		s-parame.ali
@@ -56,9 +60,15 @@ W system.tasking%s	s-taskin.adb		s-taskin.ali
 W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
 
 D ada.ads		20120510125803 3ffc8e18
+D a-calend.ads		20120510125748 d86d6c8c
+D a-caldel.ads		20120510125748 9f20b83d
+D a-charac.ads		20120510125749 2d3ec45b
+D a-chlat1.ads		20120510125749 2825df20
 D a-contai.ads		20120510125751 61e5e089
 D a-cgarso.ads		20120510125749 9129bfa8
-D a-convec.ads		20120510125751 0aaf3975
+D a-cohata.ads		20120510125750 04abccc5
+D a-cihama.ads		20120510125749 fe25b351
+D a-convec.ads		20121221103938 0aaf3975
 D a-convec.adb		20120510125751 ad118cec
 D a-except.ads		20120510125752 ec1b44c1
 D a-finali.ads		20120510125753 52ecdc1b
@@ -70,25 +80,34 @@ D a-ngelfu.ads		20120510125754 243903c9
 D a-ngelfu.adb		20120510125754 859ccdff
 D a-reatim.ads		20120510125755 63f07669
 D a-stream.ads		20120510125756 2ca4ee37
+D a-string.ads		20120510125757 90ac6797
+D a-strhas.ads		20120510125757 0fca75f9
+D a-strmap.ads		20120510125757 9cb836fb
+D a-strunb.ads		20120510125757 3f91d4c5
 D a-tags.ads		20120510125759 6c0509d0
 D a-textio.ads		20120510125800 386df5d4
 D a-unccon.ads		20120510125801 f9eb8f06
 D a-uncdea.ads		20120510125801 f15a5ed1
+D gnatcoll.ads		20111220093209 6a5da479
+D gnatcoll-json.ads	20120411143615 9dd4f3b4
 D interfac.ads		20120510125815 129923ea
 D i-c.ads		20120510125814 5421119b
 D i-cstrea.ads		20120510125814 1bd72c32
-D soccer.ads		20121212150145 5e620403
-D soccer-controllerpkg.ads  20121212150137 63cbcbbd
-D soccer-controllerpkg.adb  20121212150159 7edd5c15
+D soccer.ads		20121224124300 973562d2
+D soccer-controllerpkg.ads  20121221144250 86643120
+D soccer-controllerpkg.adb  20121224125734 3c05c028
+D soccer-controllerpkg-referee.ads  20121221094422 06b21b47
+D soccer-core_event.ads	20121220084914 dae84186
+D soccer-core_event-motion_core_event.ads  20121222135139 09b2b4c5
+D soccer-utils.ads	20121221132332 30a17976
 D system.ads		20120510125846 eb6e42ba
 D s-atacco.ads		20120510125819 4c36d12f
+D s-atocou.ads		20120510125819 4a9c6cb4
+D s-atocou.adb		20120510125819 7116b4cf
 D s-conca2.ads		20120510125823 fbd0f2fc
 D s-conca3.ads		20120510125823 762a026a
 D s-crtl.ads		20120510125824 ac77b159
 D s-exctab.ads		20120510125824 66e51330
-D s-exnllf.ads		20120510125824 81841eef
-D s-fatflt.ads		20120510125825 11beb392
-D s-fatgen.ads		20120510125825 9267ca45
 D s-ficobl.ads		20120510125825 443b9d66
 D s-finmas.ads		20120510125825 b95bb341
 D s-finroo.ads		20120510125825 4ff27390
@@ -108,6 +127,8 @@ D s-stoele.adb		20120510125834 afc5dc80
 D s-stopoo.ads		20120510125834 7b8fbeee
 D s-stposu.ads		20120510125834 197be7e5
 D s-stratt.ads		20120510125834 aedef97e
+D s-string.ads		20120510125834 46b01415
+D s-ststop.ads		20120510125834 ee472be4
 D s-tasinf.ads		20120510125835 21316953
 D s-taspri.ads		20120510125836 15f617a8
 D s-taprop.ads		20120510125835 1dd2e1b6
@@ -120,93 +141,103 @@ D s-traent.ads		20120510125838 5221ee41
 D s-unstyp.ads		20120510125838 6ae15c76
 D s-wchcon.ads		20120510125840 bfeb2e3d
 X 1 ada.ads
-16K9*Ada 19e8 24|1r6 2r5 25|1r6 1r23 2r6 15r35
-X 2 a-contai.ads
-16K13*Containers 24e19 24|1r10 2r9
-X 4 a-convec.ads
-40I9 Index_Type 24|32r46
-41+9 Element_Type 24|33r46
-45k24*Vectors 474e27 24|1w21 32r37
-55R9*Vector 24|38r28[32]
-243U14*Append 25|51s36[24|32]
-245p7 New_Item{24|20P9} 25|51r43[24|32]
-X 9 a-iteint.ads
+16K9*Ada 19e8 36|1r6 2r5 37|1r6 1r23 9r6
+X 6 a-contai.ads
+16K13*Containers 24e19 36|1r10 2r9
+X 10 a-convec.ads
+40I9 Index_Type 36|25r46
+41+9 Element_Type 36|26r46
+45k24*Vectors 474e27 36|1w21 25r37
+55R9*Vector 36|31r28[25]
+243U14*Append 37|38s36[36|25]
+245r7 New_Item{36|16R9} 37|38r43[36|25]
+X 15 a-iteint.ads
 24h9 Forward_Iterator
-32h9 Reversible_Iterator<24R9[4|70]>
-X 10 a-numeri.ads
-16K13*Numerics 32e17 25|2r10 15r39
-X 12 a-ngelfu.ads
-39k22*Generic_Elementary_Functions 179e46 25|2w19 15r48
-42V13*Sqrt{float} 25|28s22[15]
-X 17 a-textio.ads
-49K13*Text_IO 471e16 25|1w10 1r27
-242U14*Put 25|72s10 76s10 78s13 80s10 84s10
-263U14*Put_Line 25|74s7 81s10 86s7 102s16 103s16 104s16 105s16 118s22 124s16
-X 23 soccer.ads
-1K9*Soccer 15e11 24|4r9 49r5 25|4r14 130r5
-4V13*I2S{string} 25|78s17 103s41 104s46 104s79 105s56
-X 24 soccer-controllerpkg.ads
-4K16*ControllerPkg 23|1k9 24|49l12 49e25 25|4b21 130l12 130t25
-6U14*PrintField 25|69b14 87l8 87t18
-8i4*fieldMaxX{integer} 16r40 25|71r22 77r24 83r22
-9i4*fieldMaxY{integer} 17r40 25|75r29
-10I12*utilityRange{integer} 11r33 29r20
-11I12*utilityConstraint{10I12} 25|90r28
-13R9*CellType 18e17 20r24 25|9r30
-15i10*id{integer} 25|35r30 62r37 94m27
-16i10*coordX{integer} 25|48r45 61r31 95m27 104r69 107r57 110m48 110r77
-17i10*coordY{integer} 25|50r45 61r63 96m27 104r102 108r57 111m48 111r77
-20P9*Cell(13R9) 22r52 28r23 33r62 25|9r18 32r51
-22V13*getMyPosition{20P9} 22>28 25|32b13 40l8 40t21
-22i28 id{integer} 25|32b27 35r35
-25R9*Action 30e17 44r32 46r35 25|101r39 123r43
-27i10*byWho{integer} 25|103r53 110r35 111r35
-28p10*cellTarget{20P9} 25|104r58 104r91 107r46 108r46 110r66 111r66
-29i10*utility{10I12} 25|105r68 113r30
-32K12*Players_Container[4|45] 34r8
-36R9*ReadResultType 39e17 40r30 25|44r34
-38r10*playersInMyZone{4|55R9[32]} 25|51m20
-40P9*ReadResult(36R9) 41r80 25|43r80 44r16
-41V13*readStatus{40P9} 41>25 41>41 41>57 25|43b13 55l8 55t18
-41i25 x{integer} 25|43b25 47r28
-41i41 y{integer} 25|43b41 49r28
-41i57 r{integer} 25|43b57 50r56
-43t9*Controller 25|89b14 128l8 128t18
-44Y13 Write 44>19 25|101b20 121l17 121t22
-44r19 mAction{25R9} 25|103r45 104r50 104r83 105r60 107r38 108r38 110r27 110r58
-. 111r27 111r58 113r22
-46Y13 Awaiting 46>22 25|115r30 123b20 125l17 125t25
-46r22 mAction{25R9}
-X 25 soccer-controllerpkg.adb
-6R9 PlayerStatus 10e17 12r37
-8i10*running{integer}
-9p10*mcell{24|20P9} 35r24 36r31 48r39 50r39 51r66 61r25 61r57 62r31 94r21
-. 95r21 96r21 110r42 111r42
-12A9 Status(6R9)<integer> 13r14
-13a4 mStatus{12A9} 34r16 35r13 36r20 46r16 48r28 50r28 51r55 60r16 61r14
-. 61r46 62r20 93r16 94m10 94r10 95m10 95r10 96m10 96r10 110m19 110r19 111m19
-. 111r19
-15K12 Value_Functions[12|39] 16r8
-19V13 distance{integer} 19b13 19>22 19>39 19>56 19>73 29l8 29t16 47s13
-19i22 x1{integer} 24r19 47r22
-19i39 x2{integer} 24r24 48r22
-19i56 y1{integer} 25r19 49r22
-19i73 y2{integer} 25r24 50r22
-20f7 dx{float} 24m7 28r28 28r31
-20f11 dy{float} 25m7 28r36 28r39
-34i11 i{integer} 35r21 36r28
-44p7 result{24|40P9} 51r13 54r14
-46i11 i{integer} 48r36 50r36 51r63
-58V13 HereIsAPlayer{integer} 58b13 58>27 58>43 66l8 66t21 78s21 107s19
-58i27 x{integer} 61r40 78r35 107r33
-58i43 y{integer} 61r72 78r43 108r33
-60i11 i{integer} 61r22 61r54 62r28
-71i11 i{integer}
-75i11 y{integer} 78r48
-77i14 x{integer} 78r40
-83i11 i{integer}
-90i7 mUtilityConstraint{24|11I12} 113r40
-93i11 i{integer} 94r18 94r33 95r18 95r37 96r18 96r37
-101r26 mAction{24|25R9}
-123r30 mAction{24|25R9}
+32h9 Reversible_Iterator<24R9[10|70]>
+X 16 a-numeri.ads
+16K13*Numerics 32e17 37|9r10
+X 18 a-ngelfu.ads
+39k22*Generic_Elementary_Functions 179e46 37|9w19
+X 27 a-textio.ads
+49K13*Text_IO 471e16 37|1w10 1r27
+242U14*Put 37|66s10 70s10 72s13 74s10 78s10 100s19 101s19 102s19
+263U14*Put_Line 37|68s7 75s10 80s7 103s19 119s19
+X 35 soccer.ads
+1K9*Soccer 29e11 36|3r6 4r5 6r9 49r5 37|3r6 4r5 6r6 7r5 11r14 133r5
+5V13*I2S{string} 37|72s17 101s39 102s44 102s78 103s59 119s58
+7i4*Field_Max_X{positive} 37|65r22 71r24 77r22
+8i4*Field_Max_Y{positive} 37|69r29
+13I12*utilityRange{integer} 36|13r20
+14I12*utilityConstraint{13I12} 37|93r28
+16i4*Num_Of_Player{positive} 37|13r31 57r21
+22R9*Coordinate 26e17 36|21r19 21r33 37r52 37|17r51 18r16
+24i10*coordX{integer} 36|21m45 37|35r46 48r32 102r68 106r61 120r61
+25i10*coordY{integer} 36|22m45 37|37r46 48r65 102r102 107r61 121r61
+X 36 soccer-controllerpkg.ads
+6K16*ControllerPkg 35|1k9 36|49l12 49e25 37|6r13 7r12 11b21 133l12 133t25
+10R9*Action 14e17 44r32 46r35 37|99r42 118r46
+12p10*event{40|7P9} 37|101r51 102r56 102r90 106r49 107r49 109r38 109r76 119r70
+. 120r49 121r49 122r38 122r76
+13i10*utility{35|13I12} 37|103r71
+16R9*PlayerStatus 23e17 26r62 37|13r49
+18i10*id{integer} 37|21r24 49r31 58m21
+19b10*running{boolean}
+20b10*on_the_field{boolean}
+21r10*mCoord{35|22R9} 37|22r34 35r39 37r39 48r25 48r58 109m58 122m58
+25K12*Players_Container[10|45] 27r8
+29R9*ReadResultType 32e17 33r30 37|31r34
+31r10*playersInMyZone{10|55R9[25]} 37|38m20
+33P9*ReadResult(29R9) 39r80 37|30r80 31r16
+37V13*getMyPosition{35|22R9} 37>28 37|17b13 27l8 27t21
+37i28 id{integer} 37|17b27 21r29
+39V13*readStatus{33P9} 39>25 39>41 39>57 37|30b13 42l8 42t18
+39i25 x{integer} 37|30b25 34r28
+39i41 y{integer} 37|30b41 36r28
+39i57 r{integer} 37|30b57 37r57
+41t9*Field_Printer 37|83b14 89l8 89t21
+43t9*Controller 37|91b14 131l8 131t18
+44Y13 Write 44>19 37|99b23 115l20 115t25
+44r19 mAction{10R9} 37|101r43 102r48 102r82 103r63 106r41 107r41 109r30 109r68
+46Y13 Awaiting 46>22 37|113r30 118b23 126r30 128l20 128t28
+46r22 mAction{10R9} 37|119r62 120r41 121r41 122r30 122r68
+X 37 soccer-controllerpkg.adb
+13A9 Status(36|16R9)<integer> 14r14
+14a4 mStatus{13A9} 20r16 21r13 22r23 33r16 35r28 37r28 38r55 47r16 48r14
+. 48r47 49r20 58m10 109m22 122m22
+18r7 result{35|22R9} 22m13 26r14
+20i11 i{integer} 21r21 22r31
+31p7 result{36|33P9} 38r13 41r14
+33i11 i{integer} 35r36 37r36 38r63
+45V13 HereIsAPlayer{integer} 45b13 45>27 45>43 53l8 53t21 72s21 106s22 120s22
+45i27 x{integer} 48r41 72r35 106r36 120r36
+45i43 y{integer} 48r74 72r43 107r36 121r36
+47i11 i{integer} 48r22 48r55 49r28
+55U14 Initialize 55b14 60l8 60t18 95s7
+57i11 i{integer} 58r18 58r27
+63U14 PrintField 63b14 81l8 81t18 86s10
+65i11 i{integer}
+69i11 y{integer} 72r48
+71i14 x{integer} 72r40
+77i11 i{integer}
+92b7 Released{boolean} 110m22 112m22 117r18 123m22 125m22
+93i7 mUtilityConstraint{35|14I12}
+99r29 mAction{36|10R9}
+118r33 mAction{36|10R9}
+X 38 soccer-controllerpkg-referee.ads
+1K30*Referee 37|6w27 7r26 38|3e33
+X 39 soccer-core_event.ads
+2K16*Core_Event 36|3r13 4r12 39|16e22
+X 40 soccer-core_event-motion_core_event.ads
+4K27*Motion_Core_Event 36|3w24 4r23 40|28e40
+7P9*Motion_Event_Prt(6R9) 36|12r18
+16V13*getPlayer_Id{integer} 37|101R57 109R44 119R76 122R44
+18V13*getTo{35|22R9} 37|102R62 102R96 106R55 107R55 109R82 120R55 121R55
+. 122R82
+X 41 soccer-utils.ads
+1K16*Utils 37|3w13 4r12 41|9e17
+4V13*distance{integer} 37|34s13
+4i22 x1{integer} 37|34r22
+4i39 x2{integer} 37|35r22
+4i56 y1{integer} 37|36r22
+4i73 y2{integer} 37|37r22
 

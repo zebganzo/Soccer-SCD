@@ -1,41 +1,29 @@
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Numerics.Generic_Elementary_Functions;
+
+with Soccer.Utils;
+use Soccer.Utils;
 
 with Soccer.ControllerPkg.Referee;
 use Soccer.ControllerPkg.Referee;
 
+with Ada.Numerics.Generic_Elementary_Functions;
+
 package body Soccer.ControllerPkg is
 
-   type PlayerStatus is
-      record
-         running : Integer := 0;
-         mcell : Cell := new CellType;
-      end record;
-
-   type Status is array (1 .. 1) of PlayerStatus;
+   type Status is array (1 .. Num_Of_Player) of PlayerStatus;
    mStatus : Status;
 
-   package Value_Functions is new Ada.Numerics.Generic_Elementary_Functions (Float);
-   use Value_Functions;
-
-   --+ Distanza tra due punti
-   function distance(x1 : in Integer; x2 : in Integer; y1 : in Integer; y2 : in Integer) return Integer is
-      dx, dy : float;
-   begin
-      dx := float(x1 - x2);
-      dy := float(y1 - y2);
-      return Integer(Sqrt( dx*dx + dy*dy ));
-   end distance;
-
    --+ Ritorna la posizione in base all'id
-   function getMyPosition(id : in Integer) return Cell is
+   function getMyPosition(id : in Integer) return Coordinate is
+      result : Coordinate;
    begin
       for i in mStatus'Range loop
-         if(mStatus(i).mcell.id = id) then
-            return mStatus(i).mcell;
+         if(mStatus(i).id = id) then
+            result := mStatus(i).mCoord;
+            exit;
          end if;
       end loop;
-      return null;
+      return result;
    end getMyPosition;
 
    --+ Ritorna un Vector di Coordinate (id, x, y) dei giocatori di distanza <= a r
@@ -44,10 +32,10 @@ package body Soccer.ControllerPkg is
    begin
       for i in mStatus'Range loop
          if(distance(x1 => x,
-                     x2 => mStatus(i).mcell.coordX,
+                     x2 => mStatus(i).mCoord.coordX,
                      y1 => y,
-                     y2 => mStatus(i).mcell.coordY) <= r) then
-            result.playersInMyZone.Append(New_Item => mStatus(i).mcell);
+                     y2 => mStatus(i).mCoord.coordY) <= r) then
+            result.playersInMyZone.Append(New_Item => mStatus(i));
          end if;
       end loop;
       return result;
@@ -57,71 +45,87 @@ package body Soccer.ControllerPkg is
    function HereIsAPlayer(x : in Integer; y : in Integer) return Integer is
    begin
       for i in mStatus'Range loop
-         if (mStatus(i).mcell.coordX = x and mStatus(i).mcell.coordY = y) then
-            return mStatus(i).mcell.id;
+         if (mStatus(i).mCoord.coordX = x and mStatus(i).mCoord.coordY = y) then
+            return mStatus(i).id;
          end if;
       end loop;
       return 0;
    end HereIsAPlayer;
 
+   procedure Initialize is
+   begin
+      for i in 1 .. Num_Of_Player loop
+         mStatus(i).id := i;
+      end loop;
+   end Initialize;
+
    --+ Stampa del campo
    procedure PrintField is
    begin
-      for i in  1 .. fieldMaxX + 1 loop
+      for i in  1 .. Field_Max_X + 1 loop
          Put("--");
       end loop;
       Put_Line("");
-      for y in reverse 1 .. fieldMaxY loop
+      for y in reverse 1 .. Field_Max_Y loop
          Put("|");
-         for x in 1 .. fieldMaxX loop
+         for x in 1 .. Field_Max_X loop
             Put(I2S(HereIsAPlayer(x => x, y => y)));
          end loop;
          Put("|");
          Put_Line("");
       end loop;
-      for i in  1 .. fieldMaxX + 1 loop
+      for i in  1 .. Field_Max_X + 1 loop
          Put("--");
       end loop;
       Put_Line("");
    end PrintField;
 
+   task body Field_Printer is
+   begin
+      loop
+         PrintField;
+         delay duration (1);
+      end loop;
+   end Field_Printer;
+
    task body Controller is
+      Released : Boolean := False;
       mUtilityConstraint : utilityConstraint := 6;
    begin
-      -- Init dello stato in modo casuale
-      for i in mStatus'Range loop
-         mStatus(i).mcell.id := i;
-         mStatus(i).mcell.coordX := i*4;
-         mStatus(i).mcell.coordY := i*6;
-      end loop;
-
+      Initialize;
       loop
          select
-            accept Write(mAction : in Action) do
-               Put_Line("Action :");
-               Put_Line("- Player : " & I2S(mAction.byWho));
-               Put_Line("- Cell target : " & I2S(mAction.cellTarget.coordX) & I2S(mAction.cellTarget.coordY));
-               Put_Line("- Utility of the action : " & I2S(mAction.utility) & "/10");
+            when True =>
+               accept Write(mAction : in Action) do
+                  Put("Action :");
+                  Put("- Player : " & I2S(mAction.event.getPlayer_Id));
+                  Put("- Cell target : " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
+                  Put_Line("- Utility of the action : " & I2S(mAction.utility) & "/10");
 
-               if(HereIsAPlayer(x => mAction.cellTarget.coordX,
-                                y => mAction.cellTarget.coordY) = 0) then
-                  -- Rilascio la cella da cui parto
-                  mStatus(mAction.byWho).mcell.coordX := mAction.cellTarget.coordX;
-                  mStatus(mAction.byWho).mcell.coordY := mAction.cellTarget.coordY;
-               else
-                  if(mAction.utility > mUtilityConstraint) then
-                     -- A volte vale la pena di aspettare...
-                     requeue Awaiting;
+                  -- Try to satisfy the request
+                  if(HereIsAPlayer(x => mAction.event.getTo.coordX,
+                                   y => mAction.event.getTo.coordY) = 0) then
+                     -- Free position
+                     mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
+                     Released := True;
                   else
-                     -- ...altre no!
-                     Put_Line("Rivedere la mossa!");
+                     Released := False;
+                     requeue Awaiting;
                   end if;
-               end if;
-            end Write;
+               end Write;
          or
-            accept Awaiting (mAction : in Action) do
-               Put_Line("Sono ancora io perbacco!");
-            end Awaiting;
+            when Released =>
+               accept Awaiting (mAction : in Action) do
+                  Put_Line("Sono ancora io perbacco! " & I2S(mAction.event.getPlayer_Id));
+                  if(HereIsAPlayer(x => mAction.event.getTo.coordX,
+                                   y => mAction.event.getTo.coordY) = 0) then
+                     mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
+                     Released := True;
+                  else
+                     Released := False;
+                     requeue Awaiting;
+                  end if;
+               end Awaiting;
          end select;
       end loop;
    end Controller;
