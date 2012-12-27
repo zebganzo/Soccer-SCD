@@ -1,0 +1,23 @@
+with Soccer.Core_Event.Motion_Core_Event;
+
+package Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event is
+
+   type Tackle_Motion_Event is new Motion_Event with private;
+   type Tackle_Motion_Event_Prt is access all Tackle_Motion_Event;
+
+   procedure Initialize (E : in out Tackle_Motion_Event;
+                         nPlayer_Id : in Integer;
+                         nFrom : in Coordinate;
+                         nTo : in Coordinate;
+                         nOther_Player_Id : Integer);
+
+   function getOther_Player_Id (E : in Tackle_Motion_Event) return Integer;
+
+private
+
+   type Tackle_Motion_Event is new Motion_Event with
+      record
+	Other_Player_Id : Integer;
+      end record;
+
+end Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event;
