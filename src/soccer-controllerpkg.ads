@@ -40,10 +40,14 @@ package Soccer.ControllerPkg is
 
    task Field_Printer;
 
+   Num_Of_Zone : Integer := 3;
+
+   type Fields_Zone is new Integer range 1 .. Num_Of_Zone;
+
    task Controller is
       entry Write(mAction : in Action);
    private
-      entry Awaiting(mAction : in Action);
+      entry Awaiting(Fields_Zone)(mAction : in Action);
    end Controller;
 
 end Soccer.ControllerPkg;

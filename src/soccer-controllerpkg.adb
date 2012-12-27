@@ -13,6 +13,8 @@ package body Soccer.ControllerPkg is
    type Status is array (1 .. Num_Of_Player) of PlayerStatus;
    mStatus : Status;
 
+   type Released_Zone is array (1 .. 3) of Boolean;
+
    --+ Ritorna la posizione in base all'id
    function getMyPosition(id : in Integer) return Coordinate is
       result : Coordinate;
@@ -88,14 +90,35 @@ package body Soccer.ControllerPkg is
       end loop;
    end Field_Printer;
 
+   Released : Released_Zone;
+
+   function getZone (coord : Coordinate) return Integer is
+   begin
+      return (Integer(coord.coordX / (Field_Max_X / Num_Of_Zone)) + 1);
+   end getZone;
+
+   procedure Release (coord : Coordinate) is
+   begin
+      Released(getZone(coord => coord)) := True;
+   end Release;
+
+   function Occupy (coord : Coordinate) return Fields_Zone is
+      Zone : Fields_Zone;
+   begin
+      Zone := Fields_Zone(getZone(coord => coord));
+      Released(Integer(Zone)) := False;
+      return Zone;
+   end Occupy;
+
    task body Controller is
-      Released : Boolean := False;
       mUtilityConstraint : utilityConstraint := 6;
+      tmp : Integer;
    begin
       Initialize;
       loop
-         select
-            when True =>
+         for Zone in Fields_Zone'Range loop
+            tmp := Integer(Zone);
+            select
                accept Write(mAction : in Action) do
                   Put("Action :");
                   Put("- Player : " & I2S(mAction.event.getPlayer_Id));
@@ -107,26 +130,25 @@ package body Soccer.ControllerPkg is
                                    y => mAction.event.getTo.coordY) = 0) then
                      -- Free position
                      mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
-                     Released := True;
+                     Release(mAction.event.getFrom);
                   else
-                     Released := False;
-                     requeue Awaiting;
+                     requeue Awaiting(Occupy(mAction.event.getTo));
                   end if;
                end Write;
-         or
-            when Released =>
-               accept Awaiting (mAction : in Action) do
-                  Put_Line("Sono ancora io perbacco! " & I2S(mAction.event.getPlayer_Id));
-                  if(HereIsAPlayer(x => mAction.event.getTo.coordX,
-                                   y => mAction.event.getTo.coordY) = 0) then
-                     mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
-                     Released := True;
-                  else
-                     Released := False;
-                     requeue Awaiting;
-                  end if;
-               end Awaiting;
-         end select;
+            or
+               when Released (Integer(Zone)) = True =>
+                  accept Awaiting (Zone) (mAction : in Action) do
+                     Put_Line(I2S(Integer(Zone)) & " Sono ancora io perbacco! " & I2S(mAction.event.getPlayer_Id));
+                     if(HereIsAPlayer(x => mAction.event.getTo.coordX,
+                                      y => mAction.event.getTo.coordY) = 0) then
+                        mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
+                        Release(mAction.event.getFrom);
+                     else
+                        requeue Awaiting(Occupy(mAction.event.getTo));
+                     end if;
+                  end Awaiting;
+            end select;
+         end loop;
       end loop;
    end Controller;
 

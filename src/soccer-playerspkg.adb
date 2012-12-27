@@ -33,14 +33,13 @@ package body Soccer.PlayersPkg is
       mReadResult : ReadResult;
       mAction : Action;
    begin
-
       Put_Line("Prima " & I2S(Id));
 
---        mTargetCoord := Coordinate'(coordX => Field_Max_X / 2,
---                                    coordY => 1);
+      mTargetCoord := Coordinate'(coordX => Id,--Field_Max_X / 2,
+                                  coordY => 1);
 
-      mTargetCoord := Coordinate'(coordX => Id,
-                                  coordY => 5);
+--        mTargetCoord := Coordinate'(coordX => Id,
+--                                    coordY => 5);
 
       mAction.event := new Move_Event;
       mCoord := ControllerPkg.getMyPosition(id => Id);
@@ -64,8 +63,8 @@ package body Soccer.PlayersPkg is
          --   Put_Line("- " & I2S(mReadResult.playersInMyZone.Element(Index => i).id));
          --end loop;
 
-         Initial_Coord.coordX := mCoord.coordX + 1;
-         Initial_Coord.coordY := mCoord.coordY;
+         --           Initial_Coord.coordX := mCoord.coordX + 1;
+         --           Initial_Coord.coordY := mCoord.coordY;
          mTargetCoord := Utils.getNextCoordinate(myCoord     => mCoord,
                                                  targetCoord => Initial_Coord);
 
@@ -77,7 +76,7 @@ package body Soccer.PlayersPkg is
          mAction.utility := 6;
 
          ControllerPkg.Controller.Write(mAction => mAction);
-         delay duration (Id);
+         delay duration (2);
       end loop;
    end Player;
 end Soccer.PlayersPkg;
