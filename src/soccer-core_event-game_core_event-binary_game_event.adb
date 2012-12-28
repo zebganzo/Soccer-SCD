@@ -3,6 +3,16 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
 
+   procedure Initialize (E : in out Binary_Event;
+                         nEvent_Id : in Binary_Event_Id;
+                         nPlayer_Id_1 : in Integer;
+                         nPlayer_Id_2 : in Integer) is
+   begin
+      E.Event_Id := nEvent_Id;
+      E.Player_Id_1 := nPlayer_Id_1;
+      E.Player_Id_2 := nPlayer_Id_2;
+   end Initialize;
+
    procedure Serialize (E : Binary_Event; Serialized_Obj : out JSON_Value) is
    begin
       Put_Line("binary event");

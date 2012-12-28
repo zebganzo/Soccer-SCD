@@ -1,36 +1,29 @@
 with Ada.Containers.Vectors;
 use Ada.Containers;
+with Soccer.Core_Event.Motion_Core_Event;
+use Soccer.Core_Event.Motion_Core_Event;
 
 package Soccer.ControllerPkg is
 
-   procedure PrintField;
+   -- New Types
 
-   fieldMaxX : Integer := 15;
-   fieldMaxY : Integer := 10;
-   subtype utilityRange is Integer range 1 .. 10;
-   subtype utilityConstraint is utilityRange;
-
-   type CellType is
-      record
-         id : Integer := 0;
-         coordX   : Integer range 1 .. fieldMaxX;
-         coordY   : Integer range 1 .. fieldMaxY;
-      end record;
-
-   type Cell is access CellType;
-
-   function getMyPosition (id : in Integer) return Cell;
-
-   --+ DA COMPLETARE
    type Action is
       record
-         byWho : Integer;
-         cellTarget : Cell;
+         event : Motion_Event_Prt;
          utility : utilityRange;
       end record;
 
+   type PlayerStatus is
+      record
+         id : Integer;
+         running : Boolean := False;
+         on_the_field : Boolean := False;
+         mCoord : Coordinate := Coordinate'(coordX => 0,
+                                            coordY => 0);
+      end record;
+
    package Players_Container is new Vectors (Index_Type   => Natural,
-                                             Element_Type => Cell);
+                                             Element_Type => PlayerStatus);
    use Players_Container;
 
    type ReadResultType is
@@ -38,12 +31,23 @@ package Soccer.ControllerPkg is
          playersInMyZone : Vector;
       end record;
    type ReadResult is access ReadResultType;
+
+   -- Functions, Procedure, ecc...
+
+   function getMyPosition (id : in Integer) return Coordinate;
+
    function readStatus (x : in Integer; y : in Integer; r : in Integer) return ReadResult;
+
+   task Field_Printer;
+
+   Num_Of_Zone : Integer := 3;
+
+   type Fields_Zone is new Integer range 1 .. Num_Of_Zone;
 
    task Controller is
       entry Write(mAction : in Action);
    private
-      entry Awaiting(mAction : in Action);
+      entry Awaiting(Fields_Zone)(mAction : in Action);
    end Controller;
 
 end Soccer.ControllerPkg;

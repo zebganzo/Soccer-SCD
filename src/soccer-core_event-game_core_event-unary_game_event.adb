@@ -3,6 +3,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 
+   procedure Initialize (E : in out Unary_Event; nEvent_Id : in Unary_Event_Id; nPlayer_Id : in Integer) is
+   begin
+      E.Event_Id := nEvent_Id;
+      E.Player_Id := nPlayer_Id;
+   end Initialize;
+
    procedure Serialize (E : Unary_Event; Serialized_Obj : out JSON_Value) is
    begin
       Put_Line("unary event");

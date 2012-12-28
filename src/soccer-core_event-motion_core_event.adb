@@ -3,6 +3,29 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Core_Event.Motion_Core_Event is
 
+   function getPlayer_Id (E : in Motion_Event) return Integer is
+   begin
+      return E.Player_Id;
+   end getPlayer_Id;
+   function getFrom (E : in Motion_Event) return Coordinate is
+   begin
+      return E.From;
+   end getFrom;
+   function getTo (E : in Motion_Event) return Coordinate is
+   begin
+      return E.To;
+   end getTo;
+
+   procedure Initialize (E : in out Motion_Event;
+                         nPlayer_Id : in Integer;
+                         nFrom : in Coordinate;
+                         nTo : in Coordinate) is
+   begin
+      E.Player_Id := nPlayer_Id;
+      E.From := nFrom;
+      E.To := nTo;
+   end Initialize;
+
    procedure Serialize (E : Motion_Event; Serialized_Obj : out JSON_Value) is
    begin
       Put_Line("motion event");
