@@ -10,11 +10,11 @@ W soccer%s		soccer.adb		soccer.ali
 W system.img_int%s	s-imgint.adb		s-imgint.ali
 W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
 
-U soccer%s		soccer.ads		973562d2 EE OO PK
+U soccer%s		soccer.ads		438dabc8 EE OO PK
 
 D ada.ads		20120510125803 3ffc8e18
 D a-unccon.ads		20120510125801 f9eb8f06
-D soccer.ads		20121224185638 973562d2
+D soccer.ads		20121228095036 438dabc8
 D soccer.adb		20121212150231 42accdaf
 D system.ads		20120510125846 eb6e42ba
 D s-imgint.ads		20120510125826 02dbe0c2
@@ -22,11 +22,11 @@ D s-secsta.ads		20120510125833 eea35a36
 D s-stoele.ads		20120510125834 facd7d98
 D s-stoele.adb		20120510125834 afc5dc80
 X 3 soccer.ads
-1K9*Soccer 29l5 29e11 4|1w6 3b14 9l5 9t11
+1K9*Soccer 30l5 30e11 4|1w6 3b14 9l5 9t11
 5V13*I2S{string} 5>18 4|5b13 8l8 8t11
 5i18 Num{integer} 4|5b18 7r28
-7i4*Field_Max_X{positive} 24r40
-8i4*Field_Max_Y{positive} 25r40
+7i4*Field_Max_X{positive} 25r40
+8i4*Field_Max_Y{positive} 26r40
 10I9*rangePower<short_short_integer>
 13I12*utilityRange{integer} 14r33
 14I12*utilityConstraint{13I12}
@@ -36,8 +36,8 @@ X 3 soccer.ads
 20n30*O_352{20E9}
 20n37*B_442{20E9}
 20n44*D_532{20E9}
-22R9*Coordinate 26e17 27r34
-24i10*coordX{integer}
-25i10*coordY{integer}
-27P9*Coordinate_Ptr(22R9)
+23R9*Coordinate 27e17 28r34
+25i10*coordX{integer}
+26i10*coordY{integer}
+28P9*Coordinate_Ptr(23R9)
 

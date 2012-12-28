@@ -5,7 +5,7 @@ A -march=x86-64
 P SS ZX
 R nnnvvnnnnvnnvnnnnnnnnnnvnvnnnnnvnnnnnnnvnnnnvnnnnnnvnnnnnnvnnnnvnnnvnnvnnnnnnnnnnnnnn
 
-U soccer.playerspkg%b	soccer-playerspkg.adb	921bf4d1 OO PK
+U soccer.playerspkg%b	soccer-playerspkg.adb	1637b572 OO PK
 W ada%s			ada.ads			ada.ali
 W ada.calendar.delays%s	a-caldel.adb		a-caldel.ali
 W ada.numerics%s	a-numeri.ads		a-numeri.ali
@@ -23,6 +23,8 @@ W soccer.core_event.motion_core_event.tackle_motion_event%s  soccer-core_event-m
 W soccer.utils%s	soccer-utils.adb	soccer-utils.ali
 W system%s		system.ads		system.ali
 W system.concat_2%s	s-conca2.adb		s-conca2.ali
+W system.concat_6%s	s-conca6.adb		s-conca6.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
 W system.soft_links%s	s-soflin.adb		s-soflin.ali
 W system.storage_elements%s  s-stoele.adb	s-stoele.ali
 W system.storage_pools%s  s-stopoo.adb		s-stopoo.ali
@@ -31,10 +33,9 @@ W system.tasking%s	s-taskin.adb		s-taskin.ali
 W system.tasking.rendezvous%s  s-tasren.adb	s-tasren.ali
 W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
 
-U soccer.playerspkg%s	soccer-playerspkg.ads	ae228441 EE NE OO PK
+U soccer.playerspkg%s	soccer-playerspkg.ads	fe002251 EE NE OO PK
 W ada.real_time%s	a-reatim.adb		a-reatim.ali
 W soccer%s		soccer.adb		soccer.ali
-W soccer.controllerpkg%s  soccer-controllerpkg.adb  soccer-controllerpkg.ali
 W system%s		system.ads		system.ali
 W system.parameters%s	s-parame.adb		s-parame.ali
 W system.task_info%s	s-tasinf.adb		s-tasinf.ali
@@ -72,16 +73,16 @@ D gnatcoll-json.ads	20120411143615 9dd4f3b4
 D interfac.ads		20120510125815 129923ea
 D i-c.ads		20120510125814 5421119b
 D i-cstrea.ads		20120510125814 1bd72c32
-D soccer.ads		20121224185638 973562d2
-D soccer-controllerpkg.ads  20121227105731 adf74233
+D soccer.ads		20121228095036 438dabc8
+D soccer-controllerpkg.ads  20121228091825 adf74233
 D soccer-core_event.ads	20121220084914 dae84186
 D soccer-core_event-motion_core_event.ads  20121222135139 09b2b4c5
-D soccer-core_event-motion_core_event-catch_motion_event.ads  20121220151749 bb8629da
+D soccer-core_event-motion_core_event-catch_motion_event.ads  20121228083549 22237081
 D soccer-core_event-motion_core_event-move_motion_event.ads  20121220094053 f54f7d9e
 D soccer-core_event-motion_core_event-shot_motion_event.ads  20121221094252 d1ad7134
 D soccer-core_event-motion_core_event-tackle_motion_event.ads  20121220163933 2011d0a7
-D soccer-playerspkg.ads	20121221111221 94e0a4a0
-D soccer-playerspkg.adb	20121227130659 880b867f
+D soccer-playerspkg.ads	20121228090353 bd8d8999
+D soccer-playerspkg.adb	20121228095344 bcefb3be
 D soccer-utils.ads	20121221132332 30a17976
 D system.ads		20120510125846 eb6e42ba
 D s-atacco.ads		20120510125819 4c36d12f
@@ -89,6 +90,7 @@ D s-atocou.ads		20120510125819 4a9c6cb4
 D s-atocou.adb		20120510125819 7116b4cf
 D s-conca2.ads		20120510125823 fbd0f2fc
 D s-conca3.ads		20120510125823 762a026a
+D s-conca6.ads		20120510125823 c7caf514
 D s-crtl.ads		20120510125824 ac77b159
 D s-exctab.ads		20120510125824 66e51330
 D s-ficobl.ads		20120510125825 443b9d66
@@ -126,73 +128,75 @@ D s-traent.ads		20120510125838 5221ee41
 D s-unstyp.ads		20120510125838 6ae15c76
 D s-wchcon.ads		20120510125840 bfeb2e3d
 X 1 ada.ads
-16K9*Ada 19e8 41|1r6 2r5 3r6 4r6
+16K9*Ada 19e8 41|1r6 2r5 7r6 8r6
 X 14 a-numeri.ads
-16K13*Numerics 32e17 41|3w10 4r10
+16K13*Numerics 32e17 41|7w10 8r10
 X 15 a-nudira.ads
-44k22*Discrete_Random 73e33 41|4w19
+44k22*Discrete_Random 73e33 41|8w19
 X 24 a-textio.ads
 49K13*Text_IO 471e16 41|1w10 2r9
-263U14*Put_Line 41|36s7 53s7
+263U14*Put_Line 41|40s7 58s7 60s7 65s10 67s10 81s10 91s10
 X 32 soccer.ads
-1K9*Soccer 29e11 40|1r6 2r5 4r9 11r5 41|1r19 2r18 6r6 7r5 9r6 10r5 11r6 12r5
-. 13r6 14r5 15r6 16r5 18r14 82r5
-5V13*I2S{string} 41|36s27 53s26
+1K9*Soccer 30e11 40|1r9 8r5 41|4r6 5r5 10r6 11r5 13r6 14r5 15r6 16r5 17r6
+. 18r5 19r6 20r5 22r14 95r5
+5V13*I2S{string} 41|40s36 58s31 58s58 58s85 60s40 65s40 67s34 67s66 67s93
+. 81s34 81s64 81s97 91s45
 13I12*utilityRange{integer}
-22R9*Coordinate 26e17 41|31r16 32r22 38r23
-24i10*coordX{integer} 41|38m35 57r62
-25i10*coordY{integer} 41|39m35 58r62
-27P9*Coordinate_Ptr(22R9) 40|9r71
+23R9*Coordinate 27e17 41|35r16 36r22 42r23
+25i10*coordX{integer} 41|42m35 58r69 67r77 69r62 81r81
+26i10*coordY{integer} 41|43m35 58r96 67r104 70r62 81r114
+28P9*Coordinate_Ptr(23R9) 40|6r71
 X 33 soccer-controllerpkg.ads
-6K16*ControllerPkg 53e25 40|1w13 2r12 41|1w26 2r25 45r17 51r7 56r20 57r25
-. 78r10
-10R9*Action 14e17 41|34r17
-12p10*event{35|7P9} 41|44m15 46r15 71m18 73r18
-13i10*utility{32|13I12} 41|49m15 76m18
-25K12*Players_Container[9|45] 41|20r8
-33P9*ReadResult(29R9) 41|33r21
-37V13*getMyPosition{32|22R9} 41|45s31 56s34
-37i28 id{integer} 41|45r45 56r48
-39V13*readStatus{33P9} 41|57s39
-39i25 x{integer} 41|57r50
-39i41 y{integer} 41|58r50
-39i57 r{integer} 41|59r50
-47t9*Controller 41|51r21 78r24
-48Y13 Write 41|51s32 78s35
-48r19 mAction{10R9} 41|51r38 78r41
+6K16*ControllerPkg 53e25 41|4w13 5r12 49r17 55r7 66r20 69r25 90r10
+10R9*Action 14e17 41|38r17
+12p10*event{35|7P9} 41|48m15 50r15 83m18 85r18
+13i10*utility{32|13I12} 41|53m15 88m18
+25K12*Players_Container[9|45] 41|24r8
+33P9*ReadResult(29R9) 41|37r21
+37V13*getMyPosition{32|23R9} 41|49s31 66s34
+37i28 id{integer} 41|49r45 66r48
+39V13*readStatus{33P9} 41|69s39
+39i25 x{integer} 41|69r50
+39i41 y{integer} 41|70r50
+39i57 r{integer} 41|71r50
+47t9*Controller 41|55r21 90r24
+48Y13 Write 41|55s32 90s35
+48r19 mAction{10R9} 41|55r38 90r41
 X 34 soccer-core_event.ads
-2K16*Core_Event 16e22 41|9r13 10r12 11r13 12r12 13r13 14r12 15r13 16r12
+2K16*Core_Event 16e22 41|13r13 14r12 15r13 16r12 17r13 18r12 19r13 20r12
 X 35 soccer-core_event-motion_core_event.ads
-4K27*Motion_Core_Event 28e40 41|9r24 10r23 11r24 12r23 13r24 14r23 15r24
-. 16r23
+4K27*Motion_Core_Event 28e40 41|13r24 14r23 15r24 16r23 17r24 18r23 19r24
+. 20r23
 7P9*Motion_Event_Prt(6R9)
-11U14*Initialize 41|46R21 73R24
-12i26 nPlayer_Id{integer} 41|46r32 73r35
-13r26 nFrom{32|22R9} 41|47r32 74r35
-14r26 nTo{32|22R9} 41|48r32 75r35
+11U14*Initialize 41|50R21 85R24
+12i26 nPlayer_Id{integer} 41|50r32 85r35
+13r26 nFrom{32|23R9} 41|51r32 86r35
+14r26 nTo{32|23R9} 41|52r32 87r35
 X 36 soccer-core_event-motion_core_event-catch_motion_event.ads
-3K45*Catch_Motion_Event 12e59 41|9w42 10r41
+3K45*Catch_Motion_Event 12e59 41|13w42 14r41
 X 37 soccer-core_event-motion_core_event-move_motion_event.ads
-3K45*Move_Motion_Event 12e58 41|11w42 12r41
-5R9*Move_Event<35|6R9> 10e56 41|44r28 71r31
+3K45*Move_Motion_Event 12e58 41|15w42 16r41
+5R9*Move_Event<35|6R9> 10e56 41|48r28 83r31
 X 38 soccer-core_event-motion_core_event-shot_motion_event.ads
-3K45*Shot_Motion_Event 21e58 41|13w42 14r41
+3K45*Shot_Motion_Event 21e58 41|17w42 18r41
 X 39 soccer-core_event-motion_core_event-tackle_motion_event.ads
-3K45*Tackle_Motion_Event 23e60 41|15w42 16r41
+3K45*Tackle_Motion_Event 23e60 41|19w42 20r41
 X 40 soccer-playerspkg.ads
-4K16*PlayersPkg 32|1k9 40|11l12 11e22 41|18b21 82l12 82t22
-9T14*Player 9d22 9d36 9d55 41|30b14 81l8 81t14
-9i22 Id{integer} 41|36r31 38r45 45r51 46r46 53r30 56r54 73r49
-9i36 Ability{integer} 41|59r55
-9p55 Initial_Coord{32|27P9} 41|69r65
+1K16*PlayersPkg 32|1k9 40|8l12 8e22 41|22b21 95l12 95t22
+6T14*Player 6d22 6d36 6d55 41|34b14 94l8 94t14
+6i22 Id{integer} 41|40r40 42r45 49r51 50r46 58r35 60r44 65r44 66r54 67r38
+. 81r38 85r49 91r49
+6i36 Ability{integer} 41|71r55
+6p55 Initial_Coord{32|28P9} 41|79r65
 X 41 soccer-playerspkg.adb
-31r7 mCoord{32|22R9} 45m7 47r46 56m10 57r55 58r55 68r65 74r49
-32r7 mTargetCoord{32|22R9} 38m7 48r46 68m10 75r49
-33p7 mReadResult{33|33P9} 57m10
-34r7 mAction{33|10R9} 44m7 46r7 49m7 51r49 71m10 73r10 76m10 78r52
+35r7 mCoord{32|23R9} 49m7 51r46 58r62 58r89 66m10 67r70 67r97 69r55 70r55
+. 78r65 86r49
+36r7 mTargetCoord{32|23R9} 42m7 52r46 78m10 81r68 81r101 87r49
+37p7 mReadResult{33|33P9} 69m10
+38r7 mAction{33|10R9} 48m7 50r7 53m7 55r49 83m10 85r10 88m10 90r52
 X 42 soccer-utils.ads
-1K16*Utils 41|6w13 7r12 68r26 42|9e17
-7V13*getNextCoordinate{32|22R9} 41|68s32
-7r32 myCoord{32|22R9} 41|68r50
-7p54 targetCoord{32|27P9} 41|69r50
+1K16*Utils 41|10w13 11r12 78r26 42|9e17
+7V13*getNextCoordinate{32|23R9} 41|78s32
+7r32 myCoord{32|23R9} 41|78r50
+7p54 targetCoord{32|28P9} 41|79r50
 

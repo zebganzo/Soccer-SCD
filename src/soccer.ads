@@ -13,12 +13,13 @@ package Soccer is
    subtype utilityRange is Integer range 1 .. 10;
    subtype utilityConstraint is utilityRange;
 
-   Num_Of_Player : Positive := 6;
+   Num_Of_Player : Positive := 7;
 
    agent_movement_id : Integer := 0;
 
    type Formation_Scheme is (O_352, B_442, D_532);
 
+   -- Includo la coordinata 0,0 per simulare la panchina
    type Coordinate is
       record
          coordX   : Integer range 0 .. Field_Max_X;

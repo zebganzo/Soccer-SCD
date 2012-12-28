@@ -3,8 +3,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Soccer.Utils;
 use Soccer.Utils;
 
-with Soccer.ControllerPkg.Referee;
-use Soccer.ControllerPkg.Referee;
+--  with Soccer.ControllerPkg.Referee;
+--  use Soccer.ControllerPkg.Referee;
 
 with Ada.Numerics.Generic_Elementary_Functions;
 
@@ -13,7 +13,7 @@ package body Soccer.ControllerPkg is
    type Status is array (1 .. Num_Of_Player) of PlayerStatus;
    mStatus : Status;
 
-   type Released_Zone is array (1 .. 3) of Boolean;
+   type Released_Zone is array (1 .. Num_Of_Zone) of Boolean;
 
    --+ Ritorna la posizione in base all'id
    function getMyPosition(id : in Integer) return Coordinate is
@@ -54,6 +54,7 @@ package body Soccer.ControllerPkg is
       return 0;
    end HereIsAPlayer;
 
+   --+ Inizializza l'array Status con l'id di ogni giocatore
    procedure Initialize is
    begin
       for i in 1 .. Num_Of_Player loop
@@ -112,12 +113,10 @@ package body Soccer.ControllerPkg is
 
    task body Controller is
       mUtilityConstraint : utilityConstraint := 6;
-      tmp : Integer;
    begin
       Initialize;
       loop
          for Zone in Fields_Zone'Range loop
-            tmp := Integer(Zone);
             select
                accept Write(mAction : in Action) do
                   Put("Action :");
@@ -132,6 +131,8 @@ package body Soccer.ControllerPkg is
                      mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
                      Release(mAction.event.getFrom);
                   else
+                     Put_Line("Giocatore " & I2S(mAction.event.getPlayer_Id) & " bloccato dal giocatore " & I2S(HereIsAPlayer(x => mAction.event.getTo.coordX,
+                                                                                                                              y => mAction.event.getTo.coordY)) & " alle coordinate " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
                      requeue Awaiting(Occupy(mAction.event.getTo));
                   end if;
                end Write;
@@ -144,6 +145,8 @@ package body Soccer.ControllerPkg is
                         mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
                         Release(mAction.event.getFrom);
                      else
+                        Put_Line("Giocatore " & I2S(mAction.event.getPlayer_Id) & " bloccato dal giocatore " & I2S(HereIsAPlayer(x => mAction.event.getTo.coordX,
+                                                                                                                              y => mAction.event.getTo.coordY)) & " alle coordinate " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
                         requeue Awaiting(Occupy(mAction.event.getTo));
                      end if;
                   end Awaiting;

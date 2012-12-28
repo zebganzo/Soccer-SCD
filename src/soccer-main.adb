@@ -1,8 +1,8 @@
-with Soccer.ControllerPkg, Soccer.PlayersPkg;
-use Soccer.ControllerPkg, Soccer.PlayersPkg;
+with Soccer.PlayersPkg;
+use Soccer.PlayersPkg;
 
-with Soccer.OtherEntiry;
-use Soccer.OtherEntiry;
+with Soccer.ControllerPkg;
+use Soccer.ControllerPkg;
 
 with Soccer.Bridge;
 use Soccer.Bridge;
@@ -28,7 +28,7 @@ procedure Soccer.Main is
    FiveCoord : Coordinate_Ptr := new Coordinate'(coordX => 2,
                                                  coordY => 3);
    SixCoord : Coordinate_Ptr := new Coordinate'(coordX => 3,
-                                                coordY => 14);
+                                                coordY => 9);
    SevenCoord : Coordinate_Ptr := new Coordinate'(coordX => 1,
                                                   coordY => 6);
    One   : Player (Id    => 1, Ability => 4, Initial_Coord => OneCoord);

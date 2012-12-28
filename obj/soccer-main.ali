@@ -6,7 +6,7 @@ A -march=x86-64
 P SS ZX
 R nnnvnnnnnnnnnnnnnnnnnnnnnvnnnnnvnnnnnnnnnnnnvnnnnvnvnnnnnnvnnnnvnnnnnnvnnnnnnnv1+nnnnnn
 
-U soccer.main%b		soccer-main.adb		41993428 NE OO SU
+U soccer.main%b		soccer-main.adb		f5414850 NE OO SU
 W ada%s			ada.ads			ada.ali
 W ada.tags%s		a-tags.adb		a-tags.ali
 W ada.text_io%s		a-textio.adb		a-textio.ali
@@ -18,7 +18,6 @@ W soccer.core_event.game_core_event%s  soccer-core_event-game_core_event.ads  so
 W soccer.core_event.game_core_event.binary_game_event%s  soccer-core_event-game_core_event-binary_game_event.adb  soccer-core_event-game_core_event-binary_game_event.ali
 W soccer.core_event.game_core_event.match_game_event%s  soccer-core_event-game_core_event-match_game_event.adb  soccer-core_event-game_core_event-match_game_event.ali
 W soccer.core_event.game_core_event.unary_game_event%s  soccer-core_event-game_core_event-unary_game_event.adb  soccer-core_event-game_core_event-unary_game_event.ali
-W soccer.otherentiry%s	soccer-otherentiry.adb	soccer-otherentiry.ali
 W soccer.playerspkg%s	soccer-playerspkg.adb	soccer-playerspkg.ali
 W system.soft_links%s	s-soflin.adb		s-soflin.ali
 W system.tasking%s	s-taskin.adb		s-taskin.ali
@@ -50,27 +49,26 @@ D gnatcoll-json.ads	20120411143615 9dd4f3b4
 D interfac.ads		20120510125815 129923ea
 D i-c.ads		20120510125814 5421119b
 D i-cstrea.ads		20120510125814 1bd72c32
-D soccer.ads		20121224185638 973562d2
+D soccer.ads		20121228095036 438dabc8
 D soccer-bridge.ads	20121220162724 231c41df
-D soccer-controllerpkg.ads  20121227105731 adf74233
+D soccer-controllerpkg.ads  20121228091825 adf74233
 D soccer-core_event.ads	20121220084914 dae84186
 D soccer-core_event-game_core_event.ads  20121220104219 d7cbcda1
 D soccer-core_event-game_core_event-binary_game_event.ads  20121220145028 06cef385
 D soccer-core_event-game_core_event-match_game_event.ads  20121220144858 bc4b07d1
 D soccer-core_event-game_core_event-unary_game_event.ads  20121220144705 61db2698
 D soccer-core_event-motion_core_event.ads  20121222135139 09b2b4c5
-D soccer-core_event-motion_core_event-catch_motion_event.ads  20121220151749 bb8629da
+D soccer-core_event-motion_core_event-catch_motion_event.ads  20121228083549 22237081
 D soccer-core_event-motion_core_event-move_motion_event.ads  20121220094053 f54f7d9e
 D soccer-core_event-motion_core_event-shot_motion_event.ads  20121221094252 d1ad7134
 D soccer-core_event-motion_core_event-tackle_motion_event.ads  20121220163933 2011d0a7
 D soccer-field_event.ads  20121218173244 0796cd08
-D soccer-main.adb	20121227130748 d4cb0ad5
-D soccer-main.adb	20121227130748 d4cb0ad5
+D soccer-main.adb	20121228095329 fffca4bb
+D soccer-main.adb	20121228095329 fffca4bb
 D soccer-manager_event.ads  20121218173004 b16f76ad
 D soccer-manager_event-formation.ads  20121218171244 730f64af
 D soccer-manager_event-substitution.ads  20121218172211 bf48ac01
-D soccer-otherentiry.ads  20121224203117 b682ff2f
-D soccer-playerspkg.ads	20121221111221 94e0a4a0
+D soccer-playerspkg.ads	20121228090353 bd8d8999
 D system.ads		20120510125846 eb6e42ba
 D s-atacco.ads		20120510125819 4c36d12f
 D s-atocou.ads		20120510125819 4a9c6cb4
@@ -114,16 +112,16 @@ X 1 ada.ads
 X 19 a-textio.ads
 49K13*Text_IO 471e16 42|11w10 11r27
 X 27 soccer.ads
-1K9*Soccer 29e11 42|1r6 1r28 2r5 2r27 4r6 5r5 7r6 8r5 12r6 12r63 13r6 13r62
-. 14r6 14r62 15r6 15r29 18r11 43r5
-22R9*Coordinate 26e17 42|20r37 22r37 24r39 26r38 28r38 30r37 32r39
-24i10*coordX{integer} 42|20m49 22m49 24m51 26m50 28m50 30m49 32m51
-25i10*coordY{integer} 42|21m49 23m49 25m51 27m50 29m50 31m49 33m51
-27P9*Coordinate_Ptr(22R9) 42|20r15 22r15 24r17 26r16 28r16 30r15 32r17
+1K9*Soccer 30e11 42|1r6 2r5 4r6 5r5 7r6 8r5 12r6 12r63 13r6 13r62 14r6 14r62
+. 15r6 15r29 18r11 43r5
+23R9*Coordinate 27e17 42|20r37 22r37 24r39 26r38 28r38 30r37 32r39
+25i10*coordX{integer} 42|20m49 22m49 24m51 26m50 28m50 30m49 32m51
+26i10*coordY{integer} 42|21m49 23m49 25m51 27m50 29m50 31m49 33m51
+28P9*Coordinate_Ptr(23R9) 42|20r15 22r15 24r17 26r16 28r16 30r15 32r17
 X 28 soccer-bridge.ads
 24K16*Bridge 30e18 42|7w13 8r12
 X 29 soccer-controllerpkg.ads
-6K16*ControllerPkg 53e25 42|1w13 2r12
+6K16*ControllerPkg 53e25 42|4w13 5r12
 X 30 soccer-core_event.ads
 2K16*Core_Event 16e22 42|12r13 12r70 13r13 13r69 14r13 14r69 15w13 15r36
 X 31 soccer-core_event-game_core_event.ads
@@ -136,23 +134,21 @@ X 34 soccer-core_event-game_core_event-unary_game_event.ads
 4K43*Unary_Game_Event 21e55 42|13w40 13r96
 X 42 soccer-main.adb
 18U18*Main 27|1k9 42|18b18 43l12 43t16
-20p4 OneCoord{27|27P9} 34r63
-22p4 TwoCoord{27|27P9} 35r63
-24p4 ThreeCoord{27|27P9} 36r63
-26p4 FourCoord{27|27P9} 37r62
-28p4 FiveCoord{27|27P9} 38r62
-30p4 SixCoord{27|27P9} 39r61
-32p4 SevenCoord{27|27P9} 40r63
-34t4 One{47|9T14}
-35t4 Two{47|9T14}
-36t4 Three{47|9T14}
-37t4 Four{47|9T14}
-38t4 Five{47|9T14}
-39t4 Six{47|9T14}
-40t4 Seven{47|9T14}
-X 46 soccer-otherentiry.ads
-1K16*OtherEntiry 42|4w13 5r12 46|8e23
-X 47 soccer-playerspkg.ads
-4K16*PlayersPkg 42|1w35 2r34 47|11e22
-9T14*Player 42|34r12 35r12 36r12 37r11 38r11 39r10 40r12
+20p4 OneCoord{27|28P9} 34r63
+22p4 TwoCoord{27|28P9} 35r63
+24p4 ThreeCoord{27|28P9} 36r63
+26p4 FourCoord{27|28P9} 37r62
+28p4 FiveCoord{27|28P9} 38r62
+30p4 SixCoord{27|28P9} 39r61
+32p4 SevenCoord{27|28P9} 40r63
+34t4 One{46|6T14}
+35t4 Two{46|6T14}
+36t4 Three{46|6T14}
+37t4 Four{46|6T14}
+38t4 Five{46|6T14}
+39t4 Six{46|6T14}
+40t4 Seven{46|6T14}
+X 46 soccer-playerspkg.ads
+1K16*PlayersPkg 42|1w13 2r12 46|8e22
+6T14*Player 42|34r12 35r12 36r12 37r11 38r11 39r10 40r12
 

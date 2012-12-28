@@ -1,5 +1,9 @@
-with Ada.Text_IO, Soccer.ControllerPkg;
-use Ada.Text_IO, Soccer.ControllerPkg;
+with Ada.Text_IO;
+use Ada.Text_IO;
+
+with Soccer.ControllerPkg;
+use Soccer.ControllerPkg;
+
 with Ada.Numerics;
 with Ada.Numerics.Discrete_Random;
 
@@ -33,7 +37,7 @@ package body Soccer.PlayersPkg is
       mReadResult : ReadResult;
       mAction : Action;
    begin
-      Put_Line("Prima " & I2S(Id));
+--        Put_Line("Init giocatore " & I2S(Id));
 
       mTargetCoord := Coordinate'(coordX => Id,--Field_Max_X / 2,
                                   coordY => 1);
@@ -50,10 +54,18 @@ package body Soccer.PlayersPkg is
 
       ControllerPkg.Controller.Write(mAction => mAction);
 
-      Put_Line("Dopo " & I2S(Id));
+--        mCoord := ControllerPkg.getMyPosition(id => Id);
+--        Put_Line("Giocatore " & I2S(Id) & " Coordinate " & I2S(mCoord.coordX) & "," & I2S(mCoord.coordY));
+--
+--        Put_Line("End Init giocatore " & I2S(Id));
+
+      delay duration(5);
 
       loop
+--           Put_Line("Turno giocatore " & I2S(Id));
          mCoord := ControllerPkg.getMyPosition(id => Id);
+--           Put_Line("Giocatore " & I2S(Id) & " Coordinate From " & I2S(mCoord.coordX) & "," & I2S(mCoord.coordY));
+
          mReadResult := ControllerPkg.readStatus(x => mCoord.coordX,
                                                  y => mCoord.coordY,
                                                  r => ability);
@@ -63,10 +75,10 @@ package body Soccer.PlayersPkg is
          --   Put_Line("- " & I2S(mReadResult.playersInMyZone.Element(Index => i).id));
          --end loop;
 
-         --           Initial_Coord.coordX := mCoord.coordX + 1;
-         --           Initial_Coord.coordY := mCoord.coordY;
          mTargetCoord := Utils.getNextCoordinate(myCoord     => mCoord,
                                                  targetCoord => Initial_Coord);
+
+--           Put_Line("Giocatore " & I2S(Id) & " Coordinate To " & I2S(mTargetCoord.coordX) & "," & I2S(mTargetCoord.coordY));
 
          mAction.event := new Move_Event;
 
@@ -76,6 +88,7 @@ package body Soccer.PlayersPkg is
          mAction.utility := 6;
 
          ControllerPkg.Controller.Write(mAction => mAction);
+--           Put_Line("Fine turno giocatore " & I2S(Id));
          delay duration (2);
       end loop;
    end Player;
