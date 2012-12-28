@@ -32,6 +32,9 @@ begin
 
    Soccer.Server.WebServer.Start;
 
+--     delay 10.0;
+--     Soccer.Server.WebServer.PublishFieldUpdate;
+
    --Core_Event.Print(E => arr(1).all);
    --Core_Event.Print(E => arr(2).all);
    --Core_Event.Print(E => arr(3).all);
