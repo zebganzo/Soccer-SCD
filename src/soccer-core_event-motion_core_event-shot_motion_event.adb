@@ -6,7 +6,7 @@ package body Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event is
                          nPlayer_Id : in Integer;
                          nFrom : in Coordinate;
                          nTo : in Coordinate;
-                         nShot_Power : rangePower) is
+                         nShot_Power : Power_Range) is
    begin
       E.Player_Id := nPlayer_Id;
       E.From := nFrom;

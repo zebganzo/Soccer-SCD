@@ -3,35 +3,44 @@ A -gnatA
 A -mtune=generic
 A -march=x86-64
 P SS ZX
-R nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnvnnnnnnnnnnnnnnnnnnnnnvnnnvnnvnnnnnnnnnnnnnn
+R nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnvnnvnnnnnnnnnnnnnnnnnnvnnnvnnvnnnnnnnnnnnnnn
 
 U soccer%b		soccer.adb		42accdaf NE OO PK
 W soccer%s		soccer.adb		soccer.ali
 W system.img_int%s	s-imgint.adb		s-imgint.ali
 W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
 
-U soccer%s		soccer.ads		20f0f27d EE OO PK
+U soccer%s		soccer.ads		8e289217 EE OO PK
 
 D ada.ads		20120510125803 3ffc8e18
 D a-unccon.ads		20120510125801 f9eb8f06
-D soccer.ads		20121220083905 20f0f27d
-D soccer.adb		20121218092956 42accdaf
+D soccer.ads		20121229083737 8e289217
+D soccer.adb		20121228140027 42accdaf
 D system.ads		20120510125846 eb6e42ba
 D s-imgint.ads		20120510125826 02dbe0c2
 D s-secsta.ads		20120510125833 eea35a36
 D s-stoele.ads		20120510125834 facd7d98
 D s-stoele.adb		20120510125834 afc5dc80
 X 3 soccer.ads
-1K9*Soccer 16l5 16e11 4|1w6 3b14 9l5 9t11
-3V13*I2S{string} 3>18 4|5b13 8l8 8t11
-3i18 Num{integer} 4|5b18 7r28
-5i4*fieldMaxX{integer} 12r40
-6i4*fieldMaxY{integer} 13r40
-8E9*Formation_Scheme 8e50
-8n30*O_352{8E9}
-8n37*B_442{8E9}
-8n44*D_532{8E9}
-10R9*Coordinate 14e17
-12i10*coordX{integer}
-13i10*coordY{integer}
+1K9*Soccer 35l5 35e11 4|1w6 3b14 9l5 9t11
+5V13*I2S{string} 5>18 4|5b13 8l8 8t11
+5i18 Num{integer} 4|5b18 7r28
+7i4*Field_Max_X{positive} 30r40
+8i4*Field_Max_Y{positive} 31r40
+10i4*Buffer_Dim{positive}
+12i4*Send_Buffer_Delay{integer}
+14I9*Power_Range<short_short_integer>
+17I12*Utility_Range{integer} 18r34
+18I12*Utility_Constraint{17I12} 19r25
+19i4*mUtilityConstraint{18I12}
+21i4*Num_Of_Player{positive}
+23i4*agent_movement_id{integer}
+25E9*Formation_Scheme 25e50
+25n30*O_352{25E9}
+25n37*B_442{25E9}
+25n44*D_532{25E9}
+28R9*Coordinate 32e17 33r34
+30i10*coordX{integer}
+31i10*coordY{integer}
+33P9*Coordinate_Ptr(28R9)
 

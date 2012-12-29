@@ -7,11 +7,16 @@ package Soccer is
    Field_Max_X : Positive := 15;
    Field_Max_Y : Positive := 10;
 
-   type rangePower is range 1 .. 10;
+   Buffer_Dim : Positive := 10;
+
+   Send_Buffer_Delay : Integer := 1;
+
+   type Power_Range is range 1 .. 10;
 
    --+ Utility di una mossa x/10
-   subtype utilityRange is Integer range 1 .. 10;
-   subtype utilityConstraint is utilityRange;
+   subtype Utility_Range is Integer range 1 .. 10;
+   subtype Utility_Constraint is Utility_Range;
+   mUtilityConstraint : Utility_Constraint := 2;
 
    Num_Of_Player : Positive := 7;
 

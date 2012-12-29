@@ -1,9 +1,11 @@
 package Soccer.Utils is
 
    --+ Distanza tra due punti
-   function distance(x1 : in Integer; x2 : in Integer; y1 : in Integer; y2 : in Integer) return Integer;
+   function Distance(x1 : in Integer; x2 : in Integer; y1 : in Integer; y2 : in Integer) return Integer;
 
    --+ Coordinate della prossima cella date le mie coordinate attuali e quelle della cella target
-   function getNextCoordinate (myCoord : Coordinate; targetCoord : Coordinate_Ptr) return Coordinate;
+   function Get_Next_Coordinate (myCoord : Coordinate; targetCoord : Coordinate) return Coordinate;
+
+   function Get_Ball_Delay (power : Power_Range) return duration;
 
 end Soccer.Utils;

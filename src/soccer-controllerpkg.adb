@@ -33,7 +33,7 @@ package body Soccer.ControllerPkg is
       result : ReadResult := new ReadResultType;
    begin
       for i in mStatus'Range loop
-         if(distance(x1 => x,
+         if(Distance(x1 => x,
                      x2 => mStatus(i).mCoord.coordX,
                      y1 => y,
                      y2 => mStatus(i).mCoord.coordY) <= r) then
@@ -112,13 +112,13 @@ package body Soccer.ControllerPkg is
    end Occupy;
 
    task body Controller is
-      mUtilityConstraint : utilityConstraint := 6;
+      mUtilityConstraint : Utility_Constraint := 6;
    begin
       Initialize;
       loop
          for Zone in Fields_Zone'Range loop
             select
-               accept Write(mAction : in Action) do
+               accept Write (mAction : in out Action) do
                   Put("Action :");
                   Put("- Player : " & I2S(mAction.event.getPlayer_Id));
                   Put("- Cell target : " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
@@ -133,12 +133,17 @@ package body Soccer.ControllerPkg is
                   else
                      Put_Line("Giocatore " & I2S(mAction.event.getPlayer_Id) & " bloccato dal giocatore " & I2S(HereIsAPlayer(x => mAction.event.getTo.coordX,
                                                                                                                               y => mAction.event.getTo.coordY)) & " alle coordinate " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
-                     requeue Awaiting(Occupy(mAction.event.getTo));
+                     if(mAction.utility > mUtilityConstraint) then
+                        mAction.utility := mAction.utility - 1;
+                        requeue Awaiting(Occupy(mAction.event.getTo));
+                     else
+                        Put_Line("Mossa da rivedere");
+                     end if;
                   end if;
                end Write;
             or
                when Released (Integer(Zone)) = True =>
-                  accept Awaiting (Zone) (mAction : in Action) do
+                  accept Awaiting (Zone) (mAction : in out Action) do
                      Put_Line(I2S(Integer(Zone)) & " Sono ancora io perbacco! " & I2S(mAction.event.getPlayer_Id));
                      if(HereIsAPlayer(x => mAction.event.getTo.coordX,
                                       y => mAction.event.getTo.coordY) = 0) then
@@ -146,8 +151,13 @@ package body Soccer.ControllerPkg is
                         Release(mAction.event.getFrom);
                      else
                         Put_Line("Giocatore " & I2S(mAction.event.getPlayer_Id) & " bloccato dal giocatore " & I2S(HereIsAPlayer(x => mAction.event.getTo.coordX,
-                                                                                                                              y => mAction.event.getTo.coordY)) & " alle coordinate " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
-                        requeue Awaiting(Occupy(mAction.event.getTo));
+                                                                                                                                 y => mAction.event.getTo.coordY)) & " alle coordinate " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
+                        if(mAction.utility > mUtilityConstraint) then
+                           mAction.utility := mAction.utility - 1;
+                           requeue Awaiting(Occupy(mAction.event.getTo));
+                        else
+                           Put_Line("Mossa da rivedere");
+                        end if;
                      end if;
                   end Awaiting;
             end select;

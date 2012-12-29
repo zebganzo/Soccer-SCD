@@ -2,10 +2,12 @@ with Soccer.PlayersPkg;
 use Soccer.PlayersPkg;
 
 with Soccer.ControllerPkg;
-use Soccer.ControllerPkg;
 
-with Soccer.Bridge;
-use Soccer.Bridge;
+with Soccer.BallPkg;
+with Soccer.Motion_AgentPkg;
+
+with Soccer.Bridge.Output;
+use Soccer.Bridge.Output;
 
 with Soccer.Server;
 with Soccer.Server.WebServer;
@@ -34,13 +36,13 @@ procedure Soccer.Main is
                                                 coordY => 9);
    SevenCoord : Coordinate_Ptr := new Coordinate'(coordX => 1,
                                                   coordY => 6);
-   One   : Player (Id    => 1, Ability => 4, Initial_Coord => OneCoord);
-   Two   : Player (Id    => 2, Ability => 2, Initial_Coord => TwoCoord);
-   Three : Player (Id    => 3, Ability => 5, Initial_Coord => ThreeCoord);
-   Four : Player (Id    => 4, Ability => 6, Initial_Coord => FourCoord);
-   Five : Player (Id    => 5, Ability => 4, Initial_Coord => FiveCoord);
-   Six : Player (Id    => 6, Ability => 3, Initial_Coord => SixCoord);
-   Seven : Player (Id    => 7, Ability => 3, Initial_Coord => SevenCoord);
+   One   : Player (Id    => 1, Ability => 4, Initial_Coord_X => 5, Initial_Coord_Y => 5);
+   Two   : Player (Id    => 2, Ability => 2, Initial_Coord_X => 14, Initial_Coord_Y => 9);
+   Three : Player (Id    => 3, Ability => 5, Initial_Coord_X => 12, Initial_Coord_Y => 3);
+   Four : Player (Id    => 4, Ability => 6, Initial_Coord_X => 10, Initial_Coord_Y => 7);
+   Five : Player (Id    => 5, Ability => 4, Initial_Coord_X => 2, Initial_Coord_Y => 3);
+   Six : Player (Id    => 6, Ability => 3, Initial_Coord_X => 3, Initial_Coord_Y => 9);
+   Seven : Player (Id    => 7, Ability => 3, Initial_Coord_X => 1, Initial_Coord_Y => 6);
 begin
 
    Soccer.Server.WebServer.Start;
