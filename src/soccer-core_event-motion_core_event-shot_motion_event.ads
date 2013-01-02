@@ -9,13 +9,13 @@ package Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event is
                          nPlayer_Id : in Integer;
                          nFrom : in Coordinate;
                          nTo : in Coordinate;
-                         nShot_Power : rangePower);
+                         nShot_Power : Power_Range);
 
 private
 
    type Shot_Motion_Event is new Motion_Event with
       record
-         Shot_Power : rangePower;
+         Shot_Power : Power_Range;
       end record;
 
 end Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event;

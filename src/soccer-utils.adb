@@ -7,15 +7,15 @@ package body Soccer.Utils is
    use Value_Functions;
 
    --+ Distanza tra due punti
-   function distance(x1 : in Integer; x2 : in Integer; y1 : in Integer; y2 : in Integer) return Integer is
+   function Distance(x1 : in Integer; x2 : in Integer; y1 : in Integer; y2 : in Integer) return Integer is
       dx, dy : float;
    begin
       dx := float(x1 - x2);
       dy := float(y1 - y2);
       return Integer(Sqrt( dx*dx + dy*dy ));
-   end distance;
+   end Distance;
 
-   function getNextCoordinate (myCoord : Coordinate; targetCoord : Coordinate_Ptr) return Coordinate is
+   function Get_Next_Coordinate (myCoord : Coordinate; targetCoord : Coordinate) return Coordinate is
       myX : Integer := myCoord.coordX;
       myY : Integer := myCoord.coordY;
       tarX : Integer := targetCoord.coordX;
@@ -39,6 +39,11 @@ package body Soccer.Utils is
       else return Coordinate'(coordX => myX,
                               coordY => myY+1); -- sopra (myX = tarX and myY < tarY)
       end if;
-   end getNextCoordinate;
+   end Get_Next_Coordinate;
+
+   function Get_Ball_Delay (power : Power_Range) return duration is
+   begin
+      return duration(Power_Range'Last - power);
+   end Get_Ball_Delay;
 
 end Soccer.Utils;

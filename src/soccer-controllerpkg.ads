@@ -10,7 +10,7 @@ package Soccer.ControllerPkg is
    type Action is
       record
          event : Motion_Event_Prt;
-         utility : utilityRange;
+         utility : Utility_Range;
       end record;
 
    type PlayerStatus is
@@ -20,6 +20,7 @@ package Soccer.ControllerPkg is
          on_the_field : Boolean := False;
          mCoord : Coordinate := Coordinate'(coordX => 0,
                                             coordY => 0);
+         ball_holder : Boolean := False;
       end record;
 
    package Players_Container is new Vectors (Index_Type   => Natural,
@@ -45,9 +46,9 @@ package Soccer.ControllerPkg is
    type Fields_Zone is new Integer range 1 .. Num_Of_Zone;
 
    task Controller is
-      entry Write(mAction : in Action);
+      entry Write(mAction : in out Action);
    private
-      entry Awaiting(Fields_Zone)(mAction : in Action);
+      entry Awaiting(Fields_Zone)(mAction : in out Action);
    end Controller;
 
 end Soccer.ControllerPkg;

@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Field_Event is
 
-   procedure Deserialize (E : out Field_Event; Serialized_Obj : in JSON_Value) is
+   procedure Deserialize (E : out Event; Serialized_Obj : in JSON_Value) is
    begin
       Put_Line("Field_Event event");
 

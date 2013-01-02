@@ -3,12 +3,12 @@ package Soccer.Field_Event is
 
    type Field_Type_Id is (a,b);
 
-   type Field_Event is
+   type Event is
       record
          Type_Id : Field_Type_Id;
       end record;
-   type Field_Event_Ptr is access all Field_Event;
+   type Field_Event_Ptr is access all Event;
 
-   procedure Deserialize (E : out Field_Event; Serialized_Obj : in JSON_Value);
+   procedure Deserialize (E : out Event; Serialized_Obj : in JSON_Value);
 
 end Soccer.Field_Event;

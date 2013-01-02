@@ -36,10 +36,12 @@ package body Soccer.PlayersPkg is
       mTargetCoord : Coordinate;
       mReadResult : ReadResult;
       mAction : Action;
+      Initial_Coord : Coordinate := Coordinate'(coordX => Initial_Coord_X,
+                                                  coordY => Initial_Coord_Y);
    begin
 --        Put_Line("Init giocatore " & I2S(Id));
 
-      mTargetCoord := Coordinate'(coordX => Id,--Field_Max_X / 2,
+      mTargetCoord := Coordinate'(coordX => Field_Max_X / 2,
                                   coordY => 1);
 
 --        mTargetCoord := Coordinate'(coordX => Id,
@@ -75,8 +77,8 @@ package body Soccer.PlayersPkg is
          --   Put_Line("- " & I2S(mReadResult.playersInMyZone.Element(Index => i).id));
          --end loop;
 
-         mTargetCoord := Utils.getNextCoordinate(myCoord     => mCoord,
-                                                 targetCoord => Initial_Coord);
+         mTargetCoord := Utils.Get_Next_Coordinate(myCoord     => mCoord,
+                                                   targetCoord => Initial_Coord);
 
 --           Put_Line("Giocatore " & I2S(Id) & " Coordinate To " & I2S(mTargetCoord.coordX) & "," & I2S(mTargetCoord.coordY));
 
