@@ -1,7 +1,4 @@
-
-
 package Soccer.Bridge.Output is
-
 
    protected Timer_Control is
       procedure Start;

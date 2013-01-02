@@ -11,6 +11,7 @@ with AWS.Response;
 with AWS.Status;
 with Ada;
 with Ada.Text_IO;
+with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 package Soccer.Server.WebServer is
 
@@ -38,10 +39,10 @@ package Soccer.Server.WebServer is
 
    -- Updates both managers
 
-   procedure PublishManagerUpdate ;
+   procedure PublishManagersUpdate (events : JSON_Array);
 
    -- Updates the field
 
-   procedure PublishFieldUpdate ;
+   procedure PublishFieldUpdate (events : JSON_Array);
 
 end Soccer.Server.WebServer;

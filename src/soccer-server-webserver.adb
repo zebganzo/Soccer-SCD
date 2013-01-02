@@ -23,14 +23,20 @@ package body Soccer.Server.WebServer is
 
    end Start;
 
-   procedure PublishManagerUpdate is
+   procedure PublishManagersUpdate (events : JSON_Array) is
+      container : JSON_Value := Create_Object;
    begin
-      Net.WebSocket.Registry.Send(ManagerHome, "i'm da manager");
-   end PublishManagerUpdate;
+      container.Set_Field (Field_Name => "events",
+			   Field      => events);
+      Net.WebSocket.Registry.Send(ManagerHome, Write (Item => container));
+   end PublishManagersUpdate;
 
-   procedure PublishFieldUpdate is
+   procedure PublishFieldUpdate (events : JSON_Array) is
+      container : JSON_Value := Create_Object;
    begin
-      Net.WebSocket.Registry.Send(Field, "i'm da field");
+      container.Set_Field (Field_Name => "events",
+			   Field      => events);
+      Net.WebSocket.Registry.Send(Field, Write (Item => container));
    end PublishFieldUpdate;
 
 end Soccer.Server.WebServer;

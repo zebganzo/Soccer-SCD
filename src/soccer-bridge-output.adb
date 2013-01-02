@@ -1,3 +1,5 @@
+with Soccer.Server.WebServer;
+use Soccer.Server.WebServer;
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
 
@@ -46,24 +48,25 @@ package body Soccer.Bridge.Output is
 
       procedure Send is
          j_value : JSON_Value;
-         j_array_field : JSON_Array;
-         j_array_statistic : JSON_Array;
+         field_events : JSON_Array;
+         manager_events : JSON_Array;
       begin
 
          for event in 1 .. size loop
             event_buffer(event).Serialize(j_value);
-            GNATCOLL.JSON.Append(Arr => j_array_field,
+            GNATCOLL.JSON.Append(Arr => field_events,
                                  Val => j_value);
             if event_buffer(event).all in Game_Event'Class then
-               GNATCOLL.JSON.Append(Arr => j_array_statistic,
+               GNATCOLL.JSON.Append(Arr => manager_events,
                                     Val => j_value);
             end if;
-         end loop;
+	 end loop;
+
          size := 0;
 
          -- Server
-         Soccer.Server.WebServer.PublishManagerUpdate; -- TODO aggiornare
-         Soccer.Server.WebServer.PublishFieldUpdate; -- TODO aggiornare
+         Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
+         Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
 
       end Send;
    end Buffer_Wrapper;

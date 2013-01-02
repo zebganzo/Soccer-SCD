@@ -7,6 +7,8 @@ use Soccer.Utils;
 --  use Soccer.ControllerPkg.Referee;
 
 with Ada.Numerics.Generic_Elementary_Functions;
+with Soccer.Bridge.Output; use Soccer.Bridge.Output;
+with Soccer.Manager_Event; use Soccer.Manager_Event;
 
 package body Soccer.ControllerPkg is
 
@@ -113,6 +115,7 @@ package body Soccer.ControllerPkg is
 
    task body Controller is
       mUtilityConstraint : Utility_Constraint := 6;
+      event_pointer : Core_Event.Event_Ptr;
    begin
       Initialize;
       loop
@@ -128,7 +131,9 @@ package body Soccer.ControllerPkg is
                   if(HereIsAPlayer(x => mAction.event.getTo.coordX,
                                    y => mAction.event.getTo.coordY) = 0) then
                      -- Free position
-                     mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
+		     mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
+		     event_pointer := Core_Event.Event_Ptr (mAction.event);
+		     Buffer_Wrapper.Put (new_event => event_pointer);
                      Release(mAction.event.getFrom);
                   else
                      Put_Line("Giocatore " & I2S(mAction.event.getPlayer_Id) & " bloccato dal giocatore " & I2S(HereIsAPlayer(x => mAction.event.getTo.coordX,
@@ -147,7 +152,9 @@ package body Soccer.ControllerPkg is
                      Put_Line(I2S(Integer(Zone)) & " Sono ancora io perbacco! " & I2S(mAction.event.getPlayer_Id));
                      if(HereIsAPlayer(x => mAction.event.getTo.coordX,
                                       y => mAction.event.getTo.coordY) = 0) then
-                        mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
+			mStatus(mAction.event.getPlayer_Id).mCoord := mAction.event.getTo;
+			event_pointer := Core_Event.Event_Ptr (mAction.event);
+			Buffer_Wrapper.Put (new_event => event_pointer);
                         Release(mAction.event.getFrom);
                      else
                         Put_Line("Giocatore " & I2S(mAction.event.getPlayer_Id) & " bloccato dal giocatore " & I2S(HereIsAPlayer(x => mAction.event.getTo.coordX,
