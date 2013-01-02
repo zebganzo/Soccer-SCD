@@ -1,0 +1,103 @@
+V "GNAT Lib v2012"
+A -gnatA
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+R nnnnnnnnnnnnvnnnnnnnnnnnnnvnnnnnnnnnnnnnnvnnvnnnnnnnnnnnnnnnnnnvnnnvnnvnnnnnnnnnnnnnn
+
+U soccer.core_event.motion_core_event.tackle_motion_event%b  soccer-core_event-motion_core_event-tackle_motion_event.adb  922ed5f7 NE OO PK
+W soccer%s		soccer.adb		soccer.ali
+W soccer.core_event%s	soccer-core_event.ads	soccer-core_event.ali
+W soccer.core_event.motion_core_event%s  soccer-core_event-motion_core_event.adb  soccer-core_event-motion_core_event.ali
+W soccer.core_event.motion_core_event.tackle_motion_event%s  soccer-core_event-motion_core_event-tackle_motion_event.adb  soccer-core_event-motion_core_event-tackle_motion_event.ali
+
+U soccer.core_event.motion_core_event.tackle_motion_event%s  soccer-core_event-motion_core_event-tackle_motion_event.ads  2011d0a7 EE OO PF PK
+W ada.exceptions%s	a-except.adb		a-except.ali
+W ada.streams%s		a-stream.ads		a-stream.ali
+W ada.tags%s		a-tags.adb		a-tags.ali
+W soccer%s		soccer.adb		soccer.ali
+W soccer.core_event%s	soccer-core_event.ads	soccer-core_event.ali
+W soccer.core_event.motion_core_event%s  soccer-core_event-motion_core_event.adb  soccer-core_event-motion_core_event.ali
+W system%s		system.ads		system.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+W system.storage_elements%s  s-stoele.adb	s-stoele.ali
+W system.stream_attributes%s  s-stratt.adb	s-stratt.ali
+
+D ada.ads		20120510125803 3ffc8e18
+D a-charac.ads		20120510125749 2d3ec45b
+D a-chlat1.ads		20120510125749 2825df20
+D a-contai.ads		20120510125751 61e5e089
+D a-cohata.ads		20120510125750 04abccc5
+D a-cihama.ads		20120510125749 fe25b351
+D a-convec.ads		20120510125751 0aaf3975
+D a-except.ads		20120510125752 ec1b44c1
+D a-finali.ads		20120510125753 52ecdc1b
+D a-iteint.ads		20120510125754 7c7305e9
+D a-stream.ads		20120510125756 2ca4ee37
+D a-string.ads		20120510125757 90ac6797
+D a-strhas.ads		20120510125757 0fca75f9
+D a-strmap.ads		20120510125757 9cb836fb
+D a-strunb.ads		20120510125757 3f91d4c5
+D a-tags.ads		20120510125759 6c0509d0
+D a-unccon.ads		20120510125801 f9eb8f06
+D a-uncdea.ads		20120510125801 f15a5ed1
+D gnatcoll.ads		20111220093209 6a5da479
+D gnatcoll-json.ads	20120411143615 9dd4f3b4
+D soccer.ads		20121228101635 438dabc8
+D soccer-core_event.ads	20121220083905 dae84186
+D soccer-core_event-motion_core_event.ads  20121228101635 09b2b4c5
+D soccer-core_event-motion_core_event-tackle_motion_event.ads  20121228101635 2011d0a7
+D soccer-core_event-motion_core_event-tackle_motion_event.adb  20121228101635 922ed5f7
+D system.ads		20120510125846 eb6e42ba
+D s-atocou.ads		20120510125819 4a9c6cb4
+D s-atocou.adb		20120510125819 7116b4cf
+D s-exctab.ads		20120510125824 66e51330
+D s-finmas.ads		20120510125825 b95bb341
+D s-finroo.ads		20120510125825 4ff27390
+D s-parame.ads		20120510125832 b6e20cc0
+D s-pooglo.ads		20120510125832 542f33d0
+D s-secsta.ads		20120510125833 eea35a36
+D s-soflin.ads		20120510125833 24c8153c
+D s-stache.ads		20120510125834 596fc1b4
+D s-stalib.ads		20120510125834 f78bcf95
+D s-stoele.ads		20120510125834 facd7d98
+D s-stoele.adb		20120510125834 afc5dc80
+D s-stopoo.ads		20120510125834 7b8fbeee
+D s-stposu.ads		20120510125834 197be7e5
+D s-stratt.ads		20120510125834 aedef97e
+D s-string.ads		20120510125834 46b01415
+D s-ststop.ads		20120510125834 ee472be4
+D s-traent.ads		20120510125838 5221ee41
+D s-unstyp.ads		20120510125838 6ae15c76
+X 21 soccer.ads
+1K9*Soccer 30e11 24|1r6 3r9 23r5 25|1r6 3r14 22r5
+23R9*Coordinate 27e17 24|10r37 11r35 25|12r37 13r35
+X 22 soccer-core_event.ads
+2K16*Core_Event 21|1k9 22|16e22 24|1r13 3r16 23r12 25|1r13 3r21 22r12
+X 23 soccer-core_event-motion_core_event.ads
+4K27*Motion_Core_Event 22|2k16 23|28e40 24|1w24 3r27 23r23 25|1r24 3r32 22r23
+6R9*Motion_Event<22|4R9> 26e14 24|5r36 18r36
+9U14*Serialize<22|7p14>
+11U14*Initialize
+16V13*getPlayer_Id{integer}
+17V13*getFrom{21|23R9}
+18V13*getTo{21|23R9}
+23i7*Player_Id{integer} 25|16m9
+24r7*From{21|23R9} 25|17m9
+25r7*To{21|23R9} 25|18m9
+X 24 soccer-core_event-motion_core_event-tackle_motion_event.ads
+3K45*Tackle_Motion_Event 23|4k27 24|23l41 23e60 25|1w42 3b50 22l41 22t60
+5R9*Tackle_Motion_Event<23|6R9> 23|9P14 11p14 16p13 17p13 18p13 24|6r47 8p14
+. 8r37 14p13 14r40 18c9 21e17 25|5r40 10r37
+6P9*Tackle_Motion_Event_Prt(5R9)
+8U14*Initialize 8=26 9>26 10>26 11>26 12>26 25|10b14 20l8 20t18
+8r26 E{5R9} 25|10b26 16m7 17m7 18m7 19m7
+9i26 nPlayer_Id{integer} 25|11b26 16r22
+10r26 nFrom{21|23R9} 25|12b26 17r17
+11r26 nTo{21|23R9} 25|13b26 18r15
+12i26 nOther_Player_Id{integer} 25|14b26 19r28
+14V13*getOther_Player_Id{integer} 14>33 25|5b13 8l8 8t26
+14r33 E{5R9} 25|5b33 7r14
+20i9 Other_Player_Id{integer} 25|7r16 19m9
+

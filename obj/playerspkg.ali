@@ -1,0 +1,154 @@
+V "GNAT Lib v2012"
+A -gnatA
+P SS ZX
+R nnnvvnnnnvnnnnnnnnnnnvnvnvnnnnnvnnnnnnnvnnnnvnnnnnnvnnnnnnvnnnnvnnnvnnvnnnnnnnnnnnnnn
+
+U playerspkg%b		playerspkg.adb		548b5b73 OO PK
+W ada%s			ada.ads			ada.ali
+W ada.calendar.delays%s	a-caldel.adb		a-caldel.ali
+W ada.numerics%s	a-numeri.ads		a-numeri.ali
+W ada.numerics.discrete_random%s
+W ada.tags%s		a-tags.adb		a-tags.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W controllerpkg%s	controllerpkg.adb	controllerpkg.ali
+Z system%s		system.ads		system.ali
+W system.concat_2%s	s-conca2.adb		s-conca2.ali
+Z system.random_numbers%s  s-rannum.adb		s-rannum.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
+
+U playerspkg%s		playerspkg.ads		f62adc1d EE NE OO PK
+W ada.real_time%s	a-reatim.adb		a-reatim.ali
+W controllerpkg%s	controllerpkg.adb	controllerpkg.ali
+W system%s		system.ads		system.ali
+W system.parameters%s	s-parame.adb		s-parame.ali
+W system.task_info%s	s-tasinf.adb		s-tasinf.ali
+W system.tasking%s	s-taskin.adb		s-taskin.ali
+W system.tasking.stages%s  s-tassta.adb		s-tassta.ali
+
+D ada.ads		20120510125803 3ffc8e18
+D a-calend.ads		20120510125748 d86d6c8c
+D a-caldel.ads		20120510125748 9f20b83d
+D a-contai.ads		20120510125751 61e5e089
+D a-convec.ads		20120510125751 0aaf3975
+D a-except.ads		20120510125752 ec1b44c1
+D a-finali.ads		20120510125753 52ecdc1b
+D a-ioexce.ads		20120510125753 8b9de6cd
+D a-iteint.ads		20120510125754 7c7305e9
+D a-numeri.ads		20120510125755 bb51c45a
+D a-nudira.ads		20120510125755 2fef2912
+D a-nudira.adb		20120510125755 e57ce22b
+D a-reatim.ads		20120510125755 63f07669
+D a-stream.ads		20120510125756 2ca4ee37
+D a-tags.ads		20120510125759 6c0509d0
+D a-textio.ads		20120510125800 386df5d4
+D a-unccon.ads		20120510125801 f9eb8f06
+D controllerpkg.ads	20121210124538 f1169db3
+D interfac.ads		20120510125815 129923ea
+D i-c.ads		20120510125814 5421119b
+D i-cstrea.ads		20120510125814 1bd72c32
+D playerspkg.ads	20121206171531 073c41ae
+D playerspkg.adb	20121210145059 0e729ff2
+D system.ads		20120510125846 eb6e42ba
+D s-atacco.ads		20120510125819 4c36d12f
+D s-conca2.ads		20120510125823 fbd0f2fc
+D s-crtl.ads		20120510125824 ac77b159
+D s-exctab.ads		20120510125824 66e51330
+D s-ficobl.ads		20120510125825 443b9d66
+D s-finmas.ads		20120510125825 b95bb341
+D s-finroo.ads		20120510125825 4ff27390
+D s-imguns.ads		20120510125826 9ff43cf7
+D s-linux.ads		20120510125827 70c7cb45
+D s-multip.ads		20120510125828 38ac9f73
+D s-oscons.ads		20120511153426 9012934c
+D s-osinte.ads		20120510125829 938b6b03
+D s-parame.ads		20120510125832 b6e20cc0
+D s-pooglo.ads		20120510125832 542f33d0
+D s-rannum.ads		20120510125832 5eb33f0a
+D s-rannum.adb		20120510125832 eb980280
+D s-ransee.ads		20120510125832 01a57b33
+D s-secsta.ads		20120510125833 eea35a36
+D s-soflin.ads		20120510125833 24c8153c
+D s-stache.ads		20120510125834 596fc1b4
+D s-stausa.ads		20120510125834 017a0a05
+D s-stalib.ads		20120510125834 f78bcf95
+D s-stoele.ads		20120510125834 facd7d98
+D s-stoele.adb		20120510125834 afc5dc80
+D s-stopoo.ads		20120510125834 7b8fbeee
+D s-stposu.ads		20120510125834 197be7e5
+D s-stratt.ads		20120510125834 aedef97e
+D s-tasinf.ads		20120510125835 21316953
+D s-taspri.ads		20120510125836 15f617a8
+D s-taprop.ads		20120510125835 1dd2e1b6
+D s-taskin.ads		20120510125836 5e24fb30
+D s-tassta.ads		20120510125836 3a253871
+D s-traent.ads		20120510125838 5221ee41
+D s-unstyp.ads		20120510125838 6ae15c76
+D s-valuns.ads		20120510125839 10a8ed3b
+D s-wchcon.ads		20120510125840 bfeb2e3d
+X 1 ada.ads
+16K9*Ada 19e8 23|1r6 2r5 3r6 4r6 19r31
+X 5 a-convec.ads
+49I12*Extended_Index{integer}
+55R9*Vector
+113V13*Element{18|22P9} 23|31s61[18|34]
+115i7 Index{integer} 23|31r69[18|34]
+283V13*First_Index{integer} 23|30s47[18|34]
+289V13*Last_Index{49I12[18|34]} 23|30s90[18|34]
+X 10 a-numeri.ads
+16K13*Numerics 32e17 23|3w10 4r10 19r35
+X 11 a-nudira.ads
+44k22*Discrete_Random 73e33 23|4w19 19r44
+48R9 Generator 23|20r24[19] 21r24[19]
+50V13 Random{23|18I12} 23|35s58[19] 36s58[19]
+53U14 Reset<39|91p14> 23|33s19[19] 34s19[19]
+X 12 a-nudira.adb
+51V16 Random[39|74]{23|18I12} 40|390b13[23|19]
+X 16 a-textio.ads
+49K13*Text_IO 471e16 23|1w10 2r9
+263U14*Put_Line 23|25s10 31s13
+X 18 controllerpkg.ads
+4K9*ControllerPkg 51e18 22|1w6 2r5 23|1w19 2r18 26r19 27r25
+7V13*I2S{string} 23|25s29 31s29
+12I12*utilityRange{integer}
+15R9*CellType 20e17 23|23r33
+17i10*id{integer} 23|31r81
+18i10*coordX{integer} 23|27r61 35m16 35r32 38m29 38r45
+19i10*coordY{integer} 23|28r61 36m16 36r32 39m29 39r45
+22P9*Cell(15R9) 23|13r15
+24V13*getMyPosition{22P9} 23|26s33
+24i28 id{integer} 23|26r47
+27R9*Action 32e17 23|16r17
+29i10*byWho{integer} 23|37m18
+30p10*cellTarget{22P9} 23|23m15 38r18 39r18
+31i10*utility{12I12} 23|40m18
+34K12*Players_Container[5|45] 23|8r8
+40r10*playersInMyZone{5|55R9[34]} 23|30r31 30r74 31r45
+42P9*ReadResult(38R9) 23|14r21
+43V13*readStatus{42P9} 23|27s39
+43i25 x{integer} 23|27r50
+43i41 y{integer} 23|28r50
+43i57 r{integer} 23|29r50
+X 19 interfac.ads
+61M9*Unsigned_32
+64M9*Unsigned_64
+X 22 playerspkg.ads
+4K9*PlayersPkg 11l5 11e15 23|6b14 44l5 44t15
+9T14*Player 9d22 9d36 23|12b14 43l8 43t14
+9i22 Id{integer} 23|25r33 26r53 37r27
+9i36 Ability{integer} 23|29r55
+X 23 playerspkg.adb
+13p7 mCell{18|22P9} 26m10 27r55 28r55 35m10 35r10 35r26 36m10 36r10 36r26
+. 38r39 39r39
+14p7 mReadResult{18|42P9} 27m10 30r19 30r62 31r33
+16r7 mAction{18|27R9} 23m7 37m10 38m10 38r10 39m10 39r10 40m10
+18I12 Rand_Range<short_short_integer> 19r60
+19K15 Rand_Int[11|44] 20r15 21r15 33r10 34r10 35r49 36r49
+20r7 seedX{11|48R9[19]} 33r25 35r65
+21r7 seedY{11|48R9[19]} 34r25 36r65
+30i14 i{integer} 31r78
+X 39 s-rannum.ads
+66V13*Random{19|61M9} 40|219i21
+67V13*Random{19|64M9} 40|219i21
+

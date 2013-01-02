@@ -1,0 +1,225 @@
+V "GNAT Lib v2012"
+A -gnatA
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+R nnnnnnnnnnnvvnnnnnvnnvnnnvvnnnnvnnvnnnnnnnnnvnnnnnnnnnnnnnnnnnnvnnnvnnvnnnnnnnnnnnnnn
+
+U soccer.server.websockets%b  soccer-server-websockets.adb  d4ff77a8 NE OO PK
+W ada%s			ada.ads			ada.ali
+W ada.exceptions%s	a-except.adb		a-except.ali
+W ada.tags%s		a-tags.adb		a-tags.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W soccer.server%s	soccer-server.ads	soccer-server.ali
+W system%s		system.ads		system.ali
+W system.concat_2%s	s-conca2.adb		s-conca2.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+
+U soccer.server.websockets%s  soccer-server-websockets.ads  6b3ea130 EE OO PF PK
+W ada%s			ada.ads			ada.ali
+W ada.exceptions%s	a-except.adb		a-except.ali
+W ada.streams%s		a-stream.ads		a-stream.ali
+W ada.tags%s		a-tags.adb		a-tags.ali
+W aws%s			aws.ads			aws.ali
+W aws.net%s		aws-net.adb		aws-net.ali
+W aws.net.log%s		aws-net-log.adb		aws-net-log.ali
+W aws.net.websocket%s	aws-net-websocket.adb	aws-net-websocket.ali
+W aws.response%s	aws-response.adb	aws-response.ali
+W aws.status%s		aws-status.adb		aws-status.ali
+W soccer.server%s	soccer-server.ads	soccer-server.ali
+W system%s		system.ads		system.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+W system.standard_library%s  s-stalib.adb	s-stalib.ali
+W system.storage_elements%s  s-stoele.adb	s-stoele.ali
+
+D ada.ads		20120510125803 3ffc8e18
+D a-calend.ads		20120510125748 d86d6c8c
+D a-charac.ads		20120510125749 2d3ec45b
+D a-chlat1.ads		20120510125749 2825df20
+D a-contai.ads		20120510125751 61e5e089
+D a-cohata.ads		20120510125750 04abccc5
+D a-cihama.ads		20120510125749 fe25b351
+D a-cihase.ads		20120510125750 5854d9a8
+D a-ciorma.ads		20120510125750 048a007f
+D a-coinve.ads		20120510125750 a66bf662
+D a-crbltr.ads		20120510125751 b8a2dc05
+D a-convec.ads		20120510125751 0aaf3975
+D a-direct.ads		20120510125751 9d42e46d
+D a-envvar.ads		20120510125752 0a4572ed
+D a-except.ads		20120510125752 ec1b44c1
+D a-finali.ads		20120510125753 52ecdc1b
+D a-ioexce.ads		20120510125753 8b9de6cd
+D a-iteint.ads		20120510125754 7c7305e9
+D a-reatim.ads		20120510125755 63f07669
+D a-stream.ads		20120510125756 2ca4ee37
+D a-string.ads		20120510125757 90ac6797
+D a-strhas.ads		20120510125757 0fca75f9
+D a-strmap.ads		20120510125757 9cb836fb
+D a-strunb.ads		20120510125757 3f91d4c5
+D a-tags.ads		20120510125759 6c0509d0
+D a-taside.ads		20120510125759 a4888134
+D a-textio.ads		20120510125800 386df5d4
+D a-unccon.ads		20120510125801 f9eb8f06
+D a-uncdea.ads		20120510125801 f15a5ed1
+D aws.ads		20121205173852 7408e15f
+D aws-attachments.ads	20121205173852 ba5fe9d1
+D aws-config.ads	20121205173852 cdf5a1d9
+D aws-containers.ads	20121205173852 675acf9b
+D aws-containers-memory_streams.ads  20121205173852 ea28c859
+D aws-containers-string_vectors.ads  20121205173852 b5692847
+D aws-containers-tables.ads  20121205173852 6da3fa4b
+D aws-default.ads	20121205173852 e7c2b00b
+D aws-headers.ads	20121205173852 eae08740
+D aws-messages.ads	20121205173852 99f4dcf7
+D aws-mime.ads		20121205173852 b188039e
+D aws-net.ads		20121205173852 91ca5d80
+D aws-net-log.ads	20121205173852 86a5f580
+D aws-net-websocket.ads	20121205173852 ca03e95d
+D aws-parameters.ads	20121205173852 0f8312c2
+D aws-resources.ads	20121205173852 425d4c31
+D aws-resources-streams.ads  20121205173852 ab2ae19d
+D aws-response.ads	20121205173852 5cac32fb
+D aws-session.ads	20121205173852 84248e6c
+D aws-status.ads	20121205173852 b8979672
+D aws-url.ads		20121205173852 662347fb
+D aws-utils.ads		20121205173852 e14a8da4
+D gnat.ads		20120510125813 fd2ad2f1
+D g-regexp.ads		20120510125810 691be386
+D interfac.ads		20120510125815 129923ea
+D i-c.ads		20120510125814 5421119b
+D i-cstrea.ads		20120510125814 1bd72c32
+D memory_streams.ads	20121205173852 e7c465d7
+D soccer.ads		20121228101635 438dabc8
+D soccer-server.ads	20121220142027 0864d922
+D soccer-server-websockets.ads  20121220142017 e7632e71
+D soccer-server-websockets.adb  20121220141601 0bf1ac0d
+D system.ads		20120510125846 eb6e42ba
+D s-atacco.ads		20120510125819 4c36d12f
+D s-atocou.ads		20120510125819 4a9c6cb4
+D s-atocou.adb		20120510125819 7116b4cf
+D s-conca2.ads		20120510125823 fbd0f2fc
+D s-crtl.ads		20120510125824 ac77b159
+D s-exctab.ads		20120510125824 66e51330
+D s-ficobl.ads		20120510125825 443b9d66
+D s-finmas.ads		20120510125825 b95bb341
+D s-finroo.ads		20120510125825 4ff27390
+D s-linux.ads		20120510125827 70c7cb45
+D s-multip.ads		20120510125828 38ac9f73
+D s-oscons.ads		20120511153426 9012934c
+D s-osinte.ads		20120510125829 938b6b03
+D s-parame.ads		20120510125832 b6e20cc0
+D s-pooglo.ads		20120510125832 542f33d0
+D s-regexp.ads		20120510125832 9c7d27a7
+D s-secsta.ads		20120510125833 eea35a36
+D s-soflin.ads		20120510125833 24c8153c
+D s-stache.ads		20120510125834 596fc1b4
+D s-stausa.ads		20120510125834 017a0a05
+D s-stalib.ads		20120510125834 f78bcf95
+D s-stoele.ads		20120510125834 facd7d98
+D s-stoele.adb		20120510125834 afc5dc80
+D s-stopoo.ads		20120510125834 7b8fbeee
+D s-stposu.ads		20120510125834 197be7e5
+D s-stratt.ads		20120510125834 aedef97e
+D s-string.ads		20120510125834 46b01415
+D s-ststop.ads		20120510125834 ee472be4
+D s-tasinf.ads		20120510125835 21316953
+D s-taspri.ads		20120510125836 15f617a8
+D s-taprop.ads		20120510125835 1dd2e1b6
+D s-taskin.ads		20120510125836 5e24fb30
+D s-taprob.ads		20120510125835 502249e3
+D s-tpoben.ads		20120510125837 20b7a89e
+D s-tassta.ads		20120510125836 3a253871
+D s-traent.ads		20120510125838 5221ee41
+D s-unstyp.ads		20120510125838 6ae15c76
+D s-wchcon.ads		20120510125840 bfeb2e3d
+D templates_parser.ads	20121205173908 180bb9f3
+D templates_parser-utils.ads  20121205173908 422575f2
+D templates_parser_tasking.ads  20121205173908 4c0209f0
+D zlib.ads		20121205173852 3a05091e
+X 1 ada.ads
+16K9*Ada 19e8 60|1r6 61|1r6 13r7
+X 20 a-stream.ads
+36K13*Streams 69e16 60|1w10
+44I9*Stream_Element_Offset<long_integer>
+48I12*Stream_Element_Count{44I9}
+X 27 a-textio.ads
+49K13*Text_IO 471e16 61|1w10 13r11
+263U14*Put_Line 61|13s19
+X 30 aws.ads
+30K9*AWS 41e8 60|3r6 4r6 5r6 7r6 10r8 12r23
+X 41 aws-net.ads
+41K13*Net 445e12 60|3r10 7r10 12r27 15r17 16r37 20r23 61|10r17 11r37 14r22
+. 15r25
+52P9*Socket_Access(51R9) 60|15r21 61|10r21
+56I12*FD_Type{integer}
+192y13*Get_Addr{string} 61|13R60
+198V13*Is_Any_Address{boolean}
+202V13*Is_IPv6{boolean}
+234U14*Set_Blocking_Mode
+239U14*Set_Timeout
+243U14*Set_No_Delay
+269V13*Is_Timeout{boolean}
+278V13*Is_Peer_Closed{boolean}
+284V13*To_FD_Set<59R9>
+432U25 Initialize<16|51p14>
+433U25 Adjust<16|52p14>
+434U25 Finalize<16|53p14>
+X 42 aws-net-log.ads
+39K17*Log 100e16 60|3w14
+X 43 aws-net-websocket.ads
+36K17*WebSocket 256e22 60|7w14 12r31 16r41 20r27 61|11r41 14r26 15r29
+38R9*Object<41|51R9> 177e14 60|12r41 16r51 20r37 61|11r51 14r36
+67V13*Create<38R9> 61|15s39
+74U14*On_Message
+82U14*On_Open
+85U14*On_Close
+88U14*On_Error
+91U14*Send
+98V13*Kind{43E9}
+101V13*Protocol_Version{natural}
+104V13*URI{string}
+107V13*Origin{string}
+111V13*Error{47E9}
+118U25*Shutdown<41|132p14>
+123V24*Get_FD{41|56I12}<41|183p13>
+126V24*Peer_Addr{string}<41|186p13>
+129V24*Peer_Port{positive}<41|189p13>
+132V24*Get_Addr{string}<41|192p13>
+135V24*Get_Port{positive}<41|195p13>
+138V24*Errno{integer}<41|266p13>
+141V24*Get_Send_Buffer_Size{natural}<41|224p13>
+145V24*Get_Receive_Buffer_Size{natural}<41|229p13>
+182U25 Send<41|150p14>
+187U25 Receive<41|160p14>
+194U25 Bind<41|92p14>
+201U25 Listen<41|103p14>
+204U25 Accept_Socket<41|107p14>
+207U25 Connect<41|116p14>
+214U25 Socket_Pair<41|129p14>
+216V24 Pending{20|48I12}<41|174p13>
+219V24 Is_Listening{boolean}<41|204p13>
+221U25 Set_Send_Buffer_Size<41|214p14>
+224U25 Set_Receive_Buffer_Size<41|219p14>
+227U25 Free<41|356p14>
+X 47 aws-response.ads
+48K13*Response 422e17 60|4w10
+X 49 aws-status.ads
+48K13*Status 425e15 60|5w10 16r17 61|11r17
+50R9*Data 423e14 60|16r24 61|11r24
+X 58 soccer.ads
+1K9*Soccer 30e11 60|9r9 22r5 61|3r14 18r5
+X 59 soccer-server.ads
+2K16*Server 58|1k9 59|7e18 60|9r16 22r12 61|3r21 18r12
+X 60 soccer-server-websockets.ads
+9K23*WebSockets 59|2k16 60|22l19 22e29 61|3b28 18l19 18t29
+12R9*Object<43|38R9> 41|198p13 202p13 234p14 239p14 243p14 269p13 278p13
+. 284p13 432P25 433P25 434P25 43|74p14 82p14 85p14 88p14 91p14 98p13 101p13
+. 104p13 107p13 111p13 118P25 123P24 126P24 129P24 132P24 135P24 138P24 141P24
+. 145P24 182P25 187P25 194P25 201P25 204P25 207P25 214P25 216P24 219P24 221P25
+. 224P25 227P25 60|20c9 20e60 61|14r14
+14V13*Create<43|38R9> 15>7 16>7 61|9b13 16l8 16t14
+15p7 Socket{41|52P9} 61|10b7 13r53 15r47
+16r7 Request{49|50R9} 61|11b7 15r55
+

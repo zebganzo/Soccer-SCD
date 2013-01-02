@@ -1,0 +1,285 @@
+V "GNAT Lib v2012"
+A -gnatA
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+R nnnnnnnnnnnnnnnvnnvnnvnnvvvnnvnnnnvnnnnnnvnnvnnnnnnnnvnnnnvnnvnvnnnnvnvnnnnnnnnnnnnnn
+
+U soccer.server.callbacks%b  soccer-server-callbacks.adb  66f6a412 NE OO PK
+W ada%s			ada.ads			ada.ali
+W ada.direct_io%s
+W ada.directories%s	a-direct.adb		a-direct.ali
+W ada.exceptions%s	a-except.adb		a-except.ali
+Z ada.io_exceptions%s	a-ioexce.ads		a-ioexce.ali
+W ada.strings%s		a-string.ads		a-string.ali
+W ada.strings.unbounded%s  a-strunb.adb		a-strunb.ali
+W ada.tags%s		a-tags.adb		a-tags.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+Z ada.unchecked_conversion%s
+W aws%s			aws.ads			aws.ali
+W aws.containers%s	aws-containers.ads	aws-containers.ali
+W aws.containers.tables%s  aws-containers-tables.adb  aws-containers-tables.ali
+W aws.messages%s	aws-messages.adb	aws-messages.ali
+W aws.mime%s		aws-mime.adb		aws-mime.ali
+W aws.parameters%s	aws-parameters.adb	aws-parameters.ali
+W aws.url%s		aws-url.adb		aws-url.ali
+W gnatcoll%s		gnatcoll.ads		gnatcoll.ali
+W gnatcoll.json%s	gnatcoll-json.adb	gnatcoll-json.ali
+W interfaces%s		interfac.ads		interfac.ali
+Z interfaces.c_streams%s  i-cstrea.adb		i-cstrea.ali
+W soccer%s		soccer.adb		soccer.ali
+W soccer.server%s	soccer-server.ads	soccer-server.ali
+W soccer.server.callbacks%s  soccer-server-callbacks.adb  soccer-server-callbacks.ali
+Z system%s		system.ads		system.ali
+W system.concat_2%s	s-conca2.adb		s-conca2.ali
+W system.concat_3%s	s-conca3.adb		s-conca3.ali
+Z system.crtl%s		s-crtl.ads		s-crtl.ali
+Z system.direct_io%s	s-direio.adb		s-direio.ali
+Z system.file_control_block%s  s-ficobl.ads	s-ficobl.ali
+Z system.file_io%s	s-fileio.adb		s-fileio.ali
+W system.img_bool%s	s-imgboo.adb		s-imgboo.ali
+W system.img_int%s	s-imgint.adb		s-imgint.ali
+W system.img_real%s	s-imgrea.adb		s-imgrea.ali
+W system.secondary_stack%s  s-secsta.adb	s-secsta.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+W system.standard_library%s  s-stalib.adb	s-stalib.ali
+Z system.storage_elements%s  s-stoele.adb	s-stoele.ali
+
+U soccer.server.callbacks%s  soccer-server-callbacks.ads  211b757c EE NE OO PK
+W aws%s			aws.ads			aws.ali
+W aws.response%s	aws-response.adb	aws-response.ali
+W aws.status%s		aws-status.adb		aws-status.ali
+W gnatcoll%s		gnatcoll.ads		gnatcoll.ali
+W gnatcoll.json%s	gnatcoll-json.adb	gnatcoll-json.ali
+W soccer.server%s	soccer-server.ads	soccer-server.ali
+
+D ada.ads		20120510125803 3ffc8e18
+D a-calend.ads		20120510125748 d86d6c8c
+D a-charac.ads		20120510125749 2d3ec45b
+D a-chlat1.ads		20120510125749 2825df20
+D a-contai.ads		20120510125751 61e5e089
+D a-cohata.ads		20120510125750 04abccc5
+D a-cihama.ads		20120510125749 fe25b351
+D a-cihase.ads		20120510125750 5854d9a8
+D a-ciorma.ads		20120510125750 048a007f
+D a-coinve.ads		20120510125750 a66bf662
+D a-crbltr.ads		20120510125751 b8a2dc05
+D a-convec.ads		20120510125751 0aaf3975
+D a-direio.ads		20120510125751 5842da07
+D a-direio.adb		20120510125751 ddb08ceb
+D a-direct.ads		20120510125751 9d42e46d
+D a-envvar.ads		20120510125752 0a4572ed
+D a-except.ads		20120510125752 ec1b44c1
+D a-finali.ads		20120510125753 52ecdc1b
+D a-ioexce.ads		20120510125753 8b9de6cd
+D a-iteint.ads		20120510125754 7c7305e9
+D a-reatim.ads		20120510125755 63f07669
+D a-stream.ads		20120510125756 2ca4ee37
+D a-string.ads		20120510125757 90ac6797
+D a-strhas.ads		20120510125757 0fca75f9
+D a-strmap.ads		20120510125757 9cb836fb
+D a-strunb.ads		20120510125757 3f91d4c5
+D a-tags.ads		20120510125759 6c0509d0
+D a-taside.ads		20120510125759 a4888134
+D a-textio.ads		20120510125800 386df5d4
+D a-unccon.ads		20120510125801 f9eb8f06
+D a-uncdea.ads		20120510125801 f15a5ed1
+D aws.ads		20121205173852 7408e15f
+D aws-attachments.ads	20121205173852 ba5fe9d1
+D aws-config.ads	20121205173852 cdf5a1d9
+D aws-containers.ads	20121205173852 675acf9b
+D aws-containers-memory_streams.ads  20121205173852 ea28c859
+D aws-containers-string_vectors.ads  20121205173852 b5692847
+D aws-containers-tables.ads  20121205173852 6da3fa4b
+D aws-default.ads	20121205173852 e7c2b00b
+D aws-headers.ads	20121205173852 eae08740
+D aws-messages.ads	20121205173852 99f4dcf7
+D aws-mime.ads		20121205173852 b188039e
+D aws-net.ads		20121205173852 91ca5d80
+D aws-parameters.ads	20121205173852 0f8312c2
+D aws-resources.ads	20121205173852 425d4c31
+D aws-resources-streams.ads  20121205173852 ab2ae19d
+D aws-response.ads	20121205173852 5cac32fb
+D aws-session.ads	20121205173852 84248e6c
+D aws-status.ads	20121205173852 b8979672
+D aws-url.ads		20121205173852 662347fb
+D aws-utils.ads		20121205173852 e14a8da4
+D gnat.ads		20120510125813 fd2ad2f1
+D g-regexp.ads		20120510125810 691be386
+D gnatcoll.ads		20111220093209 6a5da479
+D gnatcoll-json.ads	20120411143615 9dd4f3b4
+D interfac.ads		20120510125815 129923ea
+D i-c.ads		20120510125814 5421119b
+D i-cstrea.ads		20120510125814 1bd72c32
+D memory_streams.ads	20121205173852 e7c465d7
+D soccer.ads		20121228101635 438dabc8
+D soccer-server.ads	20121220142027 0864d922
+D soccer-server-callbacks.ads  20121224102223 5090fb63
+D soccer-server-callbacks.adb  20121224132640 06f31602
+D system.ads		20120510125846 eb6e42ba
+D s-atacco.ads		20120510125819 4c36d12f
+D s-atocou.ads		20120510125819 4a9c6cb4
+D s-atocou.adb		20120510125819 7116b4cf
+D s-conca2.ads		20120510125823 fbd0f2fc
+D s-conca3.ads		20120510125823 762a026a
+D s-crtl.ads		20120510125824 ac77b159
+D s-direio.ads		20120510125824 068812e8
+D s-exctab.ads		20120510125824 66e51330
+D s-ficobl.ads		20120510125825 443b9d66
+D s-fileio.ads		20120510125825 529bb6b9
+D s-finmas.ads		20120510125825 b95bb341
+D s-finroo.ads		20120510125825 4ff27390
+D s-imgboo.ads		20120510125825 f5d971eb
+D s-imgint.ads		20120510125826 02dbe0c2
+D s-imgrea.ads		20120510125826 c7a851e2
+D s-linux.ads		20120510125827 70c7cb45
+D s-multip.ads		20120510125828 38ac9f73
+D s-oscons.ads		20120511153426 9012934c
+D s-osinte.ads		20120510125829 938b6b03
+D s-parame.ads		20120510125832 b6e20cc0
+D s-pooglo.ads		20120510125832 542f33d0
+D s-regexp.ads		20120510125832 9c7d27a7
+D s-secsta.ads		20120510125833 eea35a36
+D s-soflin.ads		20120510125833 24c8153c
+D s-stache.ads		20120510125834 596fc1b4
+D s-stausa.ads		20120510125834 017a0a05
+D s-stalib.ads		20120510125834 f78bcf95
+D s-stoele.ads		20120510125834 facd7d98
+D s-stoele.adb		20120510125834 afc5dc80
+D s-stopoo.ads		20120510125834 7b8fbeee
+D s-stposu.ads		20120510125834 197be7e5
+D s-stratt.ads		20120510125834 aedef97e
+D s-string.ads		20120510125834 46b01415
+D s-ststop.ads		20120510125834 ee472be4
+D s-tasinf.ads		20120510125835 21316953
+D s-taspri.ads		20120510125836 15f617a8
+D s-taprop.ads		20120510125835 1dd2e1b6
+D s-taskin.ads		20120510125836 5e24fb30
+D s-taprob.ads		20120510125835 502249e3
+D s-tpoben.ads		20120510125837 20b7a89e
+D s-tassta.ads		20120510125836 3a253871
+D s-traent.ads		20120510125838 5221ee41
+D s-unstyp.ads		20120510125838 6ae15c76
+D s-wchcon.ads		20120510125840 bfeb2e3d
+D templates_parser.ads	20121205173908 180bb9f3
+D templates_parser-utils.ads  20121205173908 422575f2
+D templates_parser_tasking.ads  20121205173908 4c0209f0
+D zlib.ads		20121205173852 3a05091e
+X 1 ada.ads
+16K9*Ada 19e8 63|4r6 5r5 10r6 10r33 13r6 14r5 15r6 67r11 113r11 118r30
+X 13 a-direio.ads
+43k13*Direct_IO 191e18 63|15w10 118r34
+53P9 File_Type(71|53R9) 63|120r32[118]
+55E9 File_Mode
+55n23 In_File{55E9[63|118]} 63|124r37[118]
+80U14 Open 63|123s15[118]
+81p7 File{53P9[63|118]} 63|123r21[118]
+82e7 Mode{55E9[63|118]} 63|124r21[118]
+83s7 Name{string} 63|125r21[118]
+86U14 Close 63|128s15[118]
+86p22 File{53P9[63|118]} 63|128r22[118]
+106U14 Read 63|126s15[118]
+107p7 File{53P9[63|118]} 63|126r21[118]
+108a7 Item{string} 63|127r21[118]
+X 15 a-direct.ads
+76K13*Directories 487e20 63|13w10 14r9 113r15
+292I9*File_Size<long_integer>
+306V13*Size{292I9} 63|115s51
+X 23 a-string.ads
+16K13*Strings 35e16 63|10r10 10r37
+X 26 a-strunb.ads
+76K21*Unbounded 489e26 63|10w18 10r45
+X 29 a-textio.ads
+49K13*Text_IO 471e16 63|4w10 5r9 67r15
+166U14*New_Line 63|97s16
+242U14*Put 63|86s16 90s19 93s22 96s16
+263U14*Put_Line 63|48s7 49s7 52s7 71s13 73s13 75s13 77s13 79s13 100s13
+X 32 aws.ads
+30K9*AWS 41e8 62|2r6 3r6 8r8 63|2r6 3r6 6r6 7r6 8r6 9w6 12r6 27r25 27r48
+. 48r42 49r41 49r57 51r32 55r14
+X 35 aws-containers.ads
+30K13*Containers 34e19 63|7w10 8r10
+X 38 aws-containers-tables.ads
+36K24*Tables 150e26 63|8w21
+71V13*Get{string} 63|48s57 49s72 51s47
+X 41 aws-messages.ads
+34K13*Messages 409e17 63|2w10
+X 42 aws-mime.ads
+30K13*MIME 175e13 63|3w10 55r34
+45a4*Text_HTML{string} 63|55r39
+X 44 aws-parameters.ads
+34K13*Parameters 55e19 63|6w10 27r29 48r46 49r61 51r36
+36R9*List<38|40R9> 53e14 63|27r40
+X 47 aws-response.ads
+48K13*Response 422e17 62|2w10 10r56 63|25r56 55r18
+53R9*Data 413e14 62|10r65 63|25r65
+98V13*Build{53R9} 63|55s27
+X 49 aws-status.ads
+48K13*Status 425e15 62|3w10 10r36 63|25r36 26r32 27r52
+50R9*Data 423e14 62|10r43 63|25r43
+73V13*URI{string} 63|26s39
+81V13*Parameters{44|36R9} 63|27s59
+X 50 aws-url.ads
+35K13*URL 238e12 63|12w10 49r45
+203V13*Decode{string} 63|49s49
+X 54 gnatcoll.ads
+24K9*GNATCOLL 26e13 62|4r6 4r25 63|11r6 11r25 28r25 51r12 52r29
+X 55 gnatcoll-json.ads
+31K18*JSON 291e18 62|4w15 4r34 63|11w15 11r34 28r34 51r21 52r38
+34n7*JSON_Null_Type{33E9} 63|70r15
+35n7*JSON_Boolean_Type{33E9} 63|72r15
+36n7*JSON_Int_Type{33E9} 63|74r15
+37n7*JSON_Float_Type{33E9} 63|76r15
+38n7*JSON_String_Type{33E9} 63|78r15
+39n7*JSON_Array_Type{33E9} 63|80r15
+40n7*JSON_Object_Type{33E9} 63|99r15
+44A12*UTF8_String{string}<integer> 62|12r34 63|64r18
+54R9*JSON_Value 250e14 62|12r58 63|28r11 29r11 65r18 83r31
+55R9*JSON_Array 268e14 63|82r40
+61V13*Length{natural} 63|84s51
+62V13*Get{54R9} 63|88s35
+62r18 Arr{55R9} 63|88r40
+62i36 Index{positive} 63|89r40
+73V13*Read{54R9} 63|28s39 51s26
+158V13*Kind{33E9} 63|69s12
+158r19 Val{54R9} 63|69r18
+160V13*Get{boolean} 63|73s60
+163V13*Get{integer} 63|75s60
+166V13*Get{float} 63|77s56
+169V13*Get{44A12} 63|79s44 90s24
+175V13*Get{55R9} 63|82s54
+175r18 Val{54R9} 63|82r59
+200V13*Get{44A12} 63|52s43
+200r18 Val{54R9} 63|52r48
+200a36 Field{44A12} 63|53r48
+216U14*Map_JSON_Object 63|101s13
+217r7 Val{54R9} 63|101r30
+218p7 CB 63|102r30
+X 60 soccer.ads
+1K9*Soccer 30e11 62|6r9 16r5 63|16r6 16r35 19r14 133r5
+X 61 soccer-server.ads
+2K16*Server 60|1k9 61|7e18 62|6r16 16r12 63|16r13 16r42 19r21 133r12
+X 62 soccer-server-callbacks.ads
+6K23*Callbacks 61|2k16 62|16l19 16e28 63|16w20 16r49 19b28 133l19 133t28
+10V13*Services{47|53R9} 10>23 63|25b13 57l8 57t16
+10r23 Request{49|50R9} 63|25b23 26r44 27r71
+12U14*Handler 12>23 12>47 63|63b14 102r37 107l8 107t15
+12a23 Name{55|44A12} 63|64b7 71r23 73r23 75r23 77r23 79r23 86r21 100r23
+12r47 Value{55|54R9} 63|65b7 69r25 73r65 75r65 77r61 79r49 82r66 101r37
+14V13*Load_File{string} 14>24 63|109b13 131l8 131t17
+14s24 Filename{string} 63|110b7 115r57 125r29
+X 63 soccer-server-callbacks.adb
+26a7 URI{string} 32r10 35r13 38r13 41r13
+27r7 PARAMS{44|36R9} 48r62 49r77 51r52
+28r7 a{55|54R9}
+29r7 b{55|54R9} 51m7 52r57
+82r16 A_JSON_Array{55|55R9} 84r59 88r49
+83r16 A_JSON_Value{55|54R9} 88m19 90r29
+84i16 Array_Length{natural} 87r30 92r26
+87i20 J{integer} 89r49 92r22
+115i7 File_Size{natural} 117r45
+117A15 Test_JSON_Str{string}<integer> 118r45 121r24
+118K15 File_IO[13|43] 120r24 123r7 124r29 126r7 128r7
+120p7 File{13|53P9[118]} 123m29 123r29 126r29 128m30 128r30
+121a7 String_Content{117A15} 127m29 127r29 130r14
+
