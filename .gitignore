@@ -6,7 +6,6 @@
 *.exe
 *.o
 *.so
-*.ali
 
 # Logs and databases #
 ######################
@@ -24,3 +23,6 @@
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# SCD specific #
+obj/
