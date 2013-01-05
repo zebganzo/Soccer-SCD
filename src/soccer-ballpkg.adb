@@ -1,5 +1,6 @@
 with Soccer.Utils;
 use Soccer.Utils;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.BallPkg is
 
@@ -30,7 +31,7 @@ package body Soccer.BallPkg is
          moving := new_status;
       end Set_Moving;
 
-      procedure Catch (player_coord : Coordinate; succeed : out Boolean) is
+      procedure Catch (player_coord : Coordinate; succeded : out Boolean) is
       begin
          if(Utils.distance(x1 => player_coord.coordX,
                            x2 => mCoord.coordX,
@@ -39,9 +40,9 @@ package body Soccer.BallPkg is
             mCoord := player_coord;
             controlled := True;
             moving := False;
-            succeed := True;
+            succeded := True;
          else
-            succeed := False;
+            succeded := False;
          end if;
       end Catch;
 
@@ -53,9 +54,11 @@ package body Soccer.BallPkg is
       entry Move_Agent (new_coord : Coordinate)
         when controlled = False is
       begin
+         Put_Line("Move_Agent_Hell_yeah!!!");
          mCoord := new_coord;
       end Move_Agent;
 
+      --+ potenzialmente inutile
       procedure Release is
       begin
          controlled := False;

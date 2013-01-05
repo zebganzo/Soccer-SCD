@@ -22,27 +22,27 @@ with Soccer.Core_Event; use Soccer.Core_Event;
 
 procedure Soccer.Main is
 
-   OneCoord : Coordinate_Ptr := new Coordinate'(coordX => 5,
-                                                coordY => 5);
-   TwoCoord : Coordinate_Ptr := new Coordinate'(coordX => 14,
-                                                coordY => 9);
-   ThreeCoord : Coordinate_Ptr := new Coordinate'(coordX => 12,
-                                                  coordY => 3);
-   FourCoord : Coordinate_Ptr := new Coordinate'(coordX => 10,
-                                                 coordY => 7);
-   FiveCoord : Coordinate_Ptr := new Coordinate'(coordX => 2,
-                                                 coordY => 3);
-   SixCoord : Coordinate_Ptr := new Coordinate'(coordX => 3,
-                                                coordY => 9);
-   SevenCoord : Coordinate_Ptr := new Coordinate'(coordX => 1,
-                                                  coordY => 6);
-   One   : Player (Id    => 1, Ability => 4, Initial_Coord_X => 5, Initial_Coord_Y => 5);
-   Two   : Player (Id    => 2, Ability => 2, Initial_Coord_X => 14, Initial_Coord_Y => 9);
-   Three : Player (Id    => 3, Ability => 5, Initial_Coord_X => 12, Initial_Coord_Y => 3);
-   Four : Player (Id    => 4, Ability => 6, Initial_Coord_X => 10, Initial_Coord_Y => 7);
-   Five : Player (Id    => 5, Ability => 4, Initial_Coord_X => 2, Initial_Coord_Y => 3);
-   Six : Player (Id    => 6, Ability => 3, Initial_Coord_X => 3, Initial_Coord_Y => 9);
-   Seven : Player (Id    => 7, Ability => 3, Initial_Coord_X => 1, Initial_Coord_Y => 6);
+--     OneCoord : Coordinate_Ptr := new Coordinate'(coordX => 5,
+--                                                  coordY => 5);
+--     TwoCoord : Coordinate_Ptr := new Coordinate'(coordX => 14,
+--                                                  coordY => 9);
+--     ThreeCoord : Coordinate_Ptr := new Coordinate'(coordX => 12,
+--                                                    coordY => 3);
+--     FourCoord : Coordinate_Ptr := new Coordinate'(coordX => 10,
+--                                                   coordY => 7);
+--     FiveCoord : Coordinate_Ptr := new Coordinate'(coordX => 2,
+--                                                   coordY => 3);
+--     SixCoord : Coordinate_Ptr := new Coordinate'(coordX => 3,
+--                                                  coordY => 9);
+--     SevenCoord : Coordinate_Ptr := new Coordinate'(coordX => 1,
+--                                                    coordY => 6);
+   One   : Player (Id    => 1, Ability => 20, Initial_Coord_X => 5, Initial_Coord_Y => 5);
+   Two   : Player (Id    => 2, Ability => 15, Initial_Coord_X => 25, Initial_Coord_Y => 13);
+   Three : Player (Id    => 3, Ability => 17, Initial_Coord_X => 17, Initial_Coord_Y => 9);
+   Four : Player (Id    => 4, Ability => 18, Initial_Coord_X => 10, Initial_Coord_Y => 18);
+   Five : Player (Id    => 5, Ability => 12, Initial_Coord_X => 28, Initial_Coord_Y => 2);
+   Six : Player (Id    => 6, Ability => 24, Initial_Coord_X => 8, Initial_Coord_Y => 11);
+   Seven : Player (Id    => 7, Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15);
 begin
 
    Soccer.Server.WebServer.Start;

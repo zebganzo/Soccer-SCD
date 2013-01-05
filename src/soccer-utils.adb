@@ -15,6 +15,14 @@ package body Soccer.Utils is
       return Integer(Sqrt( dx*dx + dy*dy ));
    end Distance;
 
+   function Distance(From : in Coordinate; To : in Coordinate) return Integer is
+      dx, dy : float;
+   begin
+      dx := float(From.coordX - To.coordX);
+      dy := float(From.coordY - To.coordY);
+      return Integer(Sqrt( dx*dx + dy*dy ));
+   end Distance;
+
    function Get_Next_Coordinate (myCoord : Coordinate; targetCoord : Coordinate) return Coordinate is
       myX : Integer := myCoord.coordX;
       myY : Integer := myCoord.coordY;
@@ -45,5 +53,14 @@ package body Soccer.Utils is
    begin
       return duration(Power_Range'Last - power);
    end Get_Ball_Delay;
+
+   function Compare_Coordinates (coord1 : Coordinate; coord2 : Coordinate) return Boolean is
+   begin
+      if Distance(coord1, coord2) = 0 then
+         return True;
+      else
+         return False;
+      end if;
+   end Compare_Coordinates;
 
 end Soccer.Utils;

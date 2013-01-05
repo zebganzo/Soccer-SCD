@@ -2,6 +2,7 @@ with Soccer.Server.WebServer;
 use Soccer.Server.WebServer;
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Bridge.Output is
 

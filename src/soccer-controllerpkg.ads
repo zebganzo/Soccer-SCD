@@ -20,7 +20,6 @@ package Soccer.ControllerPkg is
          on_the_field : Boolean := False;
          mCoord : Coordinate := Coordinate'(coordX => 0,
                                             coordY => 0);
-         ball_holder : Boolean := False;
       end record;
 
    package Players_Container is new Vectors (Index_Type   => Natural,
@@ -33,9 +32,17 @@ package Soccer.ControllerPkg is
       end record;
    type ReadResult is access ReadResultType;
 
+   type Generic_Status is
+      record
+         coord : Coordinate;
+         holder : Boolean;
+         nearby : Boolean;
+      end record;
+   type Generic_Status_Ptr is access Generic_Status;
+
    -- Functions, Procedure, ecc...
 
-   function getMyPosition (id : in Integer) return Coordinate;
+   function Get_Generic_Status (id : in Integer) return Generic_Status_Ptr;
 
    function readStatus (x : in Integer; y : in Integer; r : in Integer) return ReadResult;
 

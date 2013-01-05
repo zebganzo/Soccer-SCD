@@ -2,16 +2,14 @@ with Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event;
 
 package body Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event is
 
-   procedure Initialize (E : in out Shot_Motion_Event;
-                         nPlayer_Id : in Integer;
-                         nFrom : in Coordinate;
-                         nTo : in Coordinate;
-                         nShot_Power : Power_Range) is
+   procedure Set_Shot_Power (E : in out Shot_Event; power : Power_Range) is
    begin
-      E.Player_Id := nPlayer_Id;
-      E.From := nFrom;
-      E.To := nTo; -- nil
-      E.Shot_Power := nShot_Power;
-   end Initialize;
+      E.Shot_Power := power;
+   end Set_Shot_Power;
+
+   function Get_Shot_Power (E : in Shot_Event) return Power_Range is
+   begin
+      return E.Shot_Power;
+   end Get_Shot_Power;
 
 end Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event;

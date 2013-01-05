@@ -2,18 +2,16 @@ with Soccer.Core_Event.Motion_Core_Event;
 
 package Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event is
 
-   type Shot_Motion_Event is new Motion_Event with private;
-   type Shot_Motion_Event_Prt is access all Shot_Motion_Event;
+   type Shot_Event is new Motion_Event with private;
+   type Shot_Event_Prt is access all Shot_Event;
 
-   procedure Initialize (E : in out Shot_Motion_Event;
-                         nPlayer_Id : in Integer;
-                         nFrom : in Coordinate;
-                         nTo : in Coordinate;
-                         nShot_Power : Power_Range);
+   procedure Set_Shot_Power (E : in out Shot_Event; power : Power_Range);
+
+   function Get_Shot_Power (E : in Shot_Event) return Power_Range;
 
 private
 
-   type Shot_Motion_Event is new Motion_Event with
+   type Shot_Event is new Motion_Event with
       record
          Shot_Power : Power_Range;
       end record;
