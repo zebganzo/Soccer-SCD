@@ -18,8 +18,7 @@ package Soccer.BallPkg is
       private
 --        mCoord : Coordinate := Coordinate'(coordX => Field_Max_X / 2,
 --                                           coordY => Field_Max_Y / 2);
-      mCoord : Coordinate := Coordinate'(coordX => 5,
-                                         coordY => 5);
+      mCoord : Coordinate;
       controlled : Boolean := False;
       moving : Boolean := False;
    end Ball;

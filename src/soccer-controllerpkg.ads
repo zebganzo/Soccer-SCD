@@ -3,6 +3,9 @@ use Ada.Containers;
 with Soccer.Core_Event.Motion_Core_Event;
 use Soccer.Core_Event.Motion_Core_Event;
 
+with Soccer.TeamPkg;
+use Soccer.TeamPkg;
+
 package Soccer.ControllerPkg is
 
    -- New Types
@@ -16,10 +19,12 @@ package Soccer.ControllerPkg is
    type PlayerStatus is
       record
          id : Integer;
+         team : Team_Ptr;
          running : Boolean := False;
          on_the_field : Boolean := False;
          mCoord : Coordinate := Coordinate'(coordX => 0,
                                             coordY => 0);
+         distance : Integer;
       end record;
 
    package Players_Container is new Vectors (Index_Type   => Natural,
@@ -29,6 +34,7 @@ package Soccer.ControllerPkg is
    type ReadResultType is
       record
          playersInMyZone : Vector;
+         holder_id : Integer;
       end record;
    type ReadResult is access ReadResultType;
 
