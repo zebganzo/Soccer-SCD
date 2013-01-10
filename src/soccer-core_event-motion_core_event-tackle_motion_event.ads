@@ -8,10 +8,11 @@ package Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event is
    procedure Initialize (E : in out Tackle_Event;
                          nPlayer_Id : in Integer;
                          nFrom : in Coordinate;
-                         nTo : in Coordinate;
-                         nOther_Player_Id : Integer);
+                         nTo : in Coordinate);
 
-   function getOther_Player_Id (E : in Tackle_Event) return Integer;
+   procedure Set_Other_Player_Id (E : in out Tackle_Event; id : in Integer);
+
+   function Get_Other_Player_Id (E : in Tackle_Event) return Integer;
 
 private
 

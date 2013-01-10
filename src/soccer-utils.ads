@@ -13,4 +13,10 @@ package Soccer.Utils is
 
    function Compare_Coordinates (coord1 : Coordinate; coord2 : Coordinate) return Boolean;
 
+   function Get_Random_Target (coord : Coordinate) return Coordinate;
+
+   procedure CLS;
+
+   function Check_Inside_Field (coord: Coordinate) return Boolean;
+
 end Soccer.Utils;

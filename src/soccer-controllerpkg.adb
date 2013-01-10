@@ -19,6 +19,8 @@ use Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event;
 with Soccer.Core_Event.Motion_Core_Event.Catch_Motion_Event;
 use Soccer.Core_Event.Motion_Core_Event.Catch_Motion_Event;
 with Soccer.Motion_AgentPkg; use Soccer.Motion_AgentPkg;
+with Ada.Numerics.Discrete_Random;
+with Soccer.ControllerPkg; use Soccer.ControllerPkg;
 
 package body Soccer.ControllerPkg is
 
@@ -40,9 +42,6 @@ package body Soccer.ControllerPkg is
          if(mStatus(i).id = id) then
             coord_result := mStatus(i).mCoord;
             if(ball_holder_id = mStatus(i).id) then
-	       if mStatus(i).id = 1 then
-		  null;
-               end if;
                holder_result := True;
             elsif Distance(From => Ball.Get_Position,
                            To   => mStatus(i).mCoord) <= Nearby_Distance then
@@ -66,13 +65,14 @@ package body Soccer.ControllerPkg is
    begin
       for i in mStatus'Range loop
          d := Distance(x1 => x,
-                     x2 => mStatus(i).mCoord.coordX,
-                     y1 => y,
-                     y2 => mStatus(i).mCoord.coordY);
+                       x2 => mStatus(i).mCoord.coordX,
+                       y1 => y,
+                       y2 => mStatus(i).mCoord.coordY);
          if(d <= r and d /= 0) then
             result.playersInMyZone.Append(New_Item => mStatus(i));
          end if;
       end loop;
+      result.holder_id := ball_holder_id;
       return result;
    end readStatus;
 
@@ -99,6 +99,11 @@ package body Soccer.ControllerPkg is
    begin
       for i in 1 .. Num_Of_Player loop
          mStatus(i).id := i;
+         if i < 4 then
+            mStatus(i).team := TeamPkg.Team_One;
+         else
+            mStatus(i).team := TeamPkg.Team_Two;
+         end if;
       end loop;
    end Initialize;
 
@@ -106,6 +111,8 @@ package body Soccer.ControllerPkg is
    procedure PrintField is
       cell : Integer;
    begin
+      --Utils.CLS;
+
       for i in  1 .. Field_Max_X + 1 loop
          Put("-");
       end loop;
@@ -117,7 +124,7 @@ package body Soccer.ControllerPkg is
             if cell = 0 then
                Put(" ");
             elsif cell = 100 then
-            	Put ("*");
+               Put ("*");
             else
                if(cell < 0) then
                   Put ("*" & I2S (cell));
@@ -163,16 +170,36 @@ package body Soccer.ControllerPkg is
       return Zone;
    end Occupy;
 
+   type Rand_Range is range 1 .. 10;
+   package Rand_Int is new Ada.Numerics.Discrete_Random(Rand_Range);
+
+   function Calculate_Tackle (attacker_id : in Integer; ball_owner_id : in Integer) return Boolean is
+      tackle_seed : Rand_Int.Generator;
+   begin
+      Rand_Int.Reset(tackle_seed);
+      if Integer(Rand_Int.Random(tackle_seed)) > 5 then
+         return True;
+      else
+         return False;
+      end if;
+   end Calculate_Tackle;
+
+   --+ Nel caso in cui il giocatore si sposti con la palla non cambia la mossa scritta nel buffer
+   --+dovra' essere lato distribuzione interpolare se la palla e' ancora in possesso di un giocatore
+   --+ o se si sta spostando con l'agente di movimento, ecc. ecc.
    procedure Compute (action : in Move_Event_Prt; success : out Boolean) is
       here_player_result : Integer;
    begin
-      Put_Line("Move_event");
       here_player_result := HereIsAPlayer(x => action.getTo.coordX,
                                           y => action.getTo.coordY);
       if here_player_result = 0 or here_player_result = 100 then
          -- Free position
          mStatus(action.getPlayer_Id).mCoord := action.getTo;
+         if ball_holder_id = action.getPlayer_Id then
+            Ball.Move_Player(new_coord => action.getTo);
+         end if;
          Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (action));
+
          Release(action.getFrom);
          success := True;
       else
@@ -182,20 +209,51 @@ package body Soccer.ControllerPkg is
 
    procedure Compute (action : in Shot_Event_Prt; success : out Boolean) is
    begin
-      Ball.Set_Controlled(new_status => False);
-      Ball.Set_Moving(new_status => True);
+      if Utils.Compare_Coordinates(coord1 => Ball.Get_Position,
+                                   coord2 => action.getFrom) then
+         Ball.Set_Controlled(new_status => False);
+         Ball.Set_Moving(new_status => True);
 
-      ball_holder_id := 0;
-      Motion_AgentPkg.Motion_Enabler.Move(source => action.getFrom,
-                                        target => action.getTo,
-                                        power  => action.Get_Shot_Power);
-      success := True;
+         ball_holder_id := 0;
+         Motion_AgentPkg.Motion_Enabler.Move(source => action.getFrom,
+                                             target => action.getTo,
+                                             power  => action.Get_Shot_Power);
+         success := True;
+      else
+         success := False;
+      end if;
    end Compute;
 
    procedure Compute (action : in Tackle_Event_Prt; success : out Boolean) is
    begin
-      Put_Line("Move_event");
-      success := False;
+      Put_Line("Tackle_Event");
+      if Utils.Compare_Coordinates(coord1 => action.getTo,
+                                   coord2 => mStatus(action.Get_Other_Player_Id).mCoord) then
+         -- Tento di rubargli la palla!
+         if Calculate_Tackle(attacker_id   => action.getPlayer_Id,
+                             ball_owner_id => action.Get_Other_Player_Id) then
+            -- hell yeah! Mi prendo la palla
+            ball.Move_Player(new_coord => action.getFrom);
+
+            declare
+               new_action : Motion_Event_Prt := new Motion_Event;
+            begin
+               new_action.Initialize(nPlayer_Id => 0,
+                                     nFrom      => action.getTo,
+                                     nTo        => action.getFrom);
+               Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (new_action));
+               Buffer_Wrapper.Send;
+               -- Da verificare!!!
+            end;
+
+            success := True;
+         else
+            -- oh no :-(
+            success := False;
+         end if;
+      else
+         success := False;
+      end if;
    end Compute;
 
    procedure Compute (action : in Catch_Event_Prt; success : out Boolean) is
@@ -208,10 +266,12 @@ package body Soccer.ControllerPkg is
       end if;
    end Compute;
 
-   procedure Compute (action : in Motion_Event_Prt; success : out Boolean) is
+   procedure Compute (action : in Motion_Event_Prt; success : out Boolean; revaluate : out Boolean) is
    begin
       success := False;
+      revaluate := False;
       if action.all in Move_Event'Class then
+         revaluate := True;
          Compute(action  => Move_Event_Prt(action),
                  success => success);
       elsif action.all in Shot_Event'Class then
@@ -229,26 +289,29 @@ package body Soccer.ControllerPkg is
    task body Controller is
       mUtilityConstraint : Utility_Constraint := 6;
       compute_result : Boolean;
+      revaluate : Boolean;
    begin
       Initialize;
       --Timer_Control.Start;
-      ball_holder_id := 1;
 
+      -- Do la palla ad 1 all'inizio!!!
+      ball_holder_id := 1;
       Ball.Set_Controlled(new_status => True);
 
       loop
          for Zone in Fields_Zone'Range loop
             select
                accept Write (mAction : in out Action) do
---                    Put("Action :");
---                    Put("- Player : " & I2S(mAction.event.getPlayer_Id));
---                    Put("- Cell target : " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
---                    Put_Line("- Utility of the action : " & I2S(mAction.utility) & "/10");
+                  --                    Put("Action :");
+                  --                    Put("- Player : " & I2S(mAction.event.getPlayer_Id));
+                  --                    Put("- Cell target : " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
+                  --                    Put_Line("- Utility of the action : " & I2S(mAction.utility) & "/10");
 
                   -- Try to satisfy the request
-                  Compute(mAction.event, compute_result);
+                  Compute(mAction.event, compute_result, revaluate);
 
-                  if not compute_result then
+                  if not compute_result and revaluate then
+                     -- Devo distinguere tra i tipi di mosse
                      if(mAction.utility > mUtilityConstraint) then
                         mAction.utility := mAction.utility - 1;
                         requeue Awaiting(Occupy(mAction.event.getTo));
@@ -261,7 +324,10 @@ package body Soccer.ControllerPkg is
                when Released (Integer(Zone)) = True =>
                   accept Awaiting (Zone) (mAction : in out Action) do
                      Put_Line(I2S(Integer(Zone)) & " Sono ancora io perbacco! " & I2S(mAction.event.getPlayer_Id));
-                     if not compute_result then
+
+                     Compute(mAction.event, compute_result, revaluate);
+
+                     if not compute_result and revaluate then
                         Put_Line("Giocatore " & I2S(mAction.event.getPlayer_Id) & " bloccato dal giocatore " & I2S(HereIsAPlayer(x => mAction.event.getTo.coordX,
                                                                                                                                  y => mAction.event.getTo.coordY)) & " alle coordinate " & I2S(mAction.event.getTo.coordX) & I2S(mAction.event.getTo.coordy));
                         if(mAction.utility > mUtilityConstraint) then
