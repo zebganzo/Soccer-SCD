@@ -40,7 +40,8 @@ package body Soccer.ControllerPkg is
          if(mStatus(i).id = id) then
             coord_result := mStatus(i).mCoord;
             if(ball_holder_id = mStatus(i).id) then
-               if mStatus(i).id = 1 then
+	       if mStatus(i).id = 1 then
+		  null;
                end if;
                holder_result := True;
             elsif Distance(From => Ball.Get_Position,
