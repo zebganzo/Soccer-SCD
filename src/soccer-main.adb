@@ -46,7 +46,9 @@ procedure Soccer.Main is
    Seven : Player (Id    => 7, Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
 begin
 
-   Soccer.Server.WebServer.Start;
+   null;
+
+--     Soccer.Server.WebServer.Start;
 
 --     delay 10.0;
 --     Soccer.Server.WebServer.PublishFieldUpdate;

@@ -312,6 +312,9 @@ package body Soccer.ControllerPkg is
 
                   if not compute_result and revaluate then
                      -- Devo distinguere tra i tipi di mosse
+                     Put_Line("===================================================================");
+                     Put_Line("Sono " & I2S(mAction.event.getPlayer_Id) & " e sto per fare una requeue!!!!!!!!!!!");
+                     Put_Line("===================================================================");
                      if(mAction.utility > mUtilityConstraint) then
                         mAction.utility := mAction.utility - 1;
                         requeue Awaiting(Occupy(mAction.event.getTo));

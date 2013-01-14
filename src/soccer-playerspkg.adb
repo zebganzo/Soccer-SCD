@@ -227,7 +227,6 @@ package body Soccer.PlayersPkg is
                      end if;
                   end;
                end if;
-
             end if;
          else
             -- Mi muovo a caso!
