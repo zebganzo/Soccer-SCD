@@ -29,8 +29,8 @@ package Soccer is
    -- Includo la coordinata 0,0 per simulare la panchina
    type Coordinate is
       record
-         coordX   : Integer range 0 .. Field_Max_X;
-         coordY   : Integer range 0 .. Field_Max_Y;
+         coordX   : Integer range 0 .. Field_Max_X + 1;
+         coordY   : Integer range 0 .. Field_Max_Y + 1;
       end record;
    type Coordinate_Ptr is access Coordinate;
 
