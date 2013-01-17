@@ -1,3 +1,5 @@
+with Ada.Calendar; use Ada.Calendar;
+
 package Soccer is
 
    -- Global stuff for the Soccer packages
@@ -12,6 +14,8 @@ package Soccer is
    Nearby_Distance : Integer := 3;
 
    Send_Buffer_Delay : Integer := 1;
+
+   t0 : Time := Clock;
 
    type Power_Range is range 0 .. 10;
 
