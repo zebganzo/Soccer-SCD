@@ -5,6 +5,10 @@ with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Soccer.Core_Event.Motion_Core_Event; use Soccer.Core_Event.Motion_Core_Event;
+with Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
+use Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
+with Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 
 package body Soccer.Bridge.Output is
 
@@ -65,31 +69,44 @@ package body Soccer.Bridge.Output is
          now : Time := Clock;
       begin
 
-         if event_buffer(event).event.all in Game_Event'Class then
+         if new_event.all in Game_Event'Class then
             new_element.event := new_event;
             new_element.time_start := t0 - now;
             size := size + 1;
             event_buffer(size) := new_element;
+
+            -- Se è un evento del Match (es. fine primo tempo) forzo la send
+            if new_event.all in Match_Event'Class then
+               Send;
+            end if;
          else
             -- motion event, devo gestire i vari casi!
-            if event_buffer(event).event.all in Move_Event'Class then
-            elsif event_buffer(event).event.all in Shot_Event'Class then
-            elsif event_buffer(event).event.all in Tackle_Event'Class then
-            elsif event_buffer(event).event.all in Catch_Event'Class then
+            if new_event.all in Move_Event'Class then
+               declare
+                  found : Boolean := False;
+               begin
+                  for event in reverse 1 .. size loop
+                     if event_buffer(event).event.all in Move_Event'Class then
+                        if Motion_Event(event_buffer(event).event.all).getPlayer_Id = Motion_Event(new_event.all).getPlayer_Id then
+                           Move_Event(event_buffer(event).event.all).Update_To_Coordinate(new_coord => Motion_Event(new_event.all).getTo);
+                           event_buffer(event).time_stop := t0 - now;
+                           found := True;
+                           exit;
+                        end if;
+                     else
+                        found := False;
+                        exit;
+                     end if;
+                  end loop;
+               end;
+            else
+               -- Codice uguale a sopra, lo tengo separato per problematiche future
+               -- attualmente non considerate!
+               new_element.event := new_event;
+               new_element.time_start := t0 - now;
+               size := size + 1;
+               event_buffer(size) := new_element;
             end if;
-
-            for event in reverse 1 .. size loop
-               if event_buffer(event).event.all in Motion_Event'Class then
-
-
-                  null;
-               else
-                  -- game event!!
-                  new_element.event := new_event;
-                  new_element.time_start := t0 - now;
-               end if;
-            end loop;
-
          end if;
 
          if size = Event_Buffer_Type'Last then
