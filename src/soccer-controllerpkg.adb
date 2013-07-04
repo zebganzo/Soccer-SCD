@@ -154,7 +154,7 @@ package body Soccer.ControllerPkg is
 
    function getZone (coord : Coordinate) return Integer is
    begin
-      return (Integer(coord.coordX / (Field_Max_X / Num_Of_Zone)) + 1);
+      return (Integer((coord.coordX - 1)/ (Field_Max_X / Num_Of_Zone)) + 1);
    end getZone;
 
    procedure Release (coord : Coordinate) is

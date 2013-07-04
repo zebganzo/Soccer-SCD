@@ -8,7 +8,14 @@ package Soccer.Bridge.Output is
 
    task Timer;
 
-   type Event_Buffer_Type is array (1 .. Buffer_Dim) of Soccer.Core_Event.Event_Ptr;
+   type Event_Buffer_Element is
+      record
+         event : Soccer.Core_Event.Event_Ptr;
+         time_start : Duration := 0.0;
+         time_stop : Duration := 0.0;
+      end record;
+
+   type Event_Buffer_Type is array (1 .. Buffer_Dim) of Event_Buffer_Element;
 
    protected Buffer_Wrapper is
 

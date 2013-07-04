@@ -49,7 +49,6 @@ package body Soccer.BallPkg is
       procedure Move_Player (new_coord : Coordinate) is
       begin
          mCoord := new_coord;
-         Put_Line("ciao sono qui!!!!!!!!!!!!");
          Put_Line ("mCoord " & I2S(mCoord.coordX) & " " & I2S(mCoord.coordY));
       end Move_Player;
 

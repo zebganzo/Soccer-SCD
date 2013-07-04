@@ -226,6 +226,14 @@ package body Soccer.PlayersPkg is
                         end if;
                      end if;
                   end;
+               else
+                  mAction.event := new Move_Event;
+                  mAction.event.Initialize(nPlayer_Id => Id,
+                                           nFrom      => mCoord,
+                                           nTo        => Utils.Get_Next_Coordinate(myCoord     => mCoord,
+                                                                                   targetCoord => Ball.Get_Position));
+                  mAction.utility := 10;
+                  ControllerPkg.Controller.Write(mAction => mAction);
                end if;
             end if;
          else
@@ -246,5 +254,6 @@ package body Soccer.PlayersPkg is
 
          delay duration (2);
       end loop;
+
    end Player;
 end Soccer.PlayersPkg;

@@ -20,7 +20,6 @@ with Soccer.Core_Event; use Soccer.Core_Event;
 with Soccer.TeamPkg; use Soccer.TeamPkg;
 
 
-
 procedure Soccer.Main is
 
 --     OneCoord : Coordinate_Ptr := new Coordinate'(coordX => 5,
@@ -44,6 +43,7 @@ procedure Soccer.Main is
    Five : Player (Id    => 5, Ability => 12, Initial_Coord_X => 28, Initial_Coord_Y => 2, Team => Team_Two);
    Six : Player (Id    => 6, Ability => 24, Initial_Coord_X => 6, Initial_Coord_Y => 6, Team => Team_Two);
    Seven : Player (Id    => 7, Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
+
 begin
 
    null;
