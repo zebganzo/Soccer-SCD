@@ -5,6 +5,8 @@ use Soccer.Core_Event.Motion_Core_Event;
 
 with Soccer.TeamPkg;
 use Soccer.TeamPkg;
+with Soccer.Core_Event.Game_Core_Event;
+use Soccer.Core_Event.Game_Core_Event;
 
 package Soccer.ControllerPkg is
 
@@ -16,33 +18,34 @@ package Soccer.ControllerPkg is
          utility : Utility_Range;
       end record;
 
-   type PlayerStatus is
+   type Player_Status is
       record
          id : Integer;
-         team : Team_Ptr;
+         team : Team_Id;
          running : Boolean := False;
          on_the_field : Boolean := False;
-         mCoord : Coordinate := Coordinate'(coordX => 0,
+         player_coord : Coordinate := Coordinate'(coordX => 0,
                                             coordY => 0);
          distance : Integer;
       end record;
 
    package Players_Container is new Vectors (Index_Type   => Natural,
-                                             Element_Type => PlayerStatus);
+                                             Element_Type => Player_Status);
    use Players_Container;
 
-   type ReadResultType is
+   type Read_Result_Type is
       record
-         playersInMyZone : Vector;
+         players_in_my_zone : Vector;
          holder_id : Integer;
       end record;
-   type ReadResult is access ReadResultType;
+   type Read_Result is access Read_Result_Type;
 
    type Generic_Status is
       record
          coord : Coordinate;
          holder : Boolean;
-         nearby : Boolean;
+	 nearby : Boolean;
+	 last_event : Game_Event;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
 
@@ -50,7 +53,9 @@ package Soccer.ControllerPkg is
 
    function Get_Generic_Status (id : in Integer) return Generic_Status_Ptr;
 
-   function readStatus (x : in Integer; y : in Integer; r : in Integer) return ReadResult;
+   procedure Set_Last_Event (event : Game_Event_Prt);
+
+   function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result;
 
    task Field_Printer;
 
@@ -59,9 +64,12 @@ package Soccer.ControllerPkg is
    type Fields_Zone is new Integer range 1 .. Num_Of_Zone;
 
    task Controller is
-      entry Write(mAction : in out Action);
+      entry Write(current_action : in out Action);
    private
-      entry Awaiting(Fields_Zone)(mAction : in out Action);
+      entry Awaiting(Fields_Zone)(current_action : in out Action);
    end Controller;
+
+private
+   last_event : Game_Event_Prt;
 
 end Soccer.ControllerPkg;

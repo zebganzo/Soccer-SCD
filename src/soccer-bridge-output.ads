@@ -15,7 +15,7 @@ package Soccer.Bridge.Output is
          time_stop : Duration := 0.0;
       end record;
 
-   type Event_Buffer_Type is array (1 .. Buffer_Dim) of Event_Buffer_Element;
+   type Event_Buffer_Type is array (1 .. buffer_dim) of Event_Buffer_Element;
 
    protected Buffer_Wrapper is
 

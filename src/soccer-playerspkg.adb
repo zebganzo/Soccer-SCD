@@ -34,86 +34,86 @@ package body Soccer.PlayersPkg is
    pass_range : Integer := 3;
    tackle_range : Integer := 2;
 
-   procedure Update_Distence (index : in Integer; players : in out Vector; distance : in Integer) is
-      procedure Set_New_Distance (Element : in out PlayerStatus)  is
+   procedure Update_Distance (index : in Integer; players : in out Vector; distance : in Integer) is
+      procedure Set_New_Distance (Element : in out Player_Status)  is
       begin
          Element.distance := distance;
       end Set_New_Distance;
    begin
       players.Update_Element(index, Set_New_Distance'Access);
-   end Update_Distence;
+   end Update_Distance;
 
    task body Player is
-      mCoord : Coordinate;
-      mTargetCoord : Coordinate;
-      mReadResult : ReadResult;
-      mGenericStatus : Generic_Status_Ptr;
-      mRange : Integer;
-      mAction : Action;
-      seedX : Rand_Int.Generator;
-      seedY : Rand_Int.Generator;
+      current_coord : Coordinate;
+      target_coord : Coordinate;
+      current_read_result : Read_Result;
+      current_generic_status : Generic_Status_Ptr;
+      current_range : Integer;
+      current_action : Action;
+      seed_x : Rand_Int.Generator;
+      seed_y : Rand_Int.Generator;
    begin
 
-      Rand_Int.Reset(seedX);
-      Rand_Int.Reset(seedY);
+      Rand_Int.Reset(seed_x);
+      Rand_Int.Reset(seed_y);
 
-      mTargetCoord := Coordinate'(coordX => Initial_Coord_X,
-                                  coordY => Initial_Coord_Y);
+      target_coord := Coordinate'(coordX => initial_coord_x,
+                                  coordY => initial_coord_y);
 
-      mAction.event := new Move_Event;
-      mGenericStatus := ControllerPkg.Get_Generic_Status(id => Id);
-      mCoord := mGenericStatus.coord;
-      mAction.event.Initialize(nPlayer_Id => Id,
-                               nFrom      => mCoord,
-                               nTo        => mTargetCoord);
-      mAction.utility := 10;
+      current_action.event := new Move_Event;
+      current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
+      current_coord := current_generic_status.coord;
+      current_action.event.Initialize(nPlayer_Id => id,
+                               nFrom      => current_coord,
+                               nTo        => target_coord);
+      current_action.utility := 10;
 
-      ControllerPkg.Controller.Write(mAction => mAction);
+      ControllerPkg.Controller.Write(current_action => current_action);
 
       delay duration(5);
 
       loop
 
-         mGenericStatus := ControllerPkg.Get_Generic_Status(id => Id);
-         mCoord := mGenericStatus.coord;
+         current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
+         current_coord := current_generic_status.coord;
 
-         if mGenericStatus.holder then
-            mRange := Ability;
-         elsif mGenericStatus.nearby then
-            mRange := Nearby_Distance;
+         if current_generic_status.holder then
+            current_range := ability;
+         elsif current_generic_status.nearby then
+            current_range := nearby_distance;
          else
-            mRange := 1;
+            current_range := 1;
          end if;
 
          --       Put_Line("Giocatore " & I2S(Id) & " Coordinate From " & I2S(mCoord.coordX) & "," & I2S(mCoord.coordY));
 
-         mReadResult := ControllerPkg.readStatus(x => mCoord.coordX,
-                                                 y => mCoord.coordY,
-                                                 r => mRange);
+         current_read_result := ControllerPkg.Read_Status(x => current_coord.coordX,
+                                                 y => current_coord.coordY,
+                                                 r => current_range);
 
-         for i in mReadResult.playersInMyZone.First_Index .. mReadResult.playersInMyZone.Last_Index loop
+         for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
             declare
                other_coord : Coordinate;
             begin
-               other_coord := mReadResult.playersInMyZone.Element(Index => i).mCoord;
-               Update_Distence(index       => i,
-                               players  => mReadResult.playersInMyZone,
-                               distance => Utils.Distance(From => mCoord,
+               other_coord := current_read_result.players_in_my_zone.Element(Index => i).player_coord;
+               Update_Distance(index       => i,
+                               players  => current_read_result.players_in_my_zone,
+                               distance => Utils.Distance(From => current_coord,
                                                           To   => other_coord));
 
             end;
          end loop;
 
-         Put_Line("Ciao sono " & I2S(id) & " mGenericStatus.nearby : " & Boolean'Image(mGenericStatus.nearby));
+         Put_Line("Ciao sono " & I2S(id) & " mGenericStatus.nearby : " & Boolean'Image(current_generic_status.nearby));
 
-         if mGenericStatus.holder then
+         if current_generic_status.holder then
             -- Che bello ho la palla, se sono in pericolo la passo se no fanculo tutti!
             declare
                foundPlayer : Boolean := False;
             begin
-               for i in mReadResult.playersInMyZone.First_Index .. mReadResult.playersInMyZone.Last_Index loop
-                  if mReadResult.playersInMyZone.Element(Index => i).team.id /= team.id and
-                    mReadResult.playersInMyZone.Element(Index => i).distance <= pass_range then
+               for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
+                  if current_read_result.players_in_my_zone.Element(Index => i).team /= team and
+                    current_read_result.players_in_my_zone.Element(Index => i).distance <= pass_range then
                      foundPlayer := True;
                   end if;
                end loop;
@@ -122,58 +122,58 @@ package body Soccer.PlayersPkg is
                   declare
                      playerTarget : Integer := -1;
                   begin
-                     for i in mReadResult.playersInMyZone.First_Index .. mReadResult.playersInMyZone.Last_Index loop
-                        if mReadResult.playersInMyZone.Element(Index => i).team.id = team.id and
-                          mReadResult.playersInMyZone.Element(Index => i).distance <= 10 then -- tutti con la stessa forza di tiro
+                     for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
+                        if current_read_result.players_in_my_zone.Element(Index => i).team = team and
+                          current_read_result.players_in_my_zone.Element(Index => i).distance <= 10 then -- tutti con la stessa forza di tiro
                            playerTarget := i;
                         end if;
                      end loop;
 
                      if playerTarget = -1 then
                         declare
-                           target : Coordinate := Utils.Get_Random_Target(coord => mCoord);
+                           target : Coordinate := Utils.Get_Random_Target(coord => current_coord);
                         begin
 
-                           mAction.event := new Move_Event;
-                           mAction.event.Initialize(nPlayer_Id => Id,
-                                                    nFrom      => mCoord,
+                           current_action.event := new Move_Event;
+                           current_action.event.Initialize(nPlayer_Id => id,
+                                                    nFrom      => current_coord,
                                                     nTo        => target);
-                           mAction.utility := 10;
-                           ControllerPkg.Controller.Write(mAction => mAction);
+                           current_action.utility := 10;
+                           ControllerPkg.Controller.Write(current_action => current_action);
                         end;
                      else
-                        mAction.event := new Shot_Event;
-                        mAction.event.Initialize(Id, mCoord,
-                                                 mReadResult.playersInMyZone.Element(Index => playerTarget).mCoord);
-                        Put_Line("Mi stanno per rubare palla, la passo al mio amico " & I2S(mReadResult.playersInMyZone.Element(Index => playerTarget).id));
-                        Shot_Event_Prt(mAction.event).Set_Shot_Power (10);
-                        mAction.utility := 10;
-                        ControllerPkg.Controller.Write(mAction => mAction);
+                        current_action.event := new Shot_Event;
+                        current_action.event.Initialize(id, current_coord,
+                                                 current_read_result.players_in_my_zone.Element(Index => playerTarget).player_coord);
+                        Put_Line("Mi stanno per rubare palla, la passo al mio amico " & I2S(current_read_result.players_in_my_zone.Element(Index => playerTarget).id));
+                        Shot_Event_Prt(current_action.event).Set_Shot_Power (10);
+                        current_action.utility := 10;
+                        ControllerPkg.Controller.Write(current_action => current_action);
                      end if;
                   end;
                else
                   declare
-                     target : Coordinate := Utils.Get_Random_Target(coord => mCoord);
+                     target : Coordinate := Utils.Get_Random_Target(coord => current_coord);
                   begin
 
-                     mAction.event := new Move_Event;
-                     mAction.event.Initialize(nPlayer_Id => Id,
-                                              nFrom      => mCoord,
+                     current_action.event := new Move_Event;
+                     current_action.event.Initialize(nPlayer_Id => id,
+                                              nFrom      => current_coord,
                                               nTo        => target);
-                     mAction.utility := 10;
-                     ControllerPkg.Controller.Write(mAction => mAction);
+                     current_action.utility := 10;
+                     ControllerPkg.Controller.Write(current_action => current_action);
                   end;
                end if;
             end;
-         elsif mGenericStatus.nearby then
+         elsif current_generic_status.nearby then
             -- Sono vicnino alla palla! Meglio essere coscienziosi
             if Compare_Coordinates(coord1 => Ball.Get_Position,
-                                   coord2 => mCoord) then
-               mAction.event := new Catch_Event;
-               mAction.event.Initialize(Id, mCoord,
+                                   coord2 => current_coord) then
+               current_action.event := new Catch_Event;
+               current_action.event.Initialize(id, current_coord,
                                         Ball.Get_Position);
-               mAction.utility := 10;
-               ControllerPkg.Controller.Write(mAction => mAction);
+               current_action.utility := 10;
+               ControllerPkg.Controller.Write(current_action => current_action);
             else
                if Ball.Get_Controlled then
                   declare
@@ -182,72 +182,72 @@ package body Soccer.PlayersPkg is
                      targetPlayerId : Integer := 0;
                   begin
                      -- controllata da un giocatore
-                     for i in mReadResult.playersInMyZone.First_Index .. mReadResult.playersInMyZone.Last_Index loop
-                        if mReadResult.playersInMyZone.Element(Index => i).id = mReadResult.holder_id then
-                           if mReadResult.playersInMyZone.Element(Index => i).team.id /= team.id then
+                     for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
+                        if current_read_result.players_in_my_zone.Element(Index => i).id = current_read_result.holder_id then
+                           if current_read_result.players_in_my_zone.Element(Index => i).team /= team then
                               -- la controlla un avversario
-                              targetPlayer := mReadResult.playersInMyZone.Element(Index => i).mCoord;
-                              targetPlayerId := mReadResult.playersInMyZone.Element(Index => i).id;
+                              targetPlayer := current_read_result.players_in_my_zone.Element(Index => i).player_coord;
+                              targetPlayerId := current_read_result.players_in_my_zone.Element(Index => i).id;
                            end if;
                         end if;
                      end loop;
                      if targetPlayer.coordX = 0 then
                         -- la controlla un compagno di squadra -> mi muovo a caso!
                         declare
-                           target : Coordinate := Utils.Get_Random_Target(coord => mCoord);
+                           target : Coordinate := Utils.Get_Random_Target(coord => current_coord);
                         begin
 
-                           mAction.event := new Move_Event;
-                           mAction.event.Initialize(nPlayer_Id => Id,
-                                                    nFrom      => mCoord,
+                           current_action.event := new Move_Event;
+                           current_action.event.Initialize(nPlayer_Id => id,
+                                                    nFrom      => current_coord,
                                                     nTo        => target);
-                           mAction.utility := 10;
-                           ControllerPkg.Controller.Write(mAction => mAction);
+                           current_action.utility := 10;
+                           ControllerPkg.Controller.Write(current_action => current_action);
                         end;
                      else
-                        if Utils.Distance(From => mCoord,
+                        if Utils.Distance(From => current_coord,
                                           To   => targetPlayer) = 1 then
                            -- tackle!
-                           mAction.event := new Tackle_Event;
-                           mAction.event.Initialize(Id, mCoord,
+                           current_action.event := new Tackle_Event;
+                           current_action.event.Initialize(id, current_coord,
                                                     targetPlayer);
-                           Tackle_Event_Prt(mAction.event).Set_Other_Player_Id(id => targetPlayerId);
-                           mAction.utility := 10;
-                           ControllerPkg.Controller.Write(mAction => mAction);
+                           Tackle_Event_Prt(current_action.event).Set_Other_Player_Id(id => targetPlayerId);
+                           current_action.utility := 10;
+                           ControllerPkg.Controller.Write(current_action => current_action);
                         else
                            -- mi sposto verso di lui!!
-                           mAction.event := new Move_Event;
-                           mAction.event.Initialize(nPlayer_Id => Id,
-                                                    nFrom      => mCoord,
-                                                    nTo        => Utils.Get_Next_Coordinate(myCoord     => mCoord,
+                           current_action.event := new Move_Event;
+                           current_action.event.Initialize(nPlayer_Id => id,
+                                                    nFrom      => current_coord,
+                                                    nTo        => Utils.Get_Next_Coordinate(myCoord     => current_coord,
                                                                                             targetCoord => targetPlayer));
-                           mAction.utility := 10;
-                           ControllerPkg.Controller.Write(mAction => mAction);
+                           current_action.utility := 10;
+                           ControllerPkg.Controller.Write(current_action => current_action);
                         end if;
                      end if;
                   end;
                else
-                  mAction.event := new Move_Event;
-                  mAction.event.Initialize(nPlayer_Id => Id,
-                                           nFrom      => mCoord,
-                                           nTo        => Utils.Get_Next_Coordinate(myCoord     => mCoord,
+                  current_action.event := new Move_Event;
+                  current_action.event.Initialize(nPlayer_Id => id,
+                                           nFrom      => current_coord,
+                                           nTo        => Utils.Get_Next_Coordinate(myCoord     => current_coord,
                                                                                    targetCoord => Ball.Get_Position));
-                  mAction.utility := 10;
-                  ControllerPkg.Controller.Write(mAction => mAction);
+                  current_action.utility := 10;
+                  ControllerPkg.Controller.Write(current_action => current_action);
                end if;
             end if;
          else
             -- Mi muovo a caso!
             declare
-               target : Coordinate := Utils.Get_Random_Target(coord => mCoord);
+               target : Coordinate := Utils.Get_Random_Target(coord => current_coord);
             begin
 
-               mAction.event := new Move_Event;
-               mAction.event.Initialize(nPlayer_Id => Id,
-                                        nFrom      => mCoord,
+               current_action.event := new Move_Event;
+               current_action.event.Initialize(nPlayer_Id => id,
+                                        nFrom      => current_coord,
                                         nTo        => target);
-               mAction.utility := 10;
-               ControllerPkg.Controller.Write(mAction => mAction);
+               current_action.utility := 10;
+               ControllerPkg.Controller.Write(current_action => current_action);
             end;
          end if;
 

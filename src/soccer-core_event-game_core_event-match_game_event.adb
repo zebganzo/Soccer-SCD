@@ -5,7 +5,7 @@ package body Soccer.Core_Event.Game_Core_Event.Match_Game_Event is
 
    procedure Initialize (E : in out Match_Event; nEvent_Id : in Match_Event_Id) is
    begin
-      E.Event_Id := nEvent_Id;
+      E.event_id := nEvent_Id;
    end Initialize;
 
    procedure Serialize (E : Match_Event; Serialized_Obj : out JSON_Value) is
@@ -15,7 +15,7 @@ package body Soccer.Core_Event.Game_Core_Event.Match_Game_Event is
       Serialized_Obj.Set_Field(Field_Name => "type_of_event",
                                Field      => "match");
       Serialized_Obj.Set_Field(Field_Name => "event_id",
-                               Field      => Match_Event_Id'Image(E.Event_Id));
+                               Field      => Match_Event_Id'Image(E.event_id));
    end Serialize;
 
 end Soccer.Core_Event.Game_Core_Event.Match_Game_Event;

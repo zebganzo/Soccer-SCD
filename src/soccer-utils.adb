@@ -106,8 +106,8 @@ package body Soccer.Utils is
 
    function Check_Inside_Field (coord: Coordinate) return Boolean is
    begin
-      if coord.coordX > Field_Max_X or coord.coordX < 1 or
-        coord.coordY > Field_Max_Y or coord.coordY < 1 then
+      if coord.coordX > field_max_x or coord.coordX < 1 or
+        coord.coordY > field_max_y or coord.coordY < 1 then
          Put_Line("Ma sei fuori?! " & I2S(coord.coordX) & " " & I2S(coord.coordY));
          return False;
       else

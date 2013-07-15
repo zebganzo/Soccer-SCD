@@ -7,9 +7,9 @@ package body Soccer.Manager_Event.Substitution is
    begin
       Put_Line("substitution manager event");
 
-      E.Player_Id_1 := Serialized_Obj.Get(Field => "player_id_1");
-      E.Player_Id_2 := Serialized_Obj.Get(Field => "player_id_2");
-      E.Type_Id := Substitution_Id;
+      E.player_1_id := Serialized_Obj.Get(Field => "player_id_1");
+      E.player_2_id := Serialized_Obj.Get(Field => "player_id_2");
+      E.type_id := Substitution_Id;
    end Deserialize;
 
 end Soccer.Manager_Event.Substitution;

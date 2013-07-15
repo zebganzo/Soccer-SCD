@@ -3,18 +3,18 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Core_Event.Motion_Core_Event is
 
-   function getPlayer_Id (E : in Motion_Event) return Integer is
+   function Get_Player_Id (E : in Motion_Event) return Integer is
    begin
       return E.Player_Id;
-   end getPlayer_Id;
-   function getFrom (E : in Motion_Event) return Coordinate is
+   end Get_Player_Id;
+   function Get_From (E : in Motion_Event) return Coordinate is
    begin
       return E.From;
-   end getFrom;
-   function getTo (E : in Motion_Event) return Coordinate is
+   end Get_From;
+   function Get_To (E : in Motion_Event) return Coordinate is
    begin
       return E.To;
-   end getTo;
+   end Get_To;
 
    procedure Initialize (E : in out Motion_Event;
                          nPlayer_Id : in Integer;

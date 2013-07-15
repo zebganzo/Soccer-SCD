@@ -13,9 +13,9 @@ package Soccer.Core_Event.Motion_Core_Event is
                          nFrom : in Coordinate;
                          nTo : in Coordinate);
 
-   function getPlayer_Id (E : in Motion_Event) return Integer;
-   function getFrom (E : in Motion_Event) return Coordinate;
-   function getTo (E : in Motion_Event) return Coordinate;
+   function Get_Player_Id (E : in Motion_Event) return Integer;
+   function Get_From (E : in Motion_Event) return Coordinate;
+   function Get_To (E : in Motion_Event) return Coordinate;
 
 private
 

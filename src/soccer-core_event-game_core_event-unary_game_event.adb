@@ -3,10 +3,14 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 
-   procedure Initialize (E : in out Unary_Event; nEvent_Id : in Unary_Event_Id; nPlayer_Id : in Integer) is
+   procedure Initialize (E : in out Unary_Event;
+			 new_event_id : in Unary_Event_Id;
+			 new_player_id : in Integer;
+			 new_event_coord : in Coordinate) is
    begin
-      E.Event_Id := nEvent_Id;
-      E.Player_Id := nPlayer_Id;
+      E.event_id := new_event_id;
+      E.player_id := new_player_id;
+      E.event_coord := new_event_coord;
    end Initialize;
 
    procedure Serialize (E : Unary_Event; Serialized_Obj : out JSON_Value) is
@@ -16,9 +20,9 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
             Serialized_Obj.Set_Field(Field_Name => "type_of_event",
                                Field      => "unary");
       Serialized_Obj.Set_Field(Field_Name => "event_id",
-                               Field      => Unary_Event_Id'Image(E.Event_Id));
+                               Field      => Unary_Event_Id'Image(E.event_id));
       Serialized_Obj.Set_Field(Field_Name => "player_id",
-                               Field      => E.Player_Id);
+                               Field      => E.player_id);
    end Serialize;
 
 end Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;

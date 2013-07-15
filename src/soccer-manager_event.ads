@@ -1,4 +1,5 @@
 with GNATCOLL.JSON; use GNATCOLL.JSON;
+with Soccer.TeamPkg; use Soccer.TeamPkg;
 
 package Soccer.Manager_Event is
 
@@ -10,11 +11,14 @@ package Soccer.Manager_Event is
    procedure Deserialize (E : out Event; Serialized_Obj : in JSON_Value) is abstract;
    function Get_Type (E : Event) return Manager_Event_Id;
 
+   function Get_Team (E : Event) return Team_Id;
+
 private
 
    type Event is abstract tagged
       record
-         Type_Id : Manager_Event_Id;
+	 type_id : Manager_Event_Id;
+	 event_team : Team_Id;
       end record;
 
 end Soccer.Manager_Event;

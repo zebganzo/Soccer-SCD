@@ -11,8 +11,8 @@ private
 
    type Substitution_Event is new Event with
       record
-         Player_Id_1 : Integer;
-         Player_Id_2 : Integer;
+         player_1_id : Integer;
+         player_2_id : Integer;
       end record;
 
 end Soccer.Manager_Event.Substitution;

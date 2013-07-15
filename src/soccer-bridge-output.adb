@@ -36,7 +36,7 @@ package body Soccer.Bridge.Output is
    begin
       loop
          Timer_Control.Is_On;
-         delay duration (Send_Buffer_Delay);
+         delay duration (send_buffer_delay);
          if On then
             Buffer_Wrapper.Send;
          end if;
@@ -75,7 +75,9 @@ package body Soccer.Bridge.Output is
             size := size + 1;
             event_buffer(size) := new_element;
 
-            -- Se è un evento del Match (es. fine primo tempo) forzo la send
+	    -- Se è un evento del Match (es. fine primo tempo) forzo la send
+     	    -- cambiare Match Event in Game Event: questo perche' se sono eventi
+            -- tipo goal, sostituzione va notificato
             if new_event.all in Match_Event'Class then
                Send;
             end if;
@@ -87,8 +89,8 @@ package body Soccer.Bridge.Output is
                begin
                   for event in reverse 1 .. size loop
                      if event_buffer(event).event.all in Move_Event'Class then
-                        if Motion_Event(event_buffer(event).event.all).getPlayer_Id = Motion_Event(new_event.all).getPlayer_Id then
-                           Move_Event(event_buffer(event).event.all).Update_To_Coordinate(new_coord => Motion_Event(new_event.all).getTo);
+                        if Motion_Event(event_buffer(event).event.all).Get_Player_Id = Motion_Event(new_event.all).Get_Player_Id then
+                           Move_Event(event_buffer(event).event.all).Update_To_Coordinate(new_coord => Motion_Event(new_event.all).Get_To);
                            event_buffer(event).time_stop := t0 - now;
                            found := True;
                            exit;

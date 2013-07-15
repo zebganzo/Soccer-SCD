@@ -4,13 +4,15 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
 
    procedure Initialize (E : in out Binary_Event;
-                         nEvent_Id : in Binary_Event_Id;
-                         nPlayer_Id_1 : in Integer;
-                         nPlayer_Id_2 : in Integer) is
+                         new_event_id : in Binary_Event_Id;
+                         new_player_1_id : in Integer;
+			 new_player_2_id : in Integer;
+			 new_event_coord : in Coordinate) is
    begin
-      E.Event_Id := nEvent_Id;
-      E.Player_Id_1 := nPlayer_Id_1;
-      E.Player_Id_2 := nPlayer_Id_2;
+      E.event_id := new_event_id;
+      E.player_1_id := new_player_1_id;
+      E.player_2_id := new_player_2_id;
+      E.event_coord := new_event_coord;
    end Initialize;
 
    procedure Serialize (E : Binary_Event; Serialized_Obj : out JSON_Value) is
@@ -20,11 +22,18 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
       Serialized_Obj.Set_Field(Field_Name => "type_of_event",
                                Field      => "binary");
       Serialized_Obj.Set_Field(Field_Name => "event_id",
-                               Field      => Binary_Event_Id'Image(E.Event_Id));
-      Serialized_Obj.Set_Field(Field_Name => "player_id_1",
-                               Field      => E.Player_Id_1);
-      Serialized_Obj.Set_Field(Field_Name => "player_id_2",
-                               Field      => E.Player_Id_2);
+                               Field      => Binary_Event_Id'Image(E.event_id));
+      Serialized_Obj.Set_Field(Field_Name => "player_1_id",
+                               Field      => E.player_1_id);
+      Serialized_Obj.Set_Field(Field_Name => "player_2_id",
+			       Field      => E.player_2_id);
+      Serialized_Obj.Set_Field(Field_Name => "event_coord",
+                               Field      => Serialize_Coordinate (E.event_coord) );
    end Serialize;
+
+   function Get_Event_Id (event : Binary_Event) return Binary_Event_Id is
+   begin
+      return event.event_id;
+   end Get_Event_Id;
 
 end Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;

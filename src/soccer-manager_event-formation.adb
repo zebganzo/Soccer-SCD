@@ -7,7 +7,13 @@ package body Soccer.Manager_Event.Formation is
    begin
       Put_Line("Formation manager event");
       E.Scheme := Formation_Scheme'Val(Serialized_Obj.Get(Field => "scheme"));
-      E.Type_Id := Formation_Id;
+      E.type_id := Formation_Id;
    end Deserialize;
+
+   function Get_Scheme (E : in Formation_Event) return Formation_Scheme is
+   begin
+      return E.Scheme;
+   end Get_Scheme;
+
 
 end Soccer.Manager_Event.Formation;

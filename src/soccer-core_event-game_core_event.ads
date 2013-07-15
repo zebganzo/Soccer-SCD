@@ -3,12 +3,14 @@ use Soccer.Core_Event;
 
 package Soccer.Core_Event.Game_Core_Event is
 
-   type Game_Event is abstract new Event with private;
-   type Game_Event_Prt is access all Game_Event;
+   type Game_Event is new Event with private;
+   type Game_Event_Prt is access all Game_Event'Class;
+
+   procedure Serialize (E : Game_Event; Serialized_Obj : out JSON_Value);
 
 private
 
-   type Game_Event is abstract new Event with record
+   type Game_Event is new Event with record
       null;
    end record;
 
