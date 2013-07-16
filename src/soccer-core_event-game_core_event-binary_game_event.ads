@@ -18,6 +18,11 @@ package Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
 
    function Get_Event_Id (event : Binary_Event) return Binary_Event_Id;
 
+   function Get_Id_Player_1 (event : Binary_Event) return Integer;
+   function Get_Id_Player_2 (event : Binary_Event) return Integer;
+
+   function Get_Event_Coord (event : Binary_Event) return Coordinate;
+
 private
 
    type Binary_Event is new Game_Event with record

@@ -36,4 +36,20 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
       return event.event_id;
    end Get_Event_Id;
 
+
+   function Get_Id_Player_1 (event : Binary_Event) return Integer is
+   begin
+      return event.player_1_id;
+   end;
+
+   function Get_Id_Player_2 (event : Binary_Event) return Integer is
+   begin
+      return event.player_2_id;
+   end;
+
+   function Get_Event_Coord (event : Binary_Event) return Coordinate is
+   begin
+      return event.event_coord;
+   end Get_Event_Coord;
+
 end Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;

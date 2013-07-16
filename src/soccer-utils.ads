@@ -1,3 +1,4 @@
+with Soccer.TeamPkg; use Soccer.TeamPkg;
 package Soccer.Utils is
 
    --+ Distanza tra due punti
@@ -18,5 +19,7 @@ package Soccer.Utils is
    procedure CLS;
 
    function Check_Inside_Field (coord: Coordinate) return Boolean;
+
+   function Is_In_Penalty_Area (team : Team_Id; coord : Coordinate) return Boolean;
 
 end Soccer.Utils;

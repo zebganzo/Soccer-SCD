@@ -2,6 +2,9 @@ with Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
 use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
 with Soccer.BallPkg; use Soccer.BallPkg;
 with Soccer.Manager_Event.Formation; use Soccer.Manager_Event.Formation;
+with Soccer.Manager_Event.Substitution; use Soccer.Manager_Event.Substitution;
+with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
+use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
 
 package body Soccer.ControllerPkg.Referee is
 
@@ -25,9 +28,19 @@ package body Soccer.ControllerPkg.Referee is
 	       evt : Binary_Event_Prt := Binary_Event_Prt(game_event);
 	    begin
 	       if evt.Get_Event_Id = Foul then
-		  -- fallo!
-		  -- pushare su bridge e gestire il fallo
-		  null;
+		  declare
+		     evt_coord : Coordinate := evt.Get_Event_Coord;
+		     assigned_team : Team_Id := Get_Team_From_Id (evt.Get_Id_Player_2);
+		     foul_event : Unary_Event_Prt := new Unary_Event;
+		  begin
+		     -- controllo se il fallo e' stato fatto nell'area di rigore
+
+		     foul_event.Initialize (new_event_id    => Foul,
+			      new_player_id   => null,
+			      new_team_id     => assigned_team,
+			      new_event_coord => evt.Get_Event_Coord);
+		     null;
+		  end;
 	       end if;
 	    end;
 	 end if;
@@ -53,6 +66,7 @@ package body Soccer.ControllerPkg.Referee is
 	    elsif manager_events(i).all in Substitution_Event'Class then
 	       -- sostituzione di giocatore
 	       null; -- TODO:: cambiare giocatore
+	    end if;
 	 end loop;
       end if;
 
@@ -112,6 +126,8 @@ package body Soccer.ControllerPkg.Referee is
 	    end if;
 	 end if;
       end;
+
+      -- TODO:: settare sul controller l'evento
 
    end Check;
 

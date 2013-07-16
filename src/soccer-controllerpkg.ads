@@ -3,6 +3,9 @@ use Ada.Containers;
 with Soccer.Core_Event.Motion_Core_Event;
 use Soccer.Core_Event.Motion_Core_Event;
 
+with Soccer.Manager_Event.Substitution;
+use Soccer.Manager_Event.Substitution;
+
 with Soccer.TeamPkg;
 use Soccer.TeamPkg;
 with Soccer.Core_Event.Game_Core_Event;
@@ -31,14 +34,15 @@ package Soccer.ControllerPkg is
 
    package Players_Container is new Vectors (Index_Type   => Natural,
                                              Element_Type => Player_Status);
-   use Players_Container;
-
    type Read_Result_Type is
       record
-         players_in_my_zone : Vector;
+         players_in_my_zone : Players_Container.Vector;
          holder_id : Integer;
       end record;
    type Read_Result is access Read_Result_Type;
+
+   package Substitutions_Container is new Vectors (Index_Type   => Natural,
+						   Element_Type => Substitution_Event_Ptr);
 
    type Generic_Status is
       record
@@ -46,6 +50,7 @@ package Soccer.ControllerPkg is
          holder : Boolean;
 	 nearby : Boolean;
 	 last_event : Game_Event;
+	 substitutions : Substitutions_Container.Vector;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
 
@@ -53,7 +58,7 @@ package Soccer.ControllerPkg is
 
    function Get_Generic_Status (id : in Integer) return Generic_Status_Ptr;
 
-   procedure Set_Last_Event (event : Game_Event_Prt);
+   procedure Set_Game_Status (event : Game_Event_Prt);
 
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result;
 
@@ -70,6 +75,6 @@ package Soccer.ControllerPkg is
    end Controller;
 
 private
-   last_event : Game_Event_Prt;
+   game_status : Game_Event_Prt;
 
 end Soccer.ControllerPkg;

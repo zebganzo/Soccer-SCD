@@ -20,6 +20,8 @@ package Soccer.TeamPkg is
 
    procedure Set_Formation (team : in Team_Ptr; formation : in Formation_Scheme);
 
+   function To_String (team : in Team_Id) return String;
+
 private
    team_1 : Team_Ptr;
    team_2 : Team_Ptr;

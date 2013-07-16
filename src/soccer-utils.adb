@@ -115,4 +115,26 @@ package body Soccer.Utils is
       end if;
    end Check_Inside_Field;
 
+   function Is_In_Penalty_Area (team : Team_Id; coord : Coordinate) return Boolean is
+   begin
+      if team = Team_One then
+	 if coord.coordX > team_one_goal_starting_coord.coordX
+	   and coord.coordX < team_one_goal_starting_coord.coordX + penalty_area_width
+	   and coord.coordY > team_one_goal_starting_coord.coordY - penalty_area_height
+	   and coord.coordY < team_one_goal_starting_coord.coordY then
+	    return true;
+	 end if;
+      else
+	 if coord.coordX > team_two_goal_starting_coord.coordX
+	   and coord.coordX < team_two_goal_starting_coord.coordX + penalty_area_width
+	   and coord.coordY > team_two_goal_starting_coord.coordY
+	   and coord.coordY < team_two_goal_starting_coord.coordY + penalty_area_height then
+	    return true;
+	 end if;
+      end if;
+
+      return false;
+
+   end Is_In_Penalty_Area;
+
 end Soccer.Utils;

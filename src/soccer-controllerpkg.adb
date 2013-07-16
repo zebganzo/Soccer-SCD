@@ -56,15 +56,18 @@ package body Soccer.ControllerPkg is
             exit;
          end if;
       end loop;
+
       gen_stat.coord := coord_result;
       gen_stat.holder := holder_result;
       gen_stat.nearby := nearby_result;
+
       return gen_stat;
+
    end Get_Generic_Status;
 
-   procedure Set_Last_Event (event : Game_Event_Prt) is begin
-      last_event := event;
-   end Set_Last_Event;
+   procedure Set_Game_Status (event : Game_Event_Prt) is begin
+      game_status := event;
+   end Set_Game_Status;
 
    --+ Ritorna un Vector di Coordinate (id, x, y) dei giocatori di distanza <= a r
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result is
@@ -343,6 +346,9 @@ package body Soccer.ControllerPkg is
       ball_holder_id := 1;
       Ball.Set_Controlled(new_status => True);
 
+      -- TODO:: chiamare l'arbitro, cosi' se c'e' un evento in pending puo' decidere
+      -- chi deve sbloccare il gioco
+
       loop
 	-- aggiungere controllo su flag del gioco (per pausa, fine_gioco, ecc)
          for Zone in Fields_Zone'Range loop
@@ -391,6 +397,9 @@ package body Soccer.ControllerPkg is
             end select;
          end loop;
       end loop;
+
+      -- invocare l'arbitro per controllare lo stato del gioco dopo l'azione
+
    end Controller;
 
 end Soccer.ControllerPkg;

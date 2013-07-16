@@ -20,11 +20,17 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
+   -- team one up
    team_one_goal_starting_coord : Coordinate := Coordinate'(coordX => 9,
-							coordY => 0);
+							    coordY => 0);
+   -- team two down
    team_two_goal_starting_coord : Coordinate := Coordinate'(coordX => 9,
 							coordY => 31);
    goal_length : Positive := 2;
+
+   penalty_area_width : Positive := 6;
+   penalty_area_height : Positive := 3;
+
    buffer_dim : Positive := 10;
    nearby_distance : Integer := 3;
    send_buffer_delay : Integer := 1;
