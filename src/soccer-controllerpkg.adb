@@ -65,9 +65,23 @@ package body Soccer.ControllerPkg is
 
    end Get_Generic_Status;
 
-   procedure Set_Game_Status (event : Game_Event_Prt) is begin
+   procedure Set_Game_Status (event : Game_Event_Ptr) is begin
       game_status := event;
    end Set_Game_Status;
+
+   function Get_Game_Status return Game_Event_Ptr is
+   begin
+      return game_status;
+   end Get_Game_Status;
+
+   function Is_Game_Running return Boolean is
+   begin
+      if game_status = null then
+	 return True;
+      end if;
+
+      return False;
+   end Is_Game_Running;
 
    --+ Ritorna un Vector di Coordinate (id, x, y) dei giocatori di distanza <= a r
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result is
@@ -273,7 +287,7 @@ package body Soccer.ControllerPkg is
 			      new_player_2_id => action.Get_Other_Player_Id,
 			      new_event_coord => action.Get_To);
 
-	       Referee.Notify_Game_Event(event => Game_Event_Prt (foul_event));
+	       Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
 	    end if;
 	 end;
 

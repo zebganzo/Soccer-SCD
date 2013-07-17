@@ -25,11 +25,18 @@ package Soccer is
 							    coordY => 0);
    -- team two down
    team_two_goal_starting_coord : Coordinate := Coordinate'(coordX => 9,
-							coordY => 31);
+							    coordY => 31);
+
    goal_length : Positive := 2;
 
+   -- penalty variables
    penalty_area_width : Positive := 6;
    penalty_area_height : Positive := 3;
+
+   team_one_penalty_coord : Coordinate; -- TODO:: inizializza!
+   team_two_penalty_coord : Coordinate; -- TODO:: inizializza!
+
+   middle_field_coord : Coordinate; -- TODO:: inizializza!
 
    buffer_dim : Positive := 10;
    nearby_distance : Integer := 3;

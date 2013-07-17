@@ -9,6 +9,7 @@ package Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
    type Unary_Event_Id is (Send_Off,
 			   Caution,
 			   Goal,
+			   Foul,
 			   Throw_In,
 			   Goal_Kick,
 			   Corner_Kick,

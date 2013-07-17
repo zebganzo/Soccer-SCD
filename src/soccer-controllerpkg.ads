@@ -58,7 +58,11 @@ package Soccer.ControllerPkg is
 
    function Get_Generic_Status (id : in Integer) return Generic_Status_Ptr;
 
-   procedure Set_Game_Status (event : Game_Event_Prt);
+   procedure Set_Game_Status (event : Game_Event_Ptr);
+
+   function Get_Game_Status return Game_Event_Ptr;
+
+   function Is_Game_Running return Boolean;
 
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result;
 
@@ -75,6 +79,6 @@ package Soccer.ControllerPkg is
    end Controller;
 
 private
-   game_status : Game_Event_Prt;
+   game_status : Game_Event_Ptr;
 
 end Soccer.ControllerPkg;
