@@ -28,13 +28,6 @@ with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
 
 package body Soccer.ControllerPkg is
 
-   type Status is array (1 .. num_of_players) of Player_Status;
-   mStatus : Status;
-
-   ball_holder_id : Integer := 0;
-
-   type Released_Zone is array (1 .. Num_Of_Zone) of Boolean;
-
    --+ Ritorna la posizione in base all'id
    function Get_Generic_Status(id : in Integer) return Generic_Status_Ptr is
       coord_result : Coordinate;
@@ -42,13 +35,13 @@ package body Soccer.ControllerPkg is
       nearby_result : Boolean := False;
       gen_stat : Generic_Status_Ptr := new Generic_Status;
    begin
-      for i in mStatus'Range loop
-         if(mStatus(i).id = id) then
-            coord_result := mStatus(i).player_coord;
-            if(ball_holder_id = mStatus(i).id) then
+      for i in current_status'Range loop
+         if(current_status(i).id = id) then
+            coord_result := current_status(i).player_coord;
+            if(ball_holder_id = current_status(i).id) then
                holder_result := True;
             elsif Distance(From => Ball.Get_Position,
-                           To   => mStatus(i).player_coord) <= nearby_distance then
+                           To   => current_status(i).player_coord) <= nearby_distance then
                nearby_result := True;
             else
                nearby_result := False;
@@ -60,6 +53,8 @@ package body Soccer.ControllerPkg is
       gen_stat.coord := coord_result;
       gen_stat.holder := holder_result;
       gen_stat.nearby := nearby_result;
+      gen_stat.game_status := game_status;
+      gen_stat.game_ready := is_game_ready;
 
       return gen_stat;
 
@@ -74,6 +69,16 @@ package body Soccer.ControllerPkg is
       return game_status;
    end Get_Game_Status;
 
+   procedure Set_Game_Ready (status : in Boolean) is
+   begin
+      is_game_ready := status;
+   end Set_Game_Ready;
+
+   function Get_Game_Ready return Boolean is
+   begin
+      return is_game_ready;
+   end Get_Game_Ready;
+
    function Is_Game_Running return Boolean is
    begin
       if game_status = null then
@@ -83,18 +88,23 @@ package body Soccer.ControllerPkg is
       return False;
    end Is_Game_Running;
 
+   function Get_Players_Status return Status is
+   begin
+      return current_status;
+   end Get_Players_Status;
+
    --+ Ritorna un Vector di Coordinate (id, x, y) dei giocatori di distanza <= a r
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result is
       result : Read_Result := new Read_Result_Type;
       d : Integer := 0;
    begin
-      for i in mStatus'Range loop
+      for i in current_status'Range loop
          d := Distance(x1 => x,
-                       x2 => mStatus(i).player_coord.coordX,
+                       x2 => current_status(i).player_coord.coord_x,
                        y1 => y,
-                       y2 => mStatus(i).player_coord.coordY);
+                       y2 => current_status(i).player_coord.coord_y);
          if(d <= r and d /= 0) then
-            result.players_in_my_zone.Append(New_Item => mStatus(i));
+            result.players_in_my_zone.Append(New_Item => current_status(i));
          end if;
       end loop;
       result.holder_id := ball_holder_id;
@@ -102,18 +112,18 @@ package body Soccer.ControllerPkg is
    end Read_Status;
 
    --+ Controlla se in quella cella c'e' un giocatore
-   function Check_For_Player_In_Cell(x : in Integer; y : in Integer) return Integer is
+   function Check_For_Player_In_Cell (x : in Integer; y : in Integer) return Integer is
    begin
-      for i in mStatus'Range loop
-         if (mStatus(i).player_coord.coordX = x and mStatus(i).player_coord.coordY = y) then
-            if(mStatus(i).id = ball_holder_id) then
-               return -1 * mStatus(i).id;
+      for i in current_status'Range loop
+         if (current_status(i).player_coord.coord_x = x and current_status(i).player_coord.coord_y = y) then
+            if(current_status(i).id = ball_holder_id) then
+               return -1 * current_status(i).id;
             else
-               return mStatus(i).id;
+               return current_status(i).id;
             end if;
          end if;
       end loop;
-      if Ball.Get_Position.coordX = x and Ball.Get_Position.coordY = y then
+      if Ball.Get_Position.coord_x = x and Ball.Get_Position.coord_y = y then
          return 100;
       end if;
       return 0;
@@ -123,11 +133,11 @@ package body Soccer.ControllerPkg is
    procedure Initialize is
    begin
       for i in 1 .. num_of_players loop
-         mStatus(i).id := i;
+         current_status(i).id := i;
          if i < 4 then
-            mStatus(i).team := TeamPkg.Team_One;
+            current_status(i).team := TeamPkg.Team_One;
          else
-            mStatus(i).team := TeamPkg.Team_Two;
+            current_status(i).team := TeamPkg.Team_Two;
          end if;
       end loop;
    end Initialize;
@@ -175,7 +185,7 @@ package body Soccer.ControllerPkg is
       end loop;
    end Field_Printer;
 
-   Released : Released_Zone;
+   Released : Released_Zones;
 
    function Get_Ball_Holder return Integer is
    begin
@@ -184,7 +194,7 @@ package body Soccer.ControllerPkg is
 
    function Get_Zone (coord : Coordinate) return Integer is
    begin
-      return (Integer((coord.coordX - 1)/ (field_max_x / Num_Of_Zone)) + 1);
+      return (Integer((coord.coord_x - 1)/ (field_max_x / number_of_zones)) + 1);
    end Get_Zone;
 
    procedure Release (coord : Coordinate) is
@@ -192,10 +202,10 @@ package body Soccer.ControllerPkg is
       Released(Get_Zone(coord => coord)) := True;
    end Release;
 
-   function Occupy (coord : Coordinate) return Fields_Zone is
-      Zone : Fields_Zone;
+   function Occupy (coord : Coordinate) return Field_Zones is
+      Zone : Field_Zones;
    begin
-      Zone := Fields_Zone(Get_Zone(coord => coord));
+      Zone := Field_Zones(Get_Zone(coord => coord));
       Released(Integer(Zone)) := False;
       return Zone;
    end Occupy;
@@ -219,7 +229,6 @@ package body Soccer.ControllerPkg is
       else
 	 with_foul := False;
       end if;
-
    end Calculate_Tackle;
 
    --+ Nel caso in cui il giocatore si sposti con la palla non cambia la mossa scritta nel buffer
@@ -228,11 +237,11 @@ package body Soccer.ControllerPkg is
    procedure Compute (action : in Move_Event_Prt; success : out Boolean) is
       here_player_result : Integer;
    begin
-      here_player_result := Check_For_Player_In_Cell(x => action.Get_To.coordX,
-                                          y => action.Get_To.coordY);
+      here_player_result := Check_For_Player_In_Cell(x => action.Get_To.coord_x,
+                                          y => action.Get_To.coord_y);
       if here_player_result = 0 or here_player_result = 100 then
          -- Free position
-         mStatus(action.Get_Player_Id).player_coord := action.Get_To;
+         current_status(action.Get_Player_Id).player_coord := action.Get_To;
          if ball_holder_id = action.Get_Player_Id then
             Ball.Move_Player(new_coord => action.Get_To);
          end if;
@@ -245,7 +254,7 @@ package body Soccer.ControllerPkg is
       end if;
    end Compute;
 
-   procedure Compute (action : in Shot_Event_Prt; success : out Boolean) is
+   procedure Compute (action : in Shot_Event_Ptr; success : out Boolean) is
    begin
       if Utils.Compare_Coordinates(coord1 => Ball.Get_Position,
                                    coord2 => action.Get_From) then
@@ -264,13 +273,13 @@ package body Soccer.ControllerPkg is
       end if;
    end Compute;
 
-   procedure Compute (action : in Tackle_Event_Prt; success : out Boolean) is
+   procedure Compute (action : in Tackle_Event_Ptr; success : out Boolean) is
       with_foul : Boolean := False;
       tackle_success : Boolean;
    begin
       Put_Line("Tackle_Event");
       if Utils.Compare_Coordinates(coord1 => action.Get_To,
-                                   coord2 => mStatus(action.Get_Other_Player_Id).player_coord) then
+                                   coord2 => current_status(action.Get_Other_Player_Id).player_coord) then
 	    -- Tento di rubargli la palla!
 	    Calculate_Tackle(attacker_id   => action.Get_Player_Id,
 		      ball_owner_id => action.Get_Other_Player_Id,
@@ -279,7 +288,7 @@ package body Soccer.ControllerPkg is
 
 	 -- Notifico l'arbitro se c'e' stato un contrasto con fallo
 	 declare
-	    foul_event : Binary_Event_Prt := new Binary_Event;
+	    foul_event : Binary_Event_Ptr := new Binary_Event;
 	 begin
 	    if with_foul then
 	       foul_event.Initialize(new_event_id    => Foul,
@@ -298,7 +307,7 @@ package body Soccer.ControllerPkg is
 	    Set_Last_Ball_Holder (holder => ball_holder_id);
 
             declare
-               new_action : Motion_Event_Prt := new Motion_Event;
+               new_action : Motion_Event_Ptr := new Motion_Event;
             begin
                new_action.Initialize(nPlayer_Id => 0,
                                      nFrom      => action.Get_To,
@@ -317,7 +326,7 @@ package body Soccer.ControllerPkg is
       end if;
    end Compute;
 
-   procedure Compute (action : in Catch_Event_Prt; success : out Boolean) is
+   procedure Compute (action : in Catch_Event_Ptr; success : out Boolean) is
    begin
       Put_Line("Catch_event");
       Ball.Catch(player_coord => action.Get_To,
@@ -328,7 +337,7 @@ package body Soccer.ControllerPkg is
       end if;
    end Compute;
 
-   procedure Compute (action : in Motion_Event_Prt; success : out Boolean; revaluate : out Boolean) is
+   procedure Compute (action : in Motion_Event_Ptr; success : out Boolean; revaluate : out Boolean) is
    begin
       success := False;
       revaluate := False;
@@ -337,13 +346,13 @@ package body Soccer.ControllerPkg is
          Compute(action  => Move_Event_Prt(action),
                  success => success);
       elsif action.all in Shot_Event'Class then
-         Compute(action  => Shot_Event_Prt(action),
+         Compute(action  => Shot_Event_Ptr(action),
                  success => success);
       elsif action.all in Tackle_Event'Class then
-         Compute(action  => Tackle_Event_Prt(action),
+         Compute(action  => Tackle_Event_Ptr(action),
                  success => success);
       elsif action.all in Catch_Event'Class then
-         Compute(action  => Catch_Event_Prt(action),
+         Compute(action  => Catch_Event_Ptr(action),
                  success => success);
       end if;
    end Compute;
@@ -365,7 +374,7 @@ package body Soccer.ControllerPkg is
 
       loop
 	-- aggiungere controllo su flag del gioco (per pausa, fine_gioco, ecc)
-         for Zone in Fields_Zone'Range loop
+         for Zone in Field_Zones'Range loop
             select
                accept Write (current_action : in out Action) do
                   --                    Put("Action :");
@@ -398,8 +407,8 @@ package body Soccer.ControllerPkg is
 
                      if not compute_result and revaluate then
 			Put_Line("Giocatore " & I2S(current_action.event.Get_Player_Id)
-			  & " bloccato dal giocatore " & I2S(Check_For_Player_In_Cell(x => current_action.event.Get_To.coordX, y => current_action.event.Get_To.coordY))
-			  & " alle coordinate " & I2S(current_action.event.Get_To.coordX) & I2S(current_action.event.Get_To.coordy));
+			  & " bloccato dal giocatore " & I2S(Check_For_Player_In_Cell(x => current_action.event.Get_To.coord_x, y => current_action.event.Get_To.coord_y))
+			  & " alle coordinate " & I2S(current_action.event.Get_To.coord_x) & I2S(current_action.event.Get_To.coord_y));
                         if(current_action.utility > utility_constraint) then
                            current_action.utility := current_action.utility - 1;
                            requeue Awaiting(Occupy(current_action.event.Get_To));

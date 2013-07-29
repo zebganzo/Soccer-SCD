@@ -5,7 +5,7 @@ with Soccer.TeamPkg; use Soccer.TeamPkg;
 package Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 
    type Unary_Event is new Game_Event with private;
-   type Unary_Event_Prt is access all Unary_Event;
+   type Unary_Event_Ptr is access all Unary_Event;
    type Unary_Event_Id is (Send_Off,
 			   Caution,
 			   Goal,
@@ -23,6 +23,11 @@ package Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 			 new_player_id : in Integer;
 			 new_team_id : in Team_Id;
 			 new_event_coord : in Coordinate);
+
+   function Get_Team (e : in Unary_Event_Ptr) return Team_Id;
+   function Get_Player_Id (e : in Unary_Event_Ptr) return Integer;
+   function Get_Type (e : in Unary_Event_Ptr) return Unary_Event_Id;
+   function Get_Coordinate (e : in Unary_Event_Ptr) return Coordinate;
 
 private
 

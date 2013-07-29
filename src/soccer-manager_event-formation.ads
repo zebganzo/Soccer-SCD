@@ -7,13 +7,13 @@ package Soccer.Manager_Event.Formation is
 
    procedure Deserialize (E : out Formation_Event; Serialized_Obj : in JSON_Value);
 
-   function Get_Scheme (E : in Formation_Event) return Formation_Scheme;
+   function Get_Scheme (E : in Formation_Event) return Formation_Scheme_Id;
 
 private
 
    type Formation_Event is new Event with
       record
-         Scheme : Formation_Scheme;
+         Scheme : Formation_Scheme_Id;
       end record;
 
 end Soccer.Manager_Event.Formation;

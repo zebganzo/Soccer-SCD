@@ -47,9 +47,9 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
       return event.player_2_id;
    end;
 
-   function Get_Event_Coord (event : Binary_Event) return Coordinate is
+   function Get_Coordinate (event : Binary_Event) return Coordinate is
    begin
       return event.event_coord;
-   end Get_Event_Coord;
+   end Get_Coordinate;
 
 end Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;

@@ -8,7 +8,7 @@ package body Soccer.BallPkg is
 
       function Get_Position return Coordinate is
       begin
-         return mCoord;
+         return current_position;
       end Get_Position;
 
       function Get_Controlled return Boolean is
@@ -33,11 +33,11 @@ package body Soccer.BallPkg is
 
       procedure Catch (player_coord : Coordinate; succeded : out Boolean) is
       begin
-         if(Utils.distance(x1 => player_coord.coordX,
-                           x2 => mCoord.coordX,
-                           y1 => player_coord.coordY,
-                           y2 => mCoord.coordY) <= 1) then
-            mCoord := player_coord;
+         if(Utils.distance(x1 => player_coord.coord_x,
+                           x2 => current_position.coord_x,
+                           y1 => player_coord.coord_y,
+                           y2 => current_position.coord_y) <= 1) then
+            current_position := player_coord;
             controlled := True;
             moving := False;
             succeded := True;
@@ -48,15 +48,15 @@ package body Soccer.BallPkg is
 
       procedure Move_Player (new_coord : Coordinate) is
       begin
-         mCoord := new_coord;
-         Put_Line ("mCoord " & I2S(mCoord.coordX) & " " & I2S(mCoord.coordY));
+         current_position := new_coord;
+         Put_Line ("mCoord " & I2S(current_position.coord_x) & " " & I2S(current_position.coord_y));
       end Move_Player;
 
       entry Move_Agent (new_coord : Coordinate)
         when controlled = False is
       begin
          Put_Line("Move_Agent_Hell_yeah!!!");
-         mCoord := new_coord;
+         current_position := new_coord;
       end Move_Agent;
 
       --+ potenzialmente inutile
@@ -64,6 +64,11 @@ package body Soccer.BallPkg is
       begin
          controlled := False;
       end Release;
+
+      procedure Set_Position (new_position : in Coordinate) is
+      begin
+	 current_position := new_position;
+      end Set_Position;
 
    end Ball;
 

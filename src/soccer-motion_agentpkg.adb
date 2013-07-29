@@ -37,7 +37,7 @@ package body Soccer.Motion_AgentPkg is
          Put_Line("Motion_Agent in azione!!!!!!!!!!");
 
          while actual_power > 0 and Ball.Get_Controlled = False loop
-            Put_Line("New Ball Coords " & I2S(actual_coord.coordX) & " " & I2S(actual_coord.coordY));
+            Put_Line("New Ball Coords " & I2S(actual_coord.coord_x) & " " & I2S(actual_coord.coord_y));
             Ball.Set_Moving(new_status => True);
             actual_target := Utils.Get_Next_Coordinate(myCoord => actual_coord,
                                                        targetCoord => real_target);

@@ -7,6 +7,9 @@ package Soccer.Manager_Event.Substitution is
 
    procedure Deserialize (E : out Substitution_Event; Serialized_Obj : in JSON_Value);
 
+   package Substitutions_Container is new Vectors (Index_Type   => Natural,
+						   Element_Type => Substitution_Event_Ptr);
+
 private
 
    type Substitution_Event is new Event with

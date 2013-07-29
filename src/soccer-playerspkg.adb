@@ -57,8 +57,8 @@ package body Soccer.PlayersPkg is
       Rand_Int.Reset(seed_x);
       Rand_Int.Reset(seed_y);
 
-      target_coord := Coordinate'(coordX => initial_coord_x,
-                                  coordY => initial_coord_y);
+      target_coord := Coordinate'(coord_x => initial_coord_x,
+                                  coord_y => initial_coord_y);
 
       current_action.event := new Move_Event;
       current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
@@ -87,8 +87,8 @@ package body Soccer.PlayersPkg is
 
          --       Put_Line("Giocatore " & I2S(Id) & " Coordinate From " & I2S(mCoord.coordX) & "," & I2S(mCoord.coordY));
 
-         current_read_result := ControllerPkg.Read_Status(x => current_coord.coordX,
-                                                 y => current_coord.coordY,
+         current_read_result := ControllerPkg.Read_Status(x => current_coord.coord_x,
+                                                 y => current_coord.coord_y,
                                                  r => current_range);
 
          for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
@@ -146,7 +146,7 @@ package body Soccer.PlayersPkg is
                         current_action.event.Initialize(id, current_coord,
                                                  current_read_result.players_in_my_zone.Element(Index => playerTarget).player_coord);
                         Put_Line("Mi stanno per rubare palla, la passo al mio amico " & I2S(current_read_result.players_in_my_zone.Element(Index => playerTarget).id));
-                        Shot_Event_Prt(current_action.event).Set_Shot_Power (10);
+                        Shot_Event_Ptr(current_action.event).Set_Shot_Power (10);
                         current_action.utility := 10;
                         ControllerPkg.Controller.Write(current_action => current_action);
                      end if;
@@ -167,18 +167,18 @@ package body Soccer.PlayersPkg is
             end;
          elsif current_generic_status.nearby then
             -- Sono vicnino alla palla! Meglio essere coscienziosi
-            if Compare_Coordinates(coord1 => Ball.Get_Position,
-                                   coord2 => current_coord) then
+            if Compare_Coordinates (coord1 => Ball.Get_Position,
+                                    coord2 => current_coord) then
                current_action.event := new Catch_Event;
-               current_action.event.Initialize(id, current_coord,
-                                        Ball.Get_Position);
+               current_action.event.Initialize (id, current_coord,
+                                        	Ball.Get_Position);
                current_action.utility := 10;
                ControllerPkg.Controller.Write(current_action => current_action);
             else
                if Ball.Get_Controlled then
                   declare
-                     targetPlayer : Coordinate := Coordinate'(coordX => 0,
-                                                              coordY => 0);
+                     targetPlayer : Coordinate := Coordinate'(coord_x => 0,
+                                                              coord_y => 0);
                      targetPlayerId : Integer := 0;
                   begin
                      -- controllata da un giocatore
@@ -191,7 +191,7 @@ package body Soccer.PlayersPkg is
                            end if;
                         end if;
                      end loop;
-                     if targetPlayer.coordX = 0 then
+                     if targetPlayer.coord_x = 0 then
                         -- la controlla un compagno di squadra -> mi muovo a caso!
                         declare
                            target : Coordinate := Utils.Get_Random_Target(coord => current_coord);
@@ -211,7 +211,7 @@ package body Soccer.PlayersPkg is
                            current_action.event := new Tackle_Event;
                            current_action.event.Initialize(id, current_coord,
                                                     targetPlayer);
-                           Tackle_Event_Prt(current_action.event).Set_Other_Player_Id(id => targetPlayerId);
+                           Tackle_Event_Ptr(current_action.event).Set_Other_Player_Id(id => targetPlayerId);
                            current_action.utility := 10;
                            ControllerPkg.Controller.Write(current_action => current_action);
                         else

@@ -13,14 +13,17 @@ package Soccer.BallPkg is
       procedure Move_Player (new_coord : Coordinate);
       entry Move_Agent (new_coord : Coordinate);
 
+      procedure Set_Position (new_position : in Coordinate);
+
       procedure Release;
 
       private
 --        mCoord : Coordinate := Coordinate'(coordX => Field_Max_X / 2,
 --                                           coordY => Field_Max_Y / 2);
-      mCoord : Coordinate;
+      current_position : Coordinate;
       controlled : Boolean := False;
       moving : Boolean := False;
+
    end Ball;
 
 end Soccer.BallPkg;

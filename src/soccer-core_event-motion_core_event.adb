@@ -34,13 +34,13 @@ package body Soccer.Core_Event.Motion_Core_Event is
       Serialized_Obj.Set_Field(Field_Name => "player_id",
                                Field      => E.Player_Id);
       Serialized_Obj.Set_Field(Field_Name => "from_x",
-                               Field      => E.From.coordX);
+                               Field      => E.From.coord_x);
       Serialized_Obj.Set_Field(Field_Name => "from_y",
-                               Field      => E.From.coordY);
+                               Field      => E.From.coord_y);
       Serialized_Obj.Set_Field(Field_Name => "to_x",
-                               Field      => E.To.coordX);
+                               Field      => E.To.coord_x);
       Serialized_Obj.Set_Field(Field_Name => "to_y",
-                               Field      => E.To.coordX);
+                               Field      => E.To.coord_x);
    end Serialize;
 
 end Soccer.Core_Event.Motion_Core_Event;

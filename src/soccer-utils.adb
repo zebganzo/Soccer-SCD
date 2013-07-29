@@ -1,4 +1,3 @@
-with Soccer.Utils;
 with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Numerics.Discrete_Random;
 with Ada.Text_IO;
@@ -21,34 +20,34 @@ package body Soccer.Utils is
    function Distance(From : in Coordinate; To : in Coordinate) return Integer is
       dx, dy : float;
    begin
-      dx := float(From.coordX - To.coordX);
-      dy := float(From.coordY - To.coordY);
+      dx := float(From.coord_x - To.coord_x);
+      dy := float(From.coord_y - To.coord_y);
       return Integer(Sqrt( dx*dx + dy*dy ));
    end Distance;
 
    function Get_Next_Coordinate (myCoord : Coordinate; targetCoord : Coordinate) return Coordinate is
-      myX : Integer := myCoord.coordX;
-      myY : Integer := myCoord.coordY;
-      tarX : Integer := targetCoord.coordX;
-      tarY : Integer := targetCoord.coordY;
+      myX : Integer := myCoord.coord_x;
+      myY : Integer := myCoord.coord_y;
+      tarX : Integer := targetCoord.coord_x;
+      tarY : Integer := targetCoord.coord_y;
    begin
       if (myX = tarX and myY = tarY) then return myCoord;    -- sovrapposti
-      elsif (myX < tarX and myY < tarY) then return Coordinate'(coordX => myX+1,
-                                                                coordY => myY+1); -- alto destra
-      elsif (myX < tarX and myY = tarY) then return Coordinate'(coordX => myX+1,
-                                                                coordY => myY); -- destra
-      elsif (myX < tarX and myY > tarY) then return Coordinate'(coordX => myX+1,
-                                                                coordY => myY-1); -- basso destra
-      elsif (myX = tarX and myY > tarY) then return Coordinate'(coordX => myX,
-                                                                coordY => myY-1); -- basso
-      elsif (myX > tarX and myY > tarY) then return Coordinate'(coordX => myX-1,
-                                                                coordY => myY-1); -- basso sinistra
-      elsif (myX > tarX and myY = tarY) then return Coordinate'(coordX => myX-1,
-                                                                coordY => myY); -- sinistra
-      elsif (myX > tarX and myY < tarY) then return Coordinate'(coordX => myX-1,
-                                                                coordY => myY+1); -- alto sinistra
-      else return Coordinate'(coordX => myX,
-                              coordY => myY+1); -- sopra (myX = tarX and myY < tarY)
+      elsif (myX < tarX and myY < tarY) then return Coordinate'(coord_x => myX+1,
+                                                                coord_y => myY+1); -- alto destra
+      elsif (myX < tarX and myY = tarY) then return Coordinate'(coord_x => myX+1,
+                                                                coord_y => myY); -- destra
+      elsif (myX < tarX and myY > tarY) then return Coordinate'(coord_x => myX+1,
+                                                                coord_y => myY-1); -- basso destra
+      elsif (myX = tarX and myY > tarY) then return Coordinate'(coord_x => myX,
+                                                                coord_y => myY-1); -- basso
+      elsif (myX > tarX and myY > tarY) then return Coordinate'(coord_x => myX-1,
+                                                                coord_y => myY-1); -- basso sinistra
+      elsif (myX > tarX and myY = tarY) then return Coordinate'(coord_x => myX-1,
+                                                                coord_y => myY); -- sinistra
+      elsif (myX > tarX and myY < tarY) then return Coordinate'(coord_x => myX-1,
+                                                                coord_y => myY+1); -- alto sinistra
+      else return Coordinate'(coord_x => myX,
+                              coord_y => myY+1); -- sopra (myX = tarX and myY < tarY)
       end if;
    end Get_Next_Coordinate;
 
@@ -77,21 +76,21 @@ package body Soccer.Utils is
       Rand_Int.Reset(seed);
       random_value := Integer(Rand_Int.Random(seed));
       if random_value = 1 then
-         target := Coordinate'(coordX => coord.coordX+1, coordY => coord.coordY+1); -- alto destra
+         target := Coordinate'(coord_x => coord.coord_x+1, coord_y => coord.coord_y+1); -- alto destra
       elsif random_value = 2  then
-         target := Coordinate'(coordX => coord.coordX+1, coordY => coord.coordY); -- destra
+         target := Coordinate'(coord_x => coord.coord_x+1, coord_y => coord.coord_y); -- destra
       elsif random_value = 3 then
-         target := Coordinate'(coordX => coord.coordX+1, coordY => coord.coordY-1); -- basso destra
+         target := Coordinate'(coord_x => coord.coord_x+1, coord_y => coord.coord_y-1); -- basso destra
       elsif random_value = 4 then
-         target := Coordinate'(coordX => coord.coordX, coordY => coord.coordY-1); -- basso
+         target := Coordinate'(coord_x => coord.coord_x, coord_y => coord.coord_y-1); -- basso
       elsif random_value = 5 then
-         target := Coordinate'(coordX => coord.coordX-1, coordY => coord.coordY-1); -- basso sinistra
+         target := Coordinate'(coord_x => coord.coord_x-1, coord_y => coord.coord_y-1); -- basso sinistra
       elsif random_value = 6 then
-         target := Coordinate'(coordX => coord.coordX-1, coordY => coord.coordY); -- sinistra
+         target := Coordinate'(coord_x => coord.coord_x-1, coord_y => coord.coord_y); -- sinistra
       elsif random_value = 7 then
-         target := Coordinate'(coordX => coord.coordX-1, coordY => coord.coordY+1); -- alto sinistra
+         target := Coordinate'(coord_x => coord.coord_x-1, coord_y => coord.coord_y+1); -- alto sinistra
       else
-         target := Coordinate'(coordX => coord.coordX, coordY => coord.coordY+1); -- alto
+         target := Coordinate'(coord_x => coord.coord_x, coord_y => coord.coord_y+1); -- alto
       end if;
       if not Check_Inside_Field(coord => target) then
          return Get_Random_Target(coord => coord);
@@ -106,9 +105,9 @@ package body Soccer.Utils is
 
    function Check_Inside_Field (coord: Coordinate) return Boolean is
    begin
-      if coord.coordX > field_max_x or coord.coordX < 1 or
-        coord.coordY > field_max_y or coord.coordY < 1 then
-         Put_Line("Ma sei fuori?! " & I2S(coord.coordX) & " " & I2S(coord.coordY));
+      if coord.coord_x > field_max_x or coord.coord_x < 1 or
+        coord.coord_y > field_max_y or coord.coord_y < 1 then
+         Put_Line("Ma sei fuori?! " & I2S(coord.coord_x) & " " & I2S(coord.coord_y));
          return False;
       else
          return True;
@@ -118,23 +117,22 @@ package body Soccer.Utils is
    function Is_In_Penalty_Area (team : Team_Id; coord : Coordinate) return Boolean is
    begin
       if team = Team_One then
-	 if coord.coordX > team_one_goal_starting_coord.coordX
-	   and coord.coordX < team_one_goal_starting_coord.coordX + penalty_area_width
-	   and coord.coordY > team_one_goal_starting_coord.coordY - penalty_area_height
-	   and coord.coordY < team_one_goal_starting_coord.coordY then
+	 if coord.coord_x > team_one_goal_starting_coord.coord_x
+	   and coord.coord_x < team_one_goal_starting_coord.coord_x + penalty_area_width
+	   and coord.coord_y > team_one_goal_starting_coord.coord_y - penalty_area_height
+	   and coord.coord_y < team_one_goal_starting_coord.coord_y then
 	    return true;
 	 end if;
       else
-	 if coord.coordX > team_two_goal_starting_coord.coordX
-	   and coord.coordX < team_two_goal_starting_coord.coordX + penalty_area_width
-	   and coord.coordY > team_two_goal_starting_coord.coordY
-	   and coord.coordY < team_two_goal_starting_coord.coordY + penalty_area_height then
+	 if coord.coord_x > team_two_goal_starting_coord.coord_x
+	   and coord.coord_x < team_two_goal_starting_coord.coord_x + penalty_area_width
+	   and coord.coord_y > team_two_goal_starting_coord.coord_y
+	   and coord.coord_y < team_two_goal_starting_coord.coord_y + penalty_area_height then
 	    return true;
 	 end if;
       end if;
 
       return false;
-
    end Is_In_Penalty_Area;
 
 end Soccer.Utils;

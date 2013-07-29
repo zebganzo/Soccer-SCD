@@ -57,7 +57,30 @@ begin
    Set_Teams (first_team  => t1,
 	      second_team => t2);
 
-   null;
+--     team_one_offensive_positions := (Coordinate'(coord_x => 10, -- goalie
+--  						coord_y => 15),
+--       				    Coordinate'(coord_x => 5, -- defensors
+--  			 			coord_y => 24),
+--       				    Coordinate'(coord_x => 10,
+--  			 			coord_y => 24),
+--       				    Coordinate'(coord_x => 15,
+--  			 			coord_y => 24),
+--       				    Coordinate'(coord_x => 3, -- midfielders
+--  			 			coord_y => 12),
+--       				    Coordinate'(coord_x => 5,
+--  			 			coord_y => 17),
+--       				    Coordinate'(coord_x => 10,
+--  			 			coord_y => 12),
+--       				    Coordinate'(coord_x => 12,
+--  			 			coord_y => 17),
+--       				    Coordinate'(coord_x => 17,
+--  			 			coord_y => 12),
+--       				    Coordinate'(coord_x => 7, -- attackers
+--  			 			coord_y => 8),
+--       				    Coordinate'(coord_x => 12,
+--  			 			coord_y => 8));
+
+
 
 --     Soccer.Server.WebServer.Start;
 

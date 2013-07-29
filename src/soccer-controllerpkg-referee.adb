@@ -1,11 +1,10 @@
-with Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
-use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
+with Soccer.Core_Event.Game_Core_Event.Binary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
 with Soccer.BallPkg; use Soccer.BallPkg;
 with Soccer.Manager_Event.Formation; use Soccer.Manager_Event.Formation;
 with Soccer.Manager_Event.Substitution; use Soccer.Manager_Event.Substitution;
-with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
-use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
+with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
 with Soccer.Utils; use Soccer.Utils;
+with Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event; use Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event;
 
 package body Soccer.ControllerPkg.Referee is
 
@@ -13,9 +12,142 @@ package body Soccer.ControllerPkg.Referee is
       game_event := event;
    end Notify_Game_Event;
 
-   procedure Check is
+   --+-----------------------------------
+   -- PRE CHECK
+   --+-----------------------------------
+
+   procedure Pre_Check (e : in Motion_Event_Ptr) is
+      current_game_status : Unary_Event_Ptr := Unary_Event_Ptr (Get_Game_Status);
+      game_status_id : Unary_Event_Id := Get_Type (current_game_status);
+      assigned_team : Team_Id := Get_Team (current_game_status);
+      assigned_player : Integer := Get_Player_Id (current_game_status);
+      current_event_coord : Coordinate := Get_Coordinate (current_game_status);
+   begin
+      -- controlla lo stato di gioco
+      -- -- se running, non fa nulla
+      -- -- se c'e' un evento in pending, controlla se le condizioni per la ripresa del gioco sono soddisfatte
+
+      if current_game_status = null then
+	 -- game is in progress
+	 return;
+      end if;
+
+      if game_status_id = Goal then
+	 null;
+      elsif game_status_id = Goal_Kick then
+	 null;
+      elsif game_status_id = Free_Kick then
+
+	 -- calcio di punizione
+
+	 declare
+	    current_player_status : Player_Status := current_status (assigned_player);
+	    assigned_player_position : Coordinate := current_player_status.player_coord;
+	 begin
+	    -- controllo se il gioco puo' riprendere
+	    if is_game_ready and e.all in Shot_Event'Class then
+	       -- ha tirato, quindi il gioco puo' riprendere
+	       Set_Game_Status (null);
+	    end if;
+
+	    if not is_game_ready then
+	       -- controllo che chi deve battere sia in posizione, se non lo e' esco
+	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
+				    coord2 => current_event_coord) then
+		  is_game_ready := True;
+	       end if;
+
+	       -- controllo che non ci siano giocatori attorno alla posizione
+	       -- di chi deve battere
+	       for i in 2 .. current_status'Length loop
+		  -- scorro a partire da 2 perche' non devo contare il portiere!
+		  if i /= current_player_status.id and Distance (From => assigned_player_position,
+		 	      To => current_status (i).player_coord) < free_kick_area then
+		     is_game_ready := True;
+		     exit;
+		  end if;
+	       end loop;
+	    end if;
+	 end;
+      elsif game_status_id = Penalty_Kick then
+	 null;
+      elsif game_status_id = Throw_In then
+
+	 -- rimessa
+
+	 declare
+	    current_player_status : Player_Status := current_status (assigned_player);
+	    assigned_player_position : Coordinate := current_player_status.player_coord;
+	 begin
+	    -- controllo se il gioco puo' riprendere
+	    if is_game_ready and e.all in Shot_Event'Class then
+	       -- ha lanciato, quindi il gioco puo' riprendere
+	       Set_Game_Status (null);
+	    end if;
+
+	    if not is_game_ready then
+	       -- controllo che chi deve fare la rimessa sia in posizione,
+	       -- se non lo e' esco
+	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
+				    coord2 => current_event_coord) then
+		  is_game_ready := True;
+	       end if;
+
+	       -- controllo che non ci siano giocatori attorno alla posizione
+	       -- di chi deve fare la rimessa
+	       for i in current_status'Range loop
+		  if i /= current_player_status.id and Distance (From => assigned_player_position,
+		 To => current_status (i).player_coord) < free_kick_area then
+		     is_game_ready := True;
+		     exit;
+		  end if;
+	       end loop;
+	    end if;
+	 end;
+      elsif game_status_id = Corner_Kick then
+
+	 -- Corner kick
+
+	 declare
+	    current_player_status : Player_Status := current_status (assigned_player);
+	    assigned_player_position : Coordinate := current_player_status.player_coord;
+	 begin
+	    -- controllo se il gioco puo' riprendere
+	    if is_game_ready and e.all in Shot_Event'Class then
+	       -- ha battuto, quindi il gioco puo' riprendere
+	       Set_Game_Status (null);
+	    end if;
+
+	    if not is_game_ready then
+	       -- controllo che chi deve battere il calcio d'angolo sia in
+	       -- posizione, se non lo e' esco
+	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
+				    coord2 => current_event_coord) then
+		  is_game_ready := True;
+	       end if;
+
+	       -- controllo che non ci siano giocatori attorno alla posizione
+	       -- di chi deve battere il calcio d'angolo
+	       for i in current_status'Range loop
+		  if i /= current_player_status.id and Distance (From => assigned_player_position,
+		 To => current_status (i).player_coord) < free_kick_area then
+		     is_game_ready := True;
+		     exit;
+		  end if;
+	       end loop;
+	    end if;
+	 end;
+      end if;
+   end Pre_Check;
+
+
+
+   --+-----------------------------------
+   -- POST CHECK
+   --+-----------------------------------
+   procedure Post_Check is
       last_team_possession : Team_Id := Get_Team_From_Id (id => last_ball_holder);
-      new_game_status : Unary_Event_Prt;
+      new_game_status : Unary_Event_Ptr;
    begin
       -- controllare se c'e' un evento "core" in pending
       -- controllare se il gioco e' fermo
@@ -30,13 +162,13 @@ package body Soccer.ControllerPkg.Referee is
       if game_event /= null then
 	 if game_event.all in Binary_Event'Class then
 	    declare
-	       evt : Binary_Event_Prt := Binary_Event_Prt(game_event);
+	       evt : Binary_Event_Ptr := Binary_Event_Ptr (game_event);
 	    begin
 	       if evt.Get_Event_Id = Foul then
 		  declare
-		     evt_coord : Coordinate := evt.Get_Event_Coord;
+		     evt_coord : Coordinate := evt.Get_Coordinate;
 		     assigned_team : Team_Id := Get_Team_From_Id (evt.Get_Id_Player_2);
-		     foul_event : Unary_Event_Prt := new Unary_Event;
+		     foul_event : Unary_Event_Ptr := new Unary_Event;
 		     is_penalty : Boolean := Is_In_Penalty_Area (team  => assigned_team,
 						   coord => evt_coord);
 		  begin
@@ -51,7 +183,7 @@ package body Soccer.ControllerPkg.Referee is
 
 		     -- inizializzo l'evento di fallo
 		     foul_event.Initialize (new_event_id    => Foul,
-			      new_player_id   => -1,
+			      new_player_id   => Get_Nearest_Player (evt_coord, assigned_team),
 			      new_team_id     => assigned_team,
 			      new_event_coord => evt_coord);
 
@@ -73,7 +205,7 @@ package body Soccer.ControllerPkg.Referee is
 		  declare
 		     base_event : Manager_Event.Event_Ptr := manager_events(i);
 		     new_formation_event : Formation_Event_Ptr;
-		     new_formation_scheme : Formation_Scheme;
+		     new_formation_scheme : Formation_Scheme_Id;
 		     team : Team_Ptr;
 		  begin
 		     new_formation_event := Formation_Event_Ptr (base_event);
@@ -83,7 +215,13 @@ package body Soccer.ControllerPkg.Referee is
 		  end;
 	       elsif manager_events(i).all in Substitution_Event'Class then
 		  -- sostituzione di giocatore
-		  null; -- TODO:: cambiare giocatore
+		  declare
+		     base_event : Manager_Event.Event_Ptr := manager_events(i);
+		     new_substitution_event : Substitution_Event_Ptr;
+		  begin
+		     new_substitution_event := Substitution_Event_Ptr (base_event);
+		     pending_substitutions.Append (new_substitution_event);
+		  end;
 	       end if;
 	    end loop;
 	 end if;
@@ -96,20 +234,20 @@ package body Soccer.ControllerPkg.Referee is
 	 field_y : Positive := field_max_y;
       begin
 	 -- controllo se la palla e' uscita dal campo
-	 if ball_coord.coordX < 1 or ball_coord.coordX > field_x or ball_coord.coordY < 1 or ball_coord.coordY > field_y then
+	 if ball_coord.coord_x < 1 or ball_coord.coord_x > field_x or ball_coord.coord_y < 1 or ball_coord.coord_y > field_y then
 	    -- controllo se e' stato fatto un goal
 	    declare
-	       goal_event : Unary_Event_Prt := new Unary_Event;
+	       goal_event : Unary_Event_Ptr := new Unary_Event;
 	       scoring_team : Team_Id;
 	    begin
 	       if last_team_possession = Team_One then
-		  if ball_coord.coordX < team_one_goal_starting_coord.coordX + goal_length and ball_coord.coordX > team_one_goal_starting_coord.coordX
-		    and ball_coord.coordY = team_one_goal_starting_coord.coordY then
+		  if ball_coord.coord_x < team_one_goal_starting_coord.coord_x + goal_length and ball_coord.coord_x > team_one_goal_starting_coord.coord_x
+		    and ball_coord.coord_y = team_one_goal_starting_coord.coord_y then
 		     scoring_team := Team_One;
 		  end if;
 	       else
-		  if ball_coord.coordX < team_two_goal_starting_coord.coordX + goal_length and ball_coord.coordX > team_two_goal_starting_coord.coordX
-		    and ball_coord.coordY = team_two_goal_starting_coord.coordY then
+		  if ball_coord.coord_x < team_two_goal_starting_coord.coord_x + goal_length and ball_coord.coord_x > team_two_goal_starting_coord.coord_x
+		    and ball_coord.coord_y = team_two_goal_starting_coord.coord_y then
 		     scoring_team := Team_Two;
 		  end if;
 	       end if;
@@ -121,33 +259,63 @@ package body Soccer.ControllerPkg.Referee is
 	    end;
 
 	    -- controllo se va assegnata una rimessa
-	    if (ball_coord.coordX = 0 or ball_coord.coordX = field_max_x + 1) and ball_coord.coordY > 0 and ball_coord.coordY < field_max_y then
+	    if (ball_coord.coord_x = 0 or ball_coord.coord_x = field_max_x + 1) and ball_coord.coord_y > 0 and ball_coord.coord_y < field_max_y then
 	       new_game_status.Initialize (new_event_id    => Throw_In,
-				    new_player_id   => -1,
+				    new_player_id   => Get_Nearest_Player (ball_coord, last_team_possession),
 				    new_team_id     => last_team_possession,
 				    new_event_coord => ball_coord);
 	    end if;
 
 	    -- controllo se va assegnato un calcio d'angolo o un rinvio dal
             -- fondo (non controllo la x perche' ho gia' controllato il gol)
-	    if ball_coord.coordY = 0 or ball_coord.coordY = field_max_y then
-	       if last_team_possession = Team_One then
-		  if ball_coord.coordY = 0 then
-		     -- assegna un calcio d'angolo a Team_Two
-		     null;
-		  elsif ball_coord.coordY = field_max_y then
-		     -- assegna una rimessa dal fondo a Team_Two
-		     null;
+	    if ball_coord.coord_y = 0 or ball_coord.coord_y = field_max_y then
+	       declare
+		  new_event : Unary_Event_Ptr := new Unary_Event;
+		  new_evt_coord : Coordinate := Coordinate'(0,0);
+	       begin
+		  if ball_coord.coord_x < field_max_x / 2 then
+		     Set_Coord_X (coord => new_evt_coord, value => 0);
+		  else
+		     Set_Coord_X (coord => new_evt_coord, value => field_max_x + 1);
 		  end if;
-	       else
-		  if ball_coord.coordY = 0 then
-		     -- assegna una rimessa dal fondo a Team_One
-		     null;
-		  elsif ball_coord.coordY = field_max_y then
-		     -- assegna un calcio d'angolo a Team_One
-		     null;
+
+		  if last_team_possession = Team_One then
+		     if ball_coord.coord_y = 0 then
+			-- assegna un calcio d'angolo a Team_Two
+			Set_Coord_Y (coord => new_evt_coord, value => 0);
+			new_event.Initialize (new_event_id    => Corner_Kick,
+			 		      new_player_id   => Get_Nearest_Player (new_evt_coord, last_team_possession),
+			 		      new_team_id     => last_team_possession,
+			 		      new_event_coord => new_evt_coord);
+		     elsif ball_coord.coord_y = field_max_y then
+			-- assegna una rimessa dal fondo a Team_Two
+			Set_Coord_Y (coord => new_evt_coord, value => field_max_y + 1);
+			new_event.Initialize (new_event_id    => Goal_Kick,
+			 		      new_player_id   => 1, -- portiere
+			 		      new_team_id     => last_team_possession,
+					      new_event_coord => new_evt_coord);
+		     end if;
+		  else
+		     if ball_coord.coord_y = 0 then
+			-- assegna una rimessa dal fondo a Team_One
+			Set_Coord_Y (coord => new_evt_coord, value => 0);
+			new_event.Initialize (new_event_id    => Goal_Kick,
+			 		      new_player_id   => 1, -- portiere
+			 		      new_team_id     => last_team_possession,
+			 		      new_event_coord => new_evt_coord);
+		     elsif ball_coord.coord_y = field_max_y then
+			-- assegna un calcio d'angolo a Team_One
+			Set_Coord_Y (coord => new_evt_coord, value => 0);
+			new_event.Initialize (new_event_id    => Corner_Kick,
+			 		      new_player_id   => Get_Nearest_Player (new_evt_coord, last_team_possession),
+			 		      new_team_id     => last_team_possession,
+			 		      new_event_coord => new_evt_coord);
+		     end if;
 		  end if;
-	       end if;
+
+		  -- imposto l'evento appena calcolato
+		  new_game_status := new_event;
+	       end;
 	    end if;
 	 end if;
       end;
@@ -155,7 +323,29 @@ package body Soccer.ControllerPkg.Referee is
       -- setto il nuovo stato di gioco
       Set_Game_Status (event => Game_Event_Ptr (new_game_status));
 
-   end Check;
+      -- setto la nuova posizione della palla
+      Ball.Set_Position (new_position => Get_Coordinate (new_game_status));
+
+   end Post_Check;
+
+   function Get_Nearest_Player (event_coord : in Coordinate; team : in Team_Id) return Integer is
+      smallest_distance : Integer := Integer'Last;
+      player : Integer;
+   begin
+      for i in current_status'Range loop
+	 declare
+	    current_distance : Integer := Distance (From => event_coord,
+				  To => current_status (i).player_coord);
+	 begin
+	    if current_status(i).team = team and current_distance < smallest_distance then
+	       smallest_distance := current_distance;
+	       player := i;
+	    end if;
+	 end;
+      end loop;
+
+      return player;
+   end Get_Nearest_Player;
 
    procedure Notify_Manager_Event (event : Manager_Event.Event_Ptr) is begin
       manager_events.Append(New_Item => event);

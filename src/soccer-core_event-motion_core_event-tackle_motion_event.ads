@@ -3,7 +3,7 @@ with Soccer.Core_Event.Motion_Core_Event;
 package Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event is
 
    type Tackle_Event is new Motion_Event with private;
-   type Tackle_Event_Prt is access all Tackle_Event;
+   type Tackle_Event_Ptr is access all Tackle_Event;
 
    procedure Initialize (E : in out Tackle_Event;
                          nPlayer_Id : in Integer;

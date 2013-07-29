@@ -30,4 +30,24 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 			       Field	  => To_String (E.event_team_id));
    end Serialize;
 
+   function Get_Team (e : in Unary_Event_Ptr) return Team_Id is
+   begin
+      return e.event_team_id;
+   end Get_Team;
+
+   function Get_Player_Id (e : in Unary_Event_Ptr) return Integer is
+   begin
+      return e.player_id;
+   end Get_Player_Id;
+
+   function Get_Type (e : in Unary_Event_Ptr) return Unary_Event_Id is
+   begin
+      return e.event_id;
+   end Get_Type;
+
+   function Get_Coordinate (e : in Unary_Event_Ptr) return Coordinate is
+   begin
+      return e.event_coord;
+   end Get_Coordinate;
+
 end Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;

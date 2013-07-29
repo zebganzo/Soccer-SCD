@@ -4,7 +4,7 @@ use Soccer.Core_Event.Game_Core_Event;
 package Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
 
    type Binary_Event is new Game_Event with private;
-   type Binary_Event_Prt is access all Binary_Event;
+   type Binary_Event_Ptr is access all Binary_Event;
 
    type Binary_Event_Id is (Foul);
 
@@ -21,7 +21,7 @@ package Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
    function Get_Id_Player_1 (event : Binary_Event) return Integer;
    function Get_Id_Player_2 (event : Binary_Event) return Integer;
 
-   function Get_Event_Coord (event : Binary_Event) return Coordinate;
+   function Get_Coordinate (event : Binary_Event) return Coordinate;
 
 private
 
