@@ -22,8 +22,8 @@ package Soccer.ControllerPkg is
          team : Team_Id;
          running : Boolean := False;
          on_the_field : Boolean := False;
-         player_coord : Coordinate := Coordinate'(coord_x => 0,
-                                            coord_y => 0);
+	 player_coord : Coordinate := Coordinate'(coord_x => 0, coord_y => 0);
+	 reference_coord : Coordinate;
          distance : Integer;
       end record;
 
@@ -81,9 +81,11 @@ package Soccer.ControllerPkg is
    end Controller;
 
 private
+   last_event : Motion_Event_Ptr;
    game_status : Game_Event_Ptr;
    current_status : Status;
    ball_holder_id : Integer := 0;
    is_game_ready : Boolean;
+   is_game_paused : Boolean;
 
 end Soccer.ControllerPkg;

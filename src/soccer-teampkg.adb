@@ -1,9 +1,11 @@
+with Ada.Text_IO; use Ada.Text_IO;
 package body Soccer.TeamPkg is
 
-   function Get_Team_From_Id (id : Positive) return Team_Id is begin
+   function Get_Team_From_Id (id : Integer) return Team_Id is begin
 
       -- controllare se e' giusto!
       for i in team_1.players'First .. team_1.players'Last loop
+	 Put_Line("Looping to find team for Player " & I2S (id));
 	 if team_1.players(i) = id then
 	    return Team_One;
 	 end if;
@@ -41,7 +43,7 @@ package body Soccer.TeamPkg is
       end if;
    end To_String;
 
-   function Get_Position_For_Player (team : in Team_Id; id : in Integer) return Coordinate is
+   function Get_Coordinate_For_Player (team : in Team_Id; id : in Integer) return Coordinate is
    begin
       if team = Team_One then
 	 if team_1.formation = O_352 then
@@ -53,9 +55,31 @@ package body Soccer.TeamPkg is
 	 end if;
       else
 	 -- TODO:: add team 2
-	 return Coordinate'(coord_x => -1,
-		     coord_y => -1);
+--  	 return Coordinate'(coord_x => -1,
+--  		     coord_y => -1);
+	 null;
       end if;
-   end Get_Position_For_Player;
+
+      return Coordinate'(coord_x => 0,
+			 coord_y => 0);
+   end Get_Coordinate_For_Player;
+
+   function Get_Goalkeeper_Id (team : in Team_Id) return Integer is
+   begin
+      if team = Team_One then
+	 return team_1.players(1);
+      else
+	 return team_2.players(1);
+      end if;
+   end Get_Goalkeeper_Id;
+
+   function Check_For_Initial_Position_Of_Players (team : in Team_Id) return Boolean is
+   begin
+      if team = Team_One then
+	 return False; -- TODO:: finire
+      end if;
+
+      return False;
+   end Check_For_Initial_Position_Of_Players;
 
 end Soccer.TeamPkg;

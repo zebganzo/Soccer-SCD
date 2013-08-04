@@ -1,6 +1,6 @@
 package Soccer.TeamPkg is
 
-   type Team_Players_List is array (Positive range <>) of Positive;
+   type Team_Players_List is array (Positive range <>) of Integer;
 
    type Team_Id is (Team_One, Team_Two);
 
@@ -12,7 +12,7 @@ package Soccer.TeamPkg is
       end record;
    type Team_Ptr is access Team;
 
-   function Get_Team_From_Id (id : Positive) return Team_Id;
+   function Get_Team_From_Id (id : Integer) return Team_Id;
 
    procedure Set_Teams (first_team : Team_Ptr; second_team : Team_Ptr);
 
@@ -22,9 +22,14 @@ package Soccer.TeamPkg is
 
    function To_String (team : in Team_Id) return String;
 
-   function Get_Position_For_Player (team : in Team_Id; id : in Integer) return Coordinate;
+   function Get_Coordinate_For_Player (team : in Team_Id; id : in Integer) return Coordinate;
+
+   function Get_Goalkeeper_Id (team : in Team_Id) return Integer;
+
+   function Check_For_Initial_Position_Of_Players (team : in Team_Id) return Boolean;
 
 private
+   --+ contengono TUTTI i giocatori di una squadra, non solo quelli in campo
    team_1 : Team_Ptr;
    team_2 : Team_Ptr;
 
@@ -32,6 +37,7 @@ private
    team_one_balanced_positions : Positions_Array;
    team_one_defensive_positions : Positions_Array;
 
+   --+ contengono SOLO i giocatori che sono in campo
    team_one_offensive_formation : Formation_Scheme := Formation_Scheme'(id        => O_352,
 							       positions => team_one_offensive_positions);
    team_one_balanced_formation : Formation_Scheme := Formation_Scheme'(id        => B_442,

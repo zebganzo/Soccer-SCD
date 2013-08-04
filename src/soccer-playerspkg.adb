@@ -68,9 +68,11 @@ package body Soccer.PlayersPkg is
                                nTo        => target_coord);
       current_action.utility := 10;
 
+--        Put_Line("[PLAYER] Sto per fare la prima write");
       ControllerPkg.Controller.Write(current_action => current_action);
+--        Put_Line("[PLAYER] Ho appena fatto la prima write");
 
-      delay duration(5);
+--        delay duration(5);
 
       loop
 
@@ -104,7 +106,7 @@ package body Soccer.PlayersPkg is
             end;
          end loop;
 
-         Put_Line("Ciao sono " & I2S(id) & " mGenericStatus.nearby : " & Boolean'Image(current_generic_status.nearby));
+         Put_Line("[PLAYER] Giocatore " & I2S(id) & ", palla vicina? " & Boolean'Image(current_generic_status.nearby));
 
          if current_generic_status.holder then
             -- Che bello ho la palla, se sono in pericolo la passo se no fanculo tutti!

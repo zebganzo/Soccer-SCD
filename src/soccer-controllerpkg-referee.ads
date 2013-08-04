@@ -1,8 +1,18 @@
 with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
 with Ada.Containers.Vectors;     use Ada.Containers;
 with Soccer.Manager_Event; use Soccer.Manager_Event;
+with Soccer.Core_Event.Game_Core_Event.Binary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
+with Soccer.BallPkg; use Soccer.BallPkg;
+with Soccer.Manager_Event.Formation; use Soccer.Manager_Event.Formation;
+with Soccer.Manager_Event.Substitution; use Soccer.Manager_Event.Substitution;
+with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
+with Soccer.Utils; use Soccer.Utils;
+with Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event; use Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package Soccer.ControllerPkg.Referee is
+
+   pragma Suppress (Elaboration_Check);
 
    procedure Notify_Game_Event (event : Game_Event_Ptr);
 

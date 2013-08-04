@@ -24,12 +24,12 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
-   -- team one up
-   team_one_goal_starting_coord : Coordinate := Coordinate'(coord_x => 9,
-							    coord_y => 0);
-   -- team two down
-   team_two_goal_starting_coord : Coordinate := Coordinate'(coord_x => 9,
-							    coord_y => 31);
+   -- team one LEFT
+   team_one_goal_starting_coord : Coordinate := Coordinate'(coord_x => 0,
+							    coord_y => 9);
+   -- team two RIGHT
+   team_two_goal_starting_coord : Coordinate := Coordinate'(coord_x => 31,
+							    coord_y => 9);
 
    goal_length : Positive := 2;
 
