@@ -1,3 +1,4 @@
+with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 
 package body Soccer.ControllerPkg.Referee is
 
@@ -10,258 +11,360 @@ package body Soccer.ControllerPkg.Referee is
    --+-----------------------------------
 
    procedure Pre_Check (e : in Motion_Event_Ptr) is
-      current_game_status : Unary_Event_Ptr := Unary_Event_Ptr (Get_Game_Status);
-      game_status_id : Unary_Event_Id := Get_Type (current_game_status);
-      assigned_team : Team_Id := Get_Team (current_game_status);
-      assigned_player : Integer := Get_Player_Id (current_game_status);
-      current_event_coord : Coordinate := Get_Coordinate (current_game_status);
+      current_game_status : Unary_Event_Ptr;
+      current_match_status : Match_Event_Ptr;
+      game_status_id : Unary_Event_Id;
+      assigned_team : Team_Id;
+      assigned_player : Integer;
+      current_event_coord : Coordinate;
    begin
+
+      if Get_Last_Game_Event /= null then
+	 if Get_Last_Game_Event.all in Match_Event'Class then
+	    current_match_status := Match_Event_Ptr (Get_Last_Game_Event);
+	    current_game_status := null;
+	 else
+	    current_match_status := null;
+	    current_game_status := Unary_Event_Ptr (Get_Last_Game_Event);
+	 end if;
+      end if;
+
+      -- controllo lo stato della partita
+
+      if current_match_status /= null then
+	 if Get_Match_Event_Id (current_match_status) = Begin_Of_Match
+	   or Get_Match_Event_Id (current_match_status) = Beginning_Of_Second_Half then
+
+	    -- controllo se il gioco puo' partire
+	    Put_Line ("[PRE_CHECK] Controllo se il gioco puo' ripartire");
+	    if Get_Game_Status = Game_Ready then
+	       if e /= null then
+		    if e.all in Shot_Event'Class then
+		     -- ha battuto, il gioco puo' partire
+		     Set_Last_Game_Event (null);
+		     Set_Game_Status (Game_Running);
+		     Put_Line ("[PRE_CHECK] Il gioco parte!");
+		     return; -- TODO:: controlla se serve!
+		  end if;
+	       end if;
+	    end if;
+
+	    -- inizio del gioco o inizio secondo tempo, tutti i giocatori devono essere nella propria
+	    -- posizione di riferimento e qualcuno ha battuto il calcio d'inizio
+	    declare
+	       first_condition : Boolean := False;
+	       second_condition : Boolean := False;
+	    begin
+	       -- controllo che tutti i giocatori siano in posizione, tranne quello che
+	       -- deve sbloccare il gioco
+	       Put_Line ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte");
+	       for i in current_status'Range loop
+		  declare
+		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
+		     current_coord : Coordinate := current_status (i).coord;
+		     ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+		  begin
+		     if i /= kickoff_player then
+			first_condition := False;
+			if Compare_Coordinates (current_coord, ref_coord) then
+			   first_condition := True;
+			end if;
+			exit when not first_condition;
+		     else
+			-- FIXME:: solo per quando si testa con un solo giocatore in campo!
+			first_condition := True;
+		     end if;
+		  end;
+	       end loop;
+
+	       -- controllo che giocatore X abbia la palla
+	       if ball_holder_id = Get_Kick_Off_Player (current_match_status) then
+		  second_condition := True;
+	       end if;
+
+	       -- controlla che entrambe le condizioni siano soddisfatte
+	       if first_condition and second_condition then
+		  Set_Game_Status (Game_Ready);
+	       end if;
+	    end;
+	 end if;
+
+	 return;
+
+      end if;
+
       -- controlla lo stato di gioco
       -- -- se running, non fa nulla
       -- -- se c'e' un evento in pending, controlla se le condizioni per la ripresa del gioco sono soddisfatte
 
-      if current_game_status = null then
-	 -- game is in progress
+      case Get_Game_Status is
+
+      when Game_Running =>
+	 -- il gioco sta andando, esco
 	 return;
-      end if;
 
-      if game_status_id = Goal then
+      when Game_Ready =>
+	 null;
 
-	 -- goal
+      when Game_Blocked =>
 
-	 declare
-	    opposite_team : Team_Id;
-	 begin
-	    if assigned_team = Team_One then
-	       opposite_team := Team_Two;
-	    else
-	       opposite_team := Team_One;
-	    end if;
+	 -- inizializzo i valori
+	 game_status_id := Get_Type (current_game_status);
+	 assigned_team := Get_Team (current_game_status);
+	 assigned_player := Get_Player_Id (current_game_status);
+	 current_event_coord := Get_Coordinate (current_game_status);
 
-	    -- controllo se il gioco puo' riprendere
-	    if is_game_ready
-	      and e.all in Shot_Event'Class
-	      and Get_Team_From_Id (e.Get_Player_Id) = opposite_team then
-	       -- ha iniziato, quindi il gioco puo' riprendere
-	       Set_Game_Status (null);
-	    end if;
+	 case game_status_id is
 
-	 end;
-      elsif game_status_id = Goal_Kick then
+	 when Goal =>
+	    -- goal
 
-	 -- rimessa dal fondo
-
-	 declare
-	    current_player_status : Player_Status := current_status (assigned_player);
-	    assigned_player_position : Coordinate := current_player_status.player_coord;
-	    first_condition : Boolean := False;
-	    second_condition : Boolean := False;
-	 begin
-	    -- controllo se il gioco puo' riprendere
-	    if is_game_ready and e.all in Shot_Event'Class then
-	       -- ha lanciato, quindi il gioco puo' riprendere
-	       Set_Game_Status (null);
-	    end if;
-
-	    if not is_game_ready then
-	       -- controllo che chi deve fare la rimessa dal fondo sia in
-	       -- posizione, se non lo e' esco
-	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
-				coord2 => current_event_coord) then
-		  first_condition := True;
-	       end if;
-
-	       -- controllo che non ci siano giocatori attorno alla posizione
-	       -- di chi deve fare la rimessa dal fondo
-	       for i in current_status'Range loop
-		  if i /= current_player_status.id
-		    and current_player_status.team /= current_status(i).team
-		    and Distance (From => assigned_player_position, To => current_status (i).player_coord) < free_kick_area then
-		     second_condition := True;
-		  end if;
-		  exit when not second_condition;
-	       end loop;
-	    end if;
-
-	    if first_condition and second_condition then
-	       is_game_ready := True;
-	    end if;
-	 end;
-
-      elsif game_status_id = Free_Kick then
-
-	 -- calcio di punizione
-
-	 declare
-	    current_player_status : Player_Status := current_status (assigned_player);
-	    assigned_player_position : Coordinate := current_player_status.player_coord;
-	    first_condition : Boolean := False;
-	    second_condition : Boolean := False;
-	 begin
-	    -- controllo se il gioco puo' riprendere
-	    if is_game_ready and e.all in Shot_Event'Class then
-	       -- ha tirato, quindi il gioco puo' riprendere
-	       Set_Game_Status (null);
-	    end if;
-
-	    if not is_game_ready then
-	       -- controllo che chi deve battere sia in posizione, se non lo e' esco
-	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
-				coord2 => current_event_coord) then
-		  first_condition := True;
-	       end if;
-
-	       -- controllo che non ci siano giocatori attorno alla posizione
-	       -- di chi deve battere (della squadra avversaria)
-	       for i in current_status'Range loop
-		  if i /= current_player_status.id
-		    and current_player_status.team /= current_status(i).team
-		    and Distance (From => assigned_player_position,
-		    To => current_status (i).player_coord) < free_kick_area then
-		     second_condition := True;
-		  end if;
-		  exit when not second_condition;
-	       end loop;
-	    end if;
-	 end;
-      elsif game_status_id = Penalty_Kick then
-
-	 -- calcio di rigore
-
-	 declare
-	    current_player_status : Player_Status := current_status (assigned_player);
-	    assigned_player_position : Coordinate := current_player_status.player_coord;
-	    opponent_team : Team_Id;
-	    first_condition : Boolean := False;
-	    second_condition : Boolean := False;
-	 begin
-	    -- controllo se il gioco puo' riprendere
-	    if is_game_ready and e.all in Shot_Event'Class then
-	       -- ha battuto, quindi il gioco puo' riprendere
-	       Set_Game_Status (null);
-	    end if;
-
-	    if not is_game_ready then
-	       -- controllo che chi deve battere il calcio di rigore sia in
-	       -- posizione, se non lo e' esco
-	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
-				coord2 => current_event_coord) then
-		  first_condition := True;
-	       end if;
-
-	       if current_player_status.team = Team_One then
-		  opponent_team := Team_Two;
+	    declare
+	       opposite_team : Team_Id;
+	    begin
+	       if assigned_team = Team_One then
+		  opposite_team := Team_Two;
 	       else
-		  opponent_team := Team_One;
+		  opposite_team := Team_One;
 	       end if;
 
-	       -- controllo che non ci siano giocatori attorno alla posizione
-	       -- di chi deve battere il calcio di rigore
-	       for i in current_status'Range loop
-		  if i /= current_player_status.id
-		    and i /= Get_Goalkeeper_Id (team => opponent_team)
-		    and Distance (From => assigned_player_position, To => current_status (i).player_coord) < free_kick_area then
-		     second_condition := True;
-		  end if;
-		  exit when not second_condition;
-	       end loop;
-	    end if;
-
-	    if first_condition and second_condition then
-	       is_game_ready := True;
-	    end if;
-	 end;
-      elsif game_status_id = Throw_In then
-
-	 -- rimessa
-
-	 declare
-	    current_player_status : Player_Status := current_status (assigned_player);
-	    assigned_player_position : Coordinate := current_player_status.player_coord;
-	    first_condition : Boolean := False;
-	    second_condition : Boolean := False;
-	 begin
-	    -- controllo se il gioco puo' riprendere
-	    if is_game_ready and e.all in Shot_Event'Class then
-	       -- ha lanciato, quindi il gioco puo' riprendere
-	       Set_Game_Status (null);
-	    end if;
-
-	    if not is_game_ready then
-	       -- controllo che chi deve fare la rimessa sia in posizione,
-	       -- se non lo e' esco
-	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
-				coord2 => current_event_coord) then
-		  first_condition := True;
+	       -- controllo se il gioco puo' riprendere
+	       if Get_Game_Status = Game_Ready
+		 and e.all in Shot_Event'Class
+		 and Get_Team_From_Id (e.Get_Player_Id) = opposite_team then
+		  -- ha iniziato, quindi il gioco puo' riprendere
+		  Set_Last_Game_Event (null);
+		  Set_Game_Status (Game_Running);
 	       end if;
 
-	       -- controllo che non ci siano giocatori attorno alla posizione
-	       -- di chi deve fare la rimessa
-	       for i in current_status'Range loop
-		  if i /= current_player_status.id
-		    and current_player_status.team /= current_status(i).team
-		    and Distance (From => assigned_player_position, To => current_status (i).player_coord) < free_kick_area then
-		     second_condition := True;
-		  end if;
-		  exit when not second_condition;
-	       end loop;
-	    end if;
+	    end;
+	 when Goal_Kick =>
+	    -- rimessa dal fondo
 
-	    if first_condition and second_condition then
-	       is_game_ready := True;
-	    end if;
-	 end;
-      elsif game_status_id = Corner_Kick then
-
-	 -- calcio d'angolo
-
-	 declare
-	    current_player_status : Player_Status := current_status (assigned_player);
-	    assigned_player_position : Coordinate := current_player_status.player_coord;
-	    first_condition : Boolean := False;
-	    second_condition : Boolean := False;
-	 begin
-	    -- controllo se il gioco puo' riprendere
-	    if is_game_ready and e.all in Shot_Event'Class then
-	       -- ha battuto, quindi il gioco puo' riprendere
-	       Set_Game_Status (null);
-	    end if;
-
-	    if not is_game_ready then
-	       -- controllo che chi deve battere il calcio d'angolo sia in
-	       -- posizione, se non lo e' esco
-	       if Compare_Coordinates (coord1 => current_status (assigned_player).player_coord,
-				coord2 => current_event_coord) then
-		  first_condition := True;
+	    declare
+	       current_player_status : Player_Status := current_status (assigned_player);
+	       assigned_player_position : Coordinate := current_player_status.coord;
+	       first_condition : Boolean := False;
+	       second_condition : Boolean := False;
+	    begin
+	       -- controllo se il gioco puo' riprendere
+	       if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
+		  -- ha lanciato, quindi il gioco puo' riprendere
+		  Set_Last_Game_Event (null);
+		  Set_Game_Status (Game_Running);
 	       end if;
 
-	       -- controllo che non ci siano giocatori attorno alla posizione
-	       -- di chi deve battere il calcio d'angolo
-	       for i in current_status'Range loop
-		  if i /= current_player_status.id and Distance (From => assigned_player_position,
-						   To => current_status (i).player_coord) < free_kick_area then
-		     second_condition := True;
+	       if Get_Game_Status /= Game_Ready then
+		  -- controllo che chi deve fare la rimessa dal fondo sia in
+		  -- posizione, se non lo e' esco
+		  if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
+			    coord2 => current_event_coord) then
+		     first_condition := True;
 		  end if;
-		  exit when not second_condition;
-	       end loop;
-	    end if;
 
-	    if first_condition and second_condition then
-	       is_game_ready := True;
-	    end if;
-	 end;
-      end if;
+		  -- controllo che non ci siano giocatori attorno alla posizione
+		  -- di chi deve fare la rimessa dal fondo
+		  for i in current_status'Range loop
+		     if i /= current_player_status.id
+		       and current_player_status.team /= current_status(i).team
+		       and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
+			second_condition := True;
+		     end if;
+		     exit when not second_condition;
+		  end loop;
+	       end if;
+
+	       if first_condition and second_condition then
+		  Set_Game_Status (Game_Ready);
+	       end if;
+	    end;
+
+	 when Free_Kick =>
+	    -- calcio di punizione
+
+	    declare
+	       current_player_status : Player_Status := current_status (assigned_player);
+	       assigned_player_position : Coordinate := current_player_status.coord;
+	       first_condition : Boolean := False;
+	       second_condition : Boolean := False;
+	    begin
+	       -- controllo se il gioco puo' riprendere
+	       if Get_Game_Status /= Game_Ready and e.all in Shot_Event'Class then
+		  -- ha tirato, quindi il gioco puo' riprendere
+		  Set_Last_Game_Event (null);
+		  Set_Game_Status (Game_Running);
+	       end if;
+
+	       if Get_Game_Status /= Game_Ready then
+		  -- controllo che chi deve battere sia in posizione, se non lo e' esco
+		  if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
+			    coord2 => current_event_coord) then
+		     first_condition := True;
+		  end if;
+
+		  -- controllo che non ci siano giocatori attorno alla posizione
+		  -- di chi deve battere (della squadra avversaria)
+		  for i in current_status'Range loop
+		     if i /= current_player_status.id
+		       and current_player_status.team /= current_status(i).team
+		       and Distance (From => assigned_player_position,
+		       To => current_status (i).coord) < free_kick_area then
+			second_condition := True;
+		     end if;
+		     exit when not second_condition;
+		  end loop;
+	       end if;
+	    end;
+
+	 when Penalty_Kick =>
+	    -- calcio di rigore
+
+	    declare
+	       current_player_status : Player_Status := current_status (assigned_player);
+	       assigned_player_position : Coordinate := current_player_status.coord;
+	       opponent_team : Team_Id;
+	       first_condition : Boolean := False;
+	       second_condition : Boolean := False;
+	    begin
+	       -- controllo se il gioco puo' riprendere
+	       if Get_Game_Status /= Game_Ready and e.all in Shot_Event'Class then
+		  -- ha battuto, quindi il gioco puo' riprendere
+		  Set_Last_Game_Event (null);
+		  Set_Game_Status (Game_Running);
+	       end if;
+
+	       if Get_Game_Status /= Game_Ready then
+		  -- controllo che chi deve battere il calcio di rigore sia in
+		  -- posizione, se non lo e' esco
+		  if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
+			    coord2 => current_event_coord) then
+		     first_condition := True;
+		  end if;
+
+		  if current_player_status.team = Team_One then
+		     opponent_team := Team_Two;
+		  else
+		     opponent_team := Team_One;
+		  end if;
+
+		  -- controllo che non ci siano giocatori attorno alla posizione
+		  -- di chi deve battere il calcio di rigore
+		  for i in current_status'Range loop
+		     if i /= current_player_status.id
+		       and i /= Get_Goalkeeper_Id (team => opponent_team)
+		       and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
+			second_condition := True;
+		     end if;
+		     exit when not second_condition;
+		  end loop;
+	       end if;
+
+	       if first_condition and second_condition then
+		  Set_Game_Status (Game_Ready);
+	       end if;
+	    end;
+
+	 when Throw_In =>
+	    -- rimessa
+
+	    declare
+	       current_player_status : Player_Status := current_status (assigned_player);
+	       assigned_player_position : Coordinate := current_player_status.coord;
+	       first_condition : Boolean := False;
+	       second_condition : Boolean := False;
+	    begin
+	       -- controllo se il gioco puo' riprendere
+	       if Get_Game_Status /= Game_Ready and e.all in Shot_Event'Class then
+		  -- ha lanciato, quindi il gioco puo' riprendere
+		  Set_Last_Game_Event (null);
+		  Set_Game_Status (Game_Running);
+	       end if;
+
+	       if Get_Game_Status /= Game_Ready then
+		  -- controllo che chi deve fare la rimessa sia in posizione,
+		  -- se non lo e' esco
+		  if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
+			    coord2 => current_event_coord) then
+		     first_condition := True;
+		  end if;
+
+		  -- controllo che non ci siano giocatori attorno alla posizione
+		  -- di chi deve fare la rimessa
+		  for i in current_status'Range loop
+		     if i /= current_player_status.id
+		       and current_player_status.team /= current_status(i).team
+		       and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
+			second_condition := True;
+		     end if;
+		     exit when not second_condition;
+		  end loop;
+	       end if;
+
+	       if first_condition and second_condition then
+		  Set_Game_Status (Game_Ready);
+	       end if;
+	    end;
+
+	 when Corner_Kick =>
+	       -- calcio d'angolo
+
+	       declare
+		  current_player_status : Player_Status := current_status (assigned_player);
+		  assigned_player_position : Coordinate := current_player_status.coord;
+		  first_condition : Boolean := False;
+		  second_condition : Boolean := False;
+	       begin
+		  -- controllo se il gioco puo' riprendere
+		  if Get_Game_Status /= Game_Ready and e.all in Shot_Event'Class then
+		     -- ha battuto, quindi il gioco puo' riprendere
+		     Set_Last_Game_Event (null);
+		     Set_Game_Status (Game_Running);
+		  end if;
+
+		  if Get_Game_Status /= Game_Ready then
+		     -- controllo che chi deve battere il calcio d'angolo sia in
+		     -- posizione, se non lo e' esco
+		     if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
+			       coord2 => current_event_coord) then
+			first_condition := True;
+		     end if;
+
+		     -- controllo che non ci siano giocatori attorno alla posizione
+		     -- di chi deve battere il calcio d'angolo
+		     for i in current_status'Range loop
+				 if i /= current_player_status.id
+				   and Distance (assigned_player_position,
+						 current_status (i).coord) > free_kick_area then
+			   second_condition := True;
+			end if;
+			exit when not second_condition;
+		     end loop;
+		  end if;
+
+		  if first_condition and second_condition then
+		     Set_Game_Status (Game_Ready);
+	       end if;
+	    end;
+	 end case;
+
+      when Game_Paused =>
+	 null;
+      end case;
+
    end Pre_Check;
 
 
    --+-----------------------------------
    -- POST CHECK
    --+-----------------------------------
-   procedure Post_Check is
+      procedure Post_Check is
       last_team_possession : Team_Id := Get_Team_From_Id (id => last_ball_holder);
       new_game_status : Unary_Event_Ptr;
    begin
-      Put_Line("[POST_CHECK] Controllo se c'e' stato un fallo");
+      -- controlla se e' finito il tempo, in quel caso setta l'evento di tipo
+      -- Match_Event ed esci
+      -- TODO:: implementa!
+
       -- controllare se c'e' un evento "core" in pending
       -- controllare se il gioco e' fermo
       -- -- controllare se ci sono eventi "dist"
@@ -286,26 +389,30 @@ package body Soccer.ControllerPkg.Referee is
 		     foul_event : Unary_Event_Ptr := new Unary_Event;
 		     is_penalty : Boolean := Is_In_Penalty_Area (team  => assigned_team,
 						   coord => evt_coord);
+		     foul_type : Unary_Event_Id;
 		  begin
 		     -- controllo se il fallo e' stato fatto nell'area di rigore
 		     if is_penalty then
+			foul_type := Penalty_Kick;
 			if assigned_team = Team_One then
 			   evt_coord := team_one_penalty_coord;
 			else
 			   evt_coord := team_two_penalty_coord;
 			end if;
+		     else
+			foul_type := Free_Kick;
 		     end if;
 
 		     -- inizializzo l'evento di fallo
-		     foul_event.Initialize (new_event_id    => Foul,
-			      new_player_id   => Get_Nearest_Player (evt_coord, assigned_team),
-			      new_team_id     => assigned_team,
-			      new_event_coord => evt_coord);
+		     foul_event.Initialize (foul_type,
+			      Get_Nearest_Player (evt_coord, assigned_team),
+			      assigned_team,
+			      evt_coord);
 
 		     -- setto il risultato (stato di gioco)
 		     new_game_status := foul_event;
 		     -- notifico il nuovo stato di gioco (e lo fermo)
-		     Set_Game_Status (Game_Event_Ptr (new_game_status));
+		     Set_Last_Game_Event (Game_Event_Ptr (new_game_status));
 		     -- setto la nuova posizione della palla
 		     Ball.Set_Position (new_position => Get_Coordinate (new_game_status));
 		  end;
@@ -316,8 +423,8 @@ package body Soccer.ControllerPkg.Referee is
 
       -- SE IL GIOCO E' FERMO, controllo eventi della distribuzione
       Put_Line("[POST_CHECK] Controllo se ci sono eventi dalla distribuzione");
-      if not Is_Game_Running then
-	 if manager_events'Size > 0 then
+      if Get_Game_Status = Game_Blocked then
+	 if manager_events.Length > 0 then
 	    Put_Line("[POST_CHECK] Ci sono eventi dalla distribuzione!");
 	    for i in manager_events.First_Index .. manager_events.Last_Index loop
 	       -- controllo se l'evento e' un cambio di formazione o una sostituzione
@@ -349,7 +456,7 @@ package body Soccer.ControllerPkg.Referee is
       end if;
 
       Put_Line("[POST_CHECK] Controllo se la palla e' uscita e ne determino la causa");
-      if Is_Game_Running then
+      if Get_Game_Status = Game_Running then
 	 -- controllo delle coordinate della palla
 	 declare
 	    ball_coord : Coordinate := Ball.Get_Position;
@@ -384,7 +491,7 @@ package body Soccer.ControllerPkg.Referee is
 		  end if;
 
 		  goal_event.Initialize (new_event_id    => Goal,
-			   new_player_id   => last_event.Get_Player_Id,
+			   new_player_id   => last_player_event.Get_Player_Id,
 			   new_team_id     => scoring_team,
 			   new_event_coord => middle_field_coord);
 	       end;
@@ -463,7 +570,7 @@ package body Soccer.ControllerPkg.Referee is
       Put_Line("[POST_CHECK] Se c'e' un nuovo stato di gioco, lo setto");
       if new_game_status /= null then
 	 Put_Line("[POST_CHECK] nuovo stato di gioco");
-	 Set_Game_Status (event => Game_Event_Ptr (new_game_status));
+	 Set_Last_Game_Event (event => Game_Event_Ptr (new_game_status));
 
 	 -- setto la nuova posizione della palla
 	 Ball.Set_Position (new_position => Get_Coordinate (new_game_status));
@@ -480,7 +587,7 @@ package body Soccer.ControllerPkg.Referee is
       for i in current_status'Range loop
 	 declare
 	    current_distance : Integer := Distance (From => event_coord,
-					     To => current_status (i).player_coord);
+					     To => current_status (i).coord);
 	 begin
 	    if current_status(i).team = team and current_distance < smallest_distance then
 	       smallest_distance := current_distance;

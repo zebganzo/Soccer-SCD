@@ -22,7 +22,7 @@ package Soccer.ControllerPkg is
          team : Team_Id;
          running : Boolean := False;
          on_the_field : Boolean := False;
-	 player_coord : Coordinate := Coordinate'(coord_x => 0, coord_y => 0);
+	 coord : Coordinate; -- := Coordinate'(coord_x => 0, coord_y => 0); -- FIXME:: se ci sono problemi, rimettilo!
 	 reference_coord : Coordinate;
          distance : Integer;
       end record;
@@ -40,11 +40,12 @@ package Soccer.ControllerPkg is
 
    type Generic_Status is
       record
-         coord : Coordinate;
+	 coord : Coordinate;
+	 team : Team_Id;
          holder : Boolean;
 	 nearby : Boolean;
-	 game_status : Game_Event_Ptr;
-	 game_ready : Boolean;
+	 last_game_event : Game_Event_Ptr;
+	 game_status : Game_State;
 	 substitutions : Substitutions_Container.Vector;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
@@ -53,15 +54,17 @@ package Soccer.ControllerPkg is
 
    function Get_Generic_Status (id : in Integer) return Generic_Status_Ptr;
 
-   procedure Set_Game_Status (event : Game_Event_Ptr);
+   procedure Set_Last_Game_Event (event : Game_Event_Ptr);
 
-   procedure Set_Game_Ready (status : in Boolean);
+   function Get_Last_Game_Event return Game_Event_Ptr;
 
-   function Get_Game_Ready return Boolean;
+   function Is_Cell_Free (coord : Coordinate) return Boolean;
 
-   function Get_Game_Status return Game_Event_Ptr;
+   function Get_Alternative_Coord (coord : Coordinate; target : Coordinate) return Coordinate;
 
-   function Is_Game_Running return Boolean;
+   function Get_Game_Status return Game_State;
+
+   procedure Set_Game_Status (new_status : Game_State);
 
    function Get_Players_Status return Status;
 
@@ -69,10 +72,8 @@ package Soccer.ControllerPkg is
 
    task Field_Printer;
 
-   number_of_zones : Integer := 3;
-
-   type Field_Zones is new Integer range 1 .. number_of_zones;
-   type Released_Zones is array (1 .. number_of_zones) of Boolean;
+   type Field_Zones is new Integer range 0 .. number_of_zones; -- anche la zona fuori dal campo!
+   type Released_Zones is array (0 .. number_of_zones) of Boolean;
 
    task Controller is
       entry Write(current_action : in out Action);
@@ -81,11 +82,12 @@ package Soccer.ControllerPkg is
    end Controller;
 
 private
-   last_event : Motion_Event_Ptr;
-   game_status : Game_Event_Ptr;
+   last_player_event : Motion_Event_Ptr;
+   last_game_event : Game_Event_Ptr;
    current_status : Status;
    ball_holder_id : Integer := 0;
-   is_game_ready : Boolean;
-   is_game_paused : Boolean;
+   game_status : Game_State;
+
+   released : Released_Zones;
 
 end Soccer.ControllerPkg;

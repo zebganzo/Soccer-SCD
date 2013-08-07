@@ -6,14 +6,14 @@ package Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 
    type Unary_Event is new Game_Event with private;
    type Unary_Event_Ptr is access all Unary_Event;
-   type Unary_Event_Id is (Send_Off,
-			   Caution,
-			   Goal,
-			   Foul,
+   type Unary_Event_Id is (Goal,
+--  			   Send_Off,
+--  			   Caution,
 			   Throw_In,
 			   Goal_Kick,
 			   Corner_Kick,
 			   Free_Kick,
+--  			   Kick_Off,
 			   Penalty_Kick);
 
    procedure Serialize (E : Unary_Event; Serialized_Obj : out JSON_Value);

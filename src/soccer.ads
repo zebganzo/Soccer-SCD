@@ -49,6 +49,8 @@ package Soccer is
    send_buffer_delay : Integer := 1;
    t0 : Time := Clock;
 
+   number_of_zones : Integer := 4;
+
    type Power_Range is range 0 .. 10;
 
    --+ Utility di una mossa x/10
@@ -56,10 +58,17 @@ package Soccer is
    subtype Utility_Constraint_Type is Utility_Range;
 
    utility_constraint : Utility_Constraint_Type := 2;
+
    num_of_players : Positive := 8;
+
    agent_movement_id : Integer := 0;
 
    type Positions_Array is array (1 .. num_of_players) of Coordinate;
+
+   type Game_State is (Game_Running,
+		       Game_Ready,
+		       Game_Blocked,
+		       Game_Paused);
 
    type Formation_Scheme_Id is (O_352, B_442, D_532);
    type Formation_Scheme is

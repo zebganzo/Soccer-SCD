@@ -5,7 +5,6 @@ package body Soccer.TeamPkg is
 
       -- controllare se e' giusto!
       for i in team_1.players'First .. team_1.players'Last loop
-	 Put_Line("Looping to find team for Player " & I2S (id));
 	 if team_1.players(i) = id then
 	    return Team_One;
 	 end if;
@@ -81,5 +80,10 @@ package body Soccer.TeamPkg is
 
       return False;
    end Check_For_Initial_Position_Of_Players;
+
+   function TEMP_Get_Coordinate_For_Player (id : in Integer) return Coordinate is
+   begin
+      return players_coord (id);
+   end TEMP_Get_Coordinate_For_Player;
 
 end Soccer.TeamPkg;

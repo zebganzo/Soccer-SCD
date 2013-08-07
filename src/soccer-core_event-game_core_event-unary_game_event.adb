@@ -42,6 +42,7 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 
    function Get_Type (e : in Unary_Event_Ptr) return Unary_Event_Id is
    begin
+      Put_Line ("Event is null: " & Boolean'Image (e = null));
       return e.event_id;
    end Get_Type;
 

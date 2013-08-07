@@ -28,6 +28,8 @@ package Soccer.TeamPkg is
 
    function Check_For_Initial_Position_Of_Players (team : in Team_Id) return Boolean;
 
+   function TEMP_Get_Coordinate_For_Player (id : in Integer) return Coordinate;
+
 private
    --+ contengono TUTTI i giocatori di una squadra, non solo quelli in campo
    team_1 : Team_Ptr;
@@ -44,5 +46,15 @@ private
 							       positions => team_one_balanced_positions);
    team_one_defensive_formation : Formation_Scheme := Formation_Scheme'(id        => D_532,
 							       positions => team_one_defensive_positions);
+
+   players_coord : array (0 .. num_of_players) of Coordinate := (Coordinate'(0,5),
+							       Coordinate'(5,5),--);
+							       Coordinate'(25,13),
+							       Coordinate'(17,9),
+							       Coordinate'(10,18),
+							       Coordinate'(28,2),
+							       Coordinate'(6,6),
+							       Coordinate'(14,15),
+							       Coordinate'(20,10));
 
 end Soccer.TeamPkg;

@@ -51,6 +51,36 @@ package body Soccer.Utils is
       end if;
    end Get_Next_Coordinate;
 
+   function Back_Off (current_coord : Coordinate; reference_coord : Coordinate; event_coord : Coordinate) return Coordinate is
+      delta_x : Positive;
+      delta_y : Positive;
+      new_x : Integer;
+      new_y : Integer;
+      result : Coordinate;
+   begin
+      if Distance (reference_coord, event_coord) < free_kick_area then
+	 delta_x := abs (reference_coord.coord_x - event_coord.coord_x);
+	 delta_y := abs (reference_coord.coord_y - event_coord.coord_y);
+
+	 if event_coord.coord_x > reference_coord.coord_x then
+	    new_x := reference_coord.coord_x + delta_x;
+	 else
+	    new_x := reference_coord.coord_x - delta_x;
+	 end if;
+
+	 if event_coord.coord_y > reference_coord.coord_y then
+	    new_y := reference_coord.coord_y + delta_y;
+	 else
+	    new_y := reference_coord.coord_y - delta_y;
+	 end if;
+
+	 result := Coordinate'(new_x, new_y);
+	 return result;
+      else
+	 return reference_coord;
+      end if;
+   end Back_Off;
+
    function Get_Ball_Delay (power : Power_Range) return duration is
    begin
       return duration(Power_Range'Last - power);
@@ -134,5 +164,26 @@ package body Soccer.Utils is
 
       return false;
    end Is_In_Penalty_Area;
+
+   function Print_Coord (coord : Coordinate) return String is
+   begin
+      return "(" & I2S (coord.coord_x) & "," & I2S (coord.coord_y) & ")";
+   end Print_Coord;
+
+
+--     function Get_Nearest_Player (point_coord : Coordinate; team : Team_Id) return Integer is
+--        current_status : Status := Get_Players_Status;
+--        nearest_player : Integer := -1;
+--        shortest_distance : Integer := 100;
+--     begin
+--        for i in current_status'Range loop
+--  	 if current_status (i).team = team then
+--  	    if Distance (current_status (i).coord, point_coord) < shortest_distance then
+--  	       shortest_distance := Distance (current_status (i).coord, point_coord);
+--  	       nearest_player := i;
+--  	    end if;
+--  	 end if;
+--        end loop;
+--     end Get_Nearest_Player;
 
 end Soccer.Utils;

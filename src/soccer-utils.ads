@@ -10,6 +10,9 @@ package Soccer.Utils is
    --+ Coordinate della prossima cella date le mie coordinate attuali e quelle della cella target
    function Get_Next_Coordinate (myCoord : Coordinate; targetCoord : Coordinate) return Coordinate;
 
+   --+ Mi tolgo di mezzo nel caso di gioco fermo
+   function Back_Off (current_coord : Coordinate; reference_coord : Coordinate; event_coord : Coordinate) return Coordinate;
+
    function Get_Ball_Delay (power : Power_Range) return duration;
 
    function Compare_Coordinates (coord1 : Coordinate; coord2 : Coordinate) return Boolean;
@@ -21,5 +24,9 @@ package Soccer.Utils is
    function Check_Inside_Field (coord: Coordinate) return Boolean;
 
    function Is_In_Penalty_Area (team : Team_Id; coord : Coordinate) return Boolean;
+
+   function Print_Coord (coord : Coordinate) return String;
+
+--     function Get_Nearest_Player (point_coord : Coordinate; team : Team_Id) return Integer;
 
 end Soccer.Utils;

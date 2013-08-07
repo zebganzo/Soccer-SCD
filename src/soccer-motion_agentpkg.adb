@@ -16,7 +16,7 @@ package body Soccer.Motion_AgentPkg is
    protected body Motion_Enabler is
       procedure Move (source : Coordinate; target : Coordinate; power : Power_Range) is
       begin
-         Put_Line("Move on Agent");
+         Put_Line("[MOTION_AGENT] Move");
          actual_coord := source;
          actual_power := power;
          real_target := target;
@@ -34,36 +34,36 @@ package body Soccer.Motion_AgentPkg is
       loop
          Motion_Enabler.Enabled;
 
-         Put_Line("Motion_Agent in azione!!!!!!!!!!");
+         Put_Line("[MOTION_AGENT] Agente avviato");
 
          while actual_power > 0 and Ball.Get_Controlled = False loop
-            Put_Line("New Ball Coords " & I2S(actual_coord.coord_x) & " " & I2S(actual_coord.coord_y));
+            Put_Line("[MOTION_AGENT] Nuova coordinata (" & I2S(actual_coord.coord_x) & "," & I2S(actual_coord.coord_y) & ")");
             Ball.Set_Moving(new_status => True);
             actual_target := Utils.Get_Next_Coordinate(myCoord => actual_coord,
                                                        targetCoord => real_target);
             select
                Ball.Move_Agent(new_coord => actual_target);
-               Put_Line ("after move agent call");
+               Put_Line ("[MOTION_AGENT] Palla mossa alla coordinata prestabilita");
                actual_coord := actual_target;
             else
-               Put_Line("Ramo else della select!!!");
+               Put_Line("[MOTION_AGENT] FIXME! Ramo else su -select-");
                exit;
             end select;
 
-            delay 1.0;-- Utils.Get_Ball_Delay(power => actual_power);
-            Put_Line ("after dealy");
+            delay 1.0;-- TODO:: Utils.Get_Ball_Delay(power => actual_power);
+            Put_Line ("[MOTION_AGENT] Delay scaduto, diminuisco la potenza");
             actual_power := actual_power - 1;
-            Put_Line("Fine while!!!!" & " actual_power " & I2S(Integer(actual_power)) & " Ball.Get_Controlled = "
+            Put_Line("[MOTION_AGENT] Fine del ciclo" & " con actual_power = " & I2S(Integer(actual_power)) & " e Ball.Get_Controlled = "
                      & Boolean'Image(Ball.Get_Controlled) & " " & Boolean'Image(actual_power > 0 and Ball.Get_Controlled = False));
          end loop;
 
          start := False;
 
          if actual_power = 0 then
-            Put_Line("Aiaiaiai...e' finita la potenza amico!!!");
+            Put_Line("[MOTION_AGENT] Potenza esaurita");
          end if;
          Ball.Set_Moving(new_status => False);
-         Put_Line("Move Finitiaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+         Put_Line("[MOTION_AGENT] Agente terminato");
       end loop;
    end Motion_Agent;
 
