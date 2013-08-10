@@ -6,8 +6,8 @@ package Soccer is
 
    -- Global stuff for the Soccer packages
 
-   field_max_x : Positive := 30;
-   field_max_y : Positive := 20;
+   field_max_x : Positive := 51;
+   field_max_y : Positive := 33;
 
    -- Includo la coordinata 0,0 per simulare la panchina
    type Coordinate is
@@ -24,25 +24,49 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
-   -- team one LEFT
-   team_one_goal_starting_coord : Coordinate := Coordinate'(coord_x => 0,
-							    coord_y => 9);
-   -- team two RIGHT
-   team_two_goal_starting_coord : Coordinate := Coordinate'(coord_x => 31,
-							    coord_y => 9);
+   team_one_goal_starting_coord : Coordinate := Coordinate'(0,9);
+   team_two_goal_starting_coord : Coordinate := Coordinate'(31,9);
 
-   goal_length : Positive := 2;
+   goal_length : Positive := 5;
+
+   -- team one [LEFT]
+   team_one_goal_lower_coord : Coordinate := Coordinate'(1,15);
+   team_one_goal_upper_coord : Coordinate := Coordinate'(1,19);
+
+   team_one_goalkeeper_coord : Coordinate := Coordinate'(1,17);
+
+   team_one_penalty_lower_left_coord : Coordinate := Coordinate'(1,9);
+   team_one_penalty_upper_left_coord : Coordinate := Coordinate'(8,9);
+   team_one_penalty_lower_right_coord : Coordinate := Coordinate'(1,25);
+   team_one_penalty_upper_right_coord : Coordinate := Coordinate'(8,25);
+
+   team_one_penalty_coord : Coordinate := Coordinate'(6,17);
+
+   -- team two [RIGHT]
+   team_two_goal_lower_coord : Coordinate := Coordinate'(51,15);
+   team_two_goal_upper_coord : Coordinate := Coordinate'(51,19);
+
+   team_two_goalkeeper_coord : Coordinate := Coordinate'(51,17);
+
+   team_two_penalty_lower_left_coord : Coordinate := Coordinate'(44,9);
+   team_two_penalty_upper_left_coord : Coordinate := Coordinate'(51,9);
+   team_two_penalty_lower_right_coord : Coordinate := Coordinate'(44,25);
+   team_two_penalty_upper_right_coord : Coordinate := Coordinate'(51,25);
+
+   team_two_penalty_coord : Coordinate := Coordinate'(46,17);
+
+   middle_field_coord : Coordinate := Coordinate'(26,17);
 
    -- penalty variables
    penalty_area_width : Positive := 6;
    penalty_area_height : Positive := 3;
 
-   team_one_penalty_coord : Coordinate; -- TODO:: inizializza!
-   team_two_penalty_coord : Coordinate; -- TODO:: inizializza!
+   free_kick_area : Positive := 4;
 
-   middle_field_coord : Coordinate; -- TODO:: inizializza!
-
-   free_kick_area : Positive := 3;
+   lower_left_corner : Coordinate := Coordinate'(1,1);
+   lower_righr_corner : Coordinate := Coordinate'(51,1);
+   upper_left_corner : Coordinate := Coordinate'(1,33);
+   upper_right_corner : Coordinate := Coordinate'(51,33);
 
    buffer_dim : Positive := 10;
    nearby_distance : Integer := 3;
