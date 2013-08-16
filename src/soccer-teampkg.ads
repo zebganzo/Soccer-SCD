@@ -7,7 +7,7 @@ package Soccer.TeamPkg is
    type Team is
       record
 	 id : Team_Id;
-	 players : Team_Players_List (1 .. 4);
+	 players : Team_Players_List (1 .. num_of_players / 2);
 	 formation : Formation_Scheme_Id;
       end record;
    type Team_Ptr is access Team;

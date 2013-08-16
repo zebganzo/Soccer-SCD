@@ -1,4 +1,5 @@
 with Soccer.TeamPkg; use Soccer.TeamPkg;
+with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
 package Soccer.Utils is
 
    --+ Distanza tra due punti
@@ -26,6 +27,8 @@ package Soccer.Utils is
    function Is_In_Penalty_Area (team : Team_Id; coord : Coordinate) return Boolean;
 
    function Print_Coord (coord : Coordinate) return String;
+
+   function Is_Match_Event (event : Game_Event_Ptr) return Boolean;
 
 --     function Get_Nearest_Player (point_coord : Coordinate; team : Team_Id) return Integer;
 

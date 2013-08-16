@@ -2,6 +2,7 @@ with Ada.Numerics.Generic_Elementary_Functions;
 with Ada.Numerics.Discrete_Random;
 with Ada.Text_IO;
 use Ada.Text_IO;
+with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 
 package body Soccer.Utils is
 
@@ -31,6 +32,21 @@ package body Soccer.Utils is
       tarX : Integer := targetCoord.coord_x;
       tarY : Integer := targetCoord.coord_y;
    begin
+
+      if targetCoord = oblivium then
+	 if myX = 1 and myY = 1 then
+	    return oblivium;
+	 end if;
+
+	 if myX = 1 then
+	    return Coordinate'(1, myY -1);
+	 end if;
+
+	 if myY = 1 then
+	    return Coordinate'(myX - 1, 1);
+	 end if;
+      end if;
+
       if (myX = tarX and myY = tarY) then return myCoord;    -- sovrapposti
       elsif (myX < tarX and myY < tarY) then return Coordinate'(coord_x => myX+1,
                                                                 coord_y => myY+1); -- alto destra
@@ -169,6 +185,15 @@ package body Soccer.Utils is
    begin
       return "(" & I2S (coord.coord_x) & "," & I2S (coord.coord_y) & ")";
    end Print_Coord;
+
+   function Is_Match_Event (event : Game_Event_Ptr) return Boolean is
+   begin
+      if event.all in Match_Event'Class then
+	 return True;
+      end if;
+
+      return False;
+   end Is_Match_Event;
 
 
 --     function Get_Nearest_Player (point_coord : Coordinate; team : Team_Id) return Integer is

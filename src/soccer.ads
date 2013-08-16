@@ -68,12 +68,18 @@ package Soccer is
    upper_left_corner : Coordinate := Coordinate'(1,33);
    upper_right_corner : Coordinate := Coordinate'(51,33);
 
+   -- oblivium
+   oblivium : Coordinate := Coordinate'(0,0);
+
    buffer_dim : Positive := 10;
    nearby_distance : Integer := 3;
    send_buffer_delay : Integer := 1;
    t0 : Time := Clock;
 
    number_of_zones : Integer := 4;
+
+   ball_speed : Float := 1.0;
+   players_delay : Float := 0.2;
 
    type Power_Range is range 0 .. 10;
 

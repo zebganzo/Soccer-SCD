@@ -49,13 +49,13 @@ package body Soccer.BallPkg is
       procedure Move_Player (new_coord : Coordinate) is
       begin
          current_position := new_coord;
-         Put_Line ("[BALL] Player moved ball to (" & I2S(current_position.coord_x) & "," & I2S(current_position.coord_y) & ")");
+         pragma Debug (Put_Line ("[BALL] Player moved ball to (" & I2S(current_position.coord_x) & "," & I2S(current_position.coord_y) & ")"));
       end Move_Player;
 
       entry Move_Agent (new_coord : Coordinate)
         when controlled = False is
       begin
-         Put_Line("[BALL] Motion agent enabled");
+         pragma Debug (Put_Line("[BALL] Motion agent enabled"));
          current_position := new_coord;
       end Move_Agent;
 

@@ -141,7 +141,7 @@ package body Soccer.ControllerPkg is
    begin
       for i in 1 .. num_of_players loop
 	 current_status (i).id := i;
-	 current_status (i).coord := Coordinate'(0,0);
+	 current_status (i).coord := Coordinate'(current_status (i).id,0);
          if i < 4 then
             current_status (i).team := Team_One;
          else
@@ -353,28 +353,28 @@ package body Soccer.ControllerPkg is
 
       if here_player_result = 0 or here_player_result = 100 then
 	 -- il giocatore si sposta li'
-	 Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
-	    & " si e' spostato sulla cella " & Print_Coord (action.Get_To));
+	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
+	    & " si e' spostato sulla cella " & Print_Coord (action.Get_To)));
          current_status (action.Get_Player_Id).coord := action.Get_To;
          if ball_holder_id = action.Get_Player_Id then
             Ball.Move_Player(new_coord => action.Get_To);
          end if;
          Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (action));
 
-	 Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id) & " sta per rilasciare la zona con coordinata " & Print_Coord (action.Get_From));
+	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id) & " sta per rilasciare la zona con coordinata " & Print_Coord (action.Get_From)));
          Release (action.Get_From);
          success := True;
       else
-	 Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
+	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
 	    & " ha fallito lo spostamento (val: " & I2S (here_player_result)
-	    & ") verso la cella " & Print_Coord (action.Get_To));
+	    & ") verso la cella " & Print_Coord (action.Get_To)));
          success := False;
       end if;
    end Compute;
 
    procedure Compute (action : in Shot_Event_Ptr; success : out Boolean) is
    begin
-      Put_Line("[CONTROLLER] Shot_Event");
+      pragma Debug (Put_Line("[CONTROLLER] Shot_Event"));
       if Utils.Compare_Coordinates(coord1 => Ball.Get_Position,
                                    coord2 => action.Get_From) then
          Ball.Set_Controlled(new_status => False);
@@ -396,7 +396,7 @@ package body Soccer.ControllerPkg is
       with_foul : Boolean := False;
       tackle_success : Boolean;
    begin
-      Put_Line("[CONTROLLER] Tackle_Event");
+      pragma Debug (Put_Line("[CONTROLLER] Tackle_Event"));
       if Utils.Compare_Coordinates(coord1 => action.Get_To,
 				   coord2 => current_status(action.Get_Other_Player_Id).coord) then
 	    -- Tento di rubargli la palla!
@@ -410,7 +410,7 @@ package body Soccer.ControllerPkg is
 	    foul_event : Binary_Event_Ptr := new Binary_Event;
 	 begin
 	    if with_foul then
-	       Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
+	       pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id)));
 	       foul_event.Initialize(new_event_id    => Foul,
 			      new_player_1_id => action.Get_Player_Id,
 			      new_player_2_id => action.Get_Other_Player_Id,
@@ -422,7 +422,7 @@ package body Soccer.ControllerPkg is
 
 	 if tackle_success then
 	    -- hell yeah! Mi prendo la palla
-	    Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla");
+	    pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla"));
 	    ball.Move_Player(new_coord => action.Get_From);
 	    ball_holder_id := action.Get_Player_Id;
 	    Set_Last_Ball_Holder (holder => ball_holder_id);
@@ -449,15 +449,16 @@ package body Soccer.ControllerPkg is
 
    procedure Compute (action : in Catch_Event_Ptr; success : out Boolean) is
    begin
-      Put_Line("[CONTROLLER] Catch_Event");
+      pragma Debug (Put_Line("[CONTROLLER] Catch_Event"));
       Ball.Catch(player_coord => action.Get_To,
                  succeded      => success);
       if success then
-	 Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla!");
+	 pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla!"));
 	 ball_holder_id := action.Get_Player_Id;
 	 Set_Last_Ball_Holder (ball_holder_id);
       else
-	 Put_Line("[CONTROLLER] Catch fallita");
+	 pragma Debug (Put_Line("[CONTROLLER] Catch fallita"));
+	 null;
       end if;
    end Compute;
 
@@ -490,7 +491,7 @@ package body Soccer.ControllerPkg is
 
    begin
       Initialize;
-      --Timer_Control.Start;
+--        Timer_Control.Start;
 
       -- imposto l'evento d'inizio gioco
       initial_match_event := new Match_Event;
@@ -520,12 +521,12 @@ package body Soccer.ControllerPkg is
 
 		  if not compute_result and revaluate then
 		     -- Devo distinguere tra i tipi di mosse
-		     Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato");
-		     if(current_action.utility > utility_constraint) then
+		     pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato"));
+		     if(current_action.utility > utility_constraint or current_action.event.Get_To = oblivium) then
 			current_action.utility := current_action.utility - 1;
 			requeue Awaiting(Occupy(current_action.event.Get_To));
 		     else
-			Put_Line("[CONTROLLER] Mossa da rivedere");
+			pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere"));
 			declare
 			   old_move : Motion_Event_Ptr := current_action.event;
 			   new_move : Motion_Event_Ptr := new Move_Event;
@@ -536,8 +537,8 @@ package body Soccer.ControllerPkg is
 			begin
 			   revaluate := False;
 			   new_move.Initialize (id, from, alternative);
-			   Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
-	       & " rivalutata alla cella " & Print_Coord (alternative));
+			   pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
+	       & " rivalutata alla cella " & Print_Coord (alternative)));
 			   Compute (new_move, compute_result, revaluate);
 			end;
 		     end if;
@@ -545,16 +546,16 @@ package body Soccer.ControllerPkg is
 		     -- stampo il campo
 --  		     Print_Field;
 		     -- invocare l'arbitro per controllare lo stato del gioco dopo l'azione
-		     Put_Line("[CONTROLLER] Sto per chiamare l'arbitro");
+		     pragma Debug (Put_Line("[CONTROLLER] Sto per chiamare l'arbitro"));
 		     Referee.Pre_Check (last_player_event);
 		     Referee.Post_Check;
 		     null;
 		  end if;
-		  end Write;
+	       end Write;
             or
                when Released (Integer(Zone)) = True =>
                   accept Awaiting (Zone) (current_action : in out Action) do
-                     Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & "pescato dalla coda");
+                     pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & "pescato dalla coda"));
 
 		     Compute(current_action.event, compute_result, revaluate);
 		     if compute_result then
@@ -562,14 +563,14 @@ package body Soccer.ControllerPkg is
 		     end if;
 
                      if not compute_result and revaluate then
-			Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id)
+			pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id)
 			  & " bloccato dal giocatore " & I2S(Check_For_Player_In_Cell(x => current_action.event.Get_To.coord_x, y => current_action.event.Get_To.coord_y))
-			  & " alle coordinate " & I2S(current_action.event.Get_To.coord_x) & " " & I2S(current_action.event.Get_To.coord_y));
-                        if(current_action.utility > utility_constraint) then
+			  & " alle coordinate " & I2S(current_action.event.Get_To.coord_x) & " " & I2S(current_action.event.Get_To.coord_y)));
+                        if(current_action.utility > utility_constraint or current_action.event.Get_To = oblivium) then
                            current_action.utility := current_action.utility - 1;
                            requeue Awaiting(Occupy(current_action.event.Get_To));
                         else
-			   Put_Line("[CONTROLLER] Mossa da rivedere (in riaccodamento)");
+			   pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere (in riaccodamento)"));
 			   declare
 			      old_move : Motion_Event_Ptr := current_action.event;
 			      new_move : Motion_Event_Ptr := new Move_Event;
@@ -580,14 +581,14 @@ package body Soccer.ControllerPkg is
 			   begin
 			      revaluate := False;
 			      new_move.Initialize (id, from, alternative);
-			      Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
-		  & " rivalutata alla cella " & Print_Coord (alternative));
+			      pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
+		  & " rivalutata alla cella " & Print_Coord (alternative)));
 			      Compute (new_move, compute_result, revaluate);
 			   end;
 			end if;
 		     else
 --  			stampo il campo
-			Print_Field;
+--  			Print_Field;
 			-- invocare l'arbitro per controllare lo stato del gioco dopo l'azione
 			Referee.Pre_Check (last_player_event);
    			Referee.Post_Check;

@@ -63,21 +63,39 @@ package body Soccer.PlayersPkg is
 --
 --        delay duration(5);
 
+      delay duration (id / 5);
+
+      pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo Start_1T"));
+      Game_Entity.Start_1T;
+      pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T"));
+
+      current_action.event := new Move_Event;
+      current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
+      current_coord := current_generic_status.coord;
+      target_coord := oblivium;
+
+      current_action.event.Initialize(nPlayer_Id => id,
+				      nFrom      => current_coord,
+				      nTo        => target_coord);
+      current_action.utility := 10;
+
+      Controller.Write(current_action => current_action);
+
       loop
-	 Put_Line ("[PLAYER_" & I2S (id) & "] Leggo Generic Status");
+	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Leggo Generic Status"));
 	 current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
 	 current_coord := current_generic_status.coord;
 
 	 current_game_status := current_generic_status.game_status;
 
-	 Put_Line ("[PLAYER_" & I2S (id) & "] Controllo che tipo di evento c'e'");
+	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo che tipo di evento c'e'"));
 	 if current_generic_status.last_game_event /= null then
 	    if current_generic_status.last_game_event.all in Match_Event'Class then
-	       Put_Line ("[PLAYER_" & I2S (id) & "] C'e' un Match_Event");
+	       pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] C'e' un Match_Event"));
 	       current_match_event := Match_Event_Ptr (current_generic_status.last_game_event);
 	       last_game_event := null;
 	    else
-	       Put_Line ("[PLAYER_" & I2S (id) & "] C'e' un Game_Event");
+	       pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] C'e' un Game_Event"));
 	       last_game_event := Unary_Event_Ptr (current_generic_status.last_game_event);
 	       current_match_event := null;
 	    end if;
@@ -94,13 +112,13 @@ package body Soccer.PlayersPkg is
 	 end if;
 
 	 -- sulla base delle mie statistiche, chiedo la mia "bolla" di stato
-	 Put_Line ("[PLAYER_" & I2S (id) & "] Leggo lo stato con la mia bolla");
+	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Leggo lo stato con la mia bolla"));
 	 current_read_result := ControllerPkg.Read_Status(x => current_coord.coord_x,
 						   y => current_coord.coord_y,
 						   r => current_range);
 
 	 -- calcolo la distanza che mi separa dai giocatori che ho intorno
-  	 Put_Line ("[PLAYER_" & I2S (id) & "] Pre-calcolo le distanze con gli altri giocatori che ho vicino a me");
+  	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Pre-calcolo le distanze con gli altri giocatori che ho vicino a me"));
 	 for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
 	    declare
 	       other_coord : Coordinate;
@@ -115,17 +133,17 @@ package body Soccer.PlayersPkg is
 	 end loop;
 
 	 -- controllo lo stato di gioco e decido l'azione da fare
-	 Put_Line ("[PLAYER_" & I2S (id) & "] Controllo lo stato di gioco per decidere l'azione");
+	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo lo stato di gioco per decidere l'azione"));
 	 case current_game_status is
 	 when Game_Running =>
 
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Stato di gioco: Game_Running");
+	    pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Stato di gioco: Game_Running"));
 
 	    --+---------------
      	    --+ GAME RUNNING
 	    --+---------------
 
-	    Put_Line("[PLAYER_" & I2S (id) & "] Ho la palla vicina? " & Boolean'Image(current_generic_status.nearby));
+	    pragma Debug (Put_Line("[PLAYER_" & I2S (id) & "] Ho la palla vicina? " & Boolean'Image(current_generic_status.nearby)));
 
 	    if current_generic_status.holder then
 	       -- Che bello ho la palla, se sono in pericolo la passo se no fanculo tutti!
@@ -165,7 +183,7 @@ package body Soccer.PlayersPkg is
 			   current_action.event := new Shot_Event;
 			   current_action.event.Initialize(id, current_coord,
 				      current_read_result.players_in_my_zone.Element(Index => playerTarget).coord);
-			   Put_Line("[PLAYER_" & I2S (id) & "] Mi stanno per rubare palla, la passo al mio amico " & I2S(current_read_result.players_in_my_zone.Element(Index => playerTarget).id));
+			   pragma Debug (Put_Line("[PLAYER_" & I2S (id) & "] Mi stanno per rubare palla, la passo al mio amico " & I2S(current_read_result.players_in_my_zone.Element(Index => playerTarget).id)));
 			   Shot_Event_Ptr(current_action.event).Set_Shot_Power (10);
 			   current_action.utility := 10;
 			end if;
@@ -268,15 +286,15 @@ package body Soccer.PlayersPkg is
      	    --+ GAME READY
 	    --+---------------
 
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Stato di gioco: Game_Ready");
+	    pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Stato di gioco: Game_Ready"));
 
 	    -- controllo se sono ad un evento notevole della partita
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se il Match_Event e' settato");
+	    pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se il Match_Event e' settato"));
 	    if current_match_event /= null then
-	       Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono all'inizio del gioco");
+	       pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono all'inizio del gioco"));
 	       if Get_Match_Event_Id (current_match_event) = Begin_Of_Match
-		 or Get_Match_Event_Id (current_match_event) = Beginning_Of_Second_Half then
-		  Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono il giocatore che deve far ripartire il gioco");
+		 or Get_Match_Event_Id (current_match_event) = Begin_Of_Second_Half then
+		  pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono il giocatore che deve far ripartire il gioco"));
 		  -- controllo se sono il giocatore che deve far ripartire il gioco
 		  if Get_Kick_Off_Player (current_match_event) = id then
 		     declare
@@ -302,7 +320,7 @@ package body Soccer.PlayersPkg is
 				    shot_target);
 			Shot_Event_Ptr(current_action.event).Set_Shot_Power (10);
 			current_action.utility := 10;
-			Put_Line ("[PLAYER_" & I2S (id) & "] Calcio d'inizio verso la cella " & Print_Coord (shot_target));
+			pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Calcio d'inizio verso la cella " & Print_Coord (shot_target)));
 		     end;
 		  end if;
 	       end if;
@@ -362,17 +380,17 @@ package body Soccer.PlayersPkg is
      	    --+ GAME BLOCKED
 	    --+---------------
 
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Stato di gioco: Game_Blocked");
+	    pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Stato di gioco: Game_Blocked"));
 
 	    -- controllo se sono ad un evento notevole della partita
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se il Match_Event e' settato");
+	    pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se il Match_Event e' settato"));
 	    if current_match_event /= null then
-	       Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono all'inizio del gioco");
-	       if Get_Match_Event_Id (current_match_event) = Begin_Of_Match then
-		  Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono il giocatore che deve far ripartire il gioco");
+	       pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono all'inizio del gioco"));
+	       if Get_Match_Event_Id (current_match_event) = Begin_Of_Match or Get_Match_Event_Id (current_match_event) = Begin_Of_Second_Half then
+		  pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo se sono il giocatore che deve far ripartire il gioco"));
 		  -- controllo se sono il giocatore che deve far ripartire il gioco
 		  if Get_Kick_Off_Player (current_match_event) = id then
-		     Put_Line ("[PLAYER_" & I2S (id) & "] Sono quello che deve far riprendere il gioco");
+		     pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Sono quello che deve far riprendere il gioco"));
 		     -- controllo se ho la palla
 		     if not current_generic_status.holder then
 			-- controllo se sono sopra la palla
@@ -392,27 +410,88 @@ package body Soccer.PlayersPkg is
 				       nFrom      => current_coord,
 				       nTo        => Get_Next_Coordinate (current_coord,
 					 Ball.Get_Position));
-			   current_action.utility := 10; -- TODO:: cambiare utilita'
-			   Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto alla coordinata "
-		& Print_Coord (Get_Next_Coordinate (current_coord, Ball.Get_Position)));
+			   current_action.utility := 5; -- TODO:: cambiare utilita'
+			   pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto alla coordinata "
+		& Print_Coord (Get_Next_Coordinate (current_coord, Ball.Get_Position))));
 			end if;
 		     end if;
 		  else
-		     Put_Line ("[PLAYER_" & I2S (id) & "] Non devo far riprendere il gioco");
+		     pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Non devo far riprendere il gioco"));
 		     -- controllo se sono nella mia posizione di riferimento
 		     if not Compare_Coordinates (current_coord, TEMP_Get_Coordinate_For_Player (id)) then
-			Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto nella cella "
+			pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto nella cella "
 	     & Print_Coord (Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)))
-	     & " verso la mia posizione di riferimento " & Print_Coord (TEMP_Get_Coordinate_For_Player (id)));
+	     & " verso la mia posizione di riferimento " & Print_Coord (TEMP_Get_Coordinate_For_Player (id))));
 			-- mi sposto sulla mia posizione di riferimento
 			current_action.event := new Move_Event;
 			current_action.event.Initialize (id,
 				    current_coord,
 				    Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)));
-			current_action.utility := 3; -- TODO:: cambiare utilita'
+			current_action.utility := 5; -- TODO:: cambiare utilita'
 		     else
-			Put_Line ("[PLAYER_" & I2S (id) & "] Sono nella mia posizione di riferimento");
+			pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Sono nella mia posizione di riferimento"));
 			current_action.event := null;
+		     end if;
+		  end if;
+	       elsif Get_Match_Event_Id (current_match_event) = End_Of_First_Half then
+		  if current_coord = Coordinate'(id, 0) then
+		     -- aspetto l'inizio del secondo tempo
+		     Game_Entity.Rest;
+		     delay duration (id / 5);
+		     Game_Entity.Start_2T;
+		  elsif current_coord = oblivium then
+		     -- mi sposto nella mia cella in panchina
+		     current_action.event := new Move_Event;
+		     current_action.event.Initialize (nPlayer_Id => id,
+					nFrom      => current_coord,
+					nTo        => Coordinate'(id, 0));
+		     current_action.utility := 10; -- TODO:: cambiare utilita'
+		  else
+		     -- se ho la palla, la mollo giu'
+		     if current_generic_status.holder then
+			-- mollo la palla (la tiro nella posizione dove sono)
+			current_action.event := new Shot_Event;
+			current_action.event.Initialize(id, current_coord, current_coord);
+			Shot_Event_Ptr(current_action.event).Set_Shot_Power (1);
+			current_action.utility := 10;
+		     else
+			-- mi sposto verso la cella oblivium
+			pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto verso Oblivium"));
+			current_action.event := new Move_Event;
+			current_action.event.Initialize (nPlayer_Id => id,
+				    nFrom      => current_coord,
+				    nTo        => Get_Next_Coordinate (current_coord, oblivium));
+			current_action.utility := 10; -- TODO:: cambiare utilita'
+		     end if;
+		  end if;
+
+	       elsif Get_Match_Event_Id (current_match_event) = End_Of_Match then
+		  if current_coord = Coordinate'(id, 0) then
+		     -- mi accodo per la distruzione
+		     Game_Entity.End_Match;
+		  elsif current_coord = oblivium then
+		     -- mi sposto nella mia cella in panchina
+		     current_action.event := new Move_Event;
+		     current_action.event.Initialize (nPlayer_Id => id,
+					nFrom      => current_coord,
+					nTo        => Coordinate'(id, 0));
+		     current_action.utility := 10; -- TODO:: cambiare utilita'
+		  else
+		     -- se ho la palla, la mollo giu'
+		     if current_generic_status.holder then
+			-- mollo la palla (la tiro nella posizione dove sono)
+			current_action.event := new Shot_Event;
+			current_action.event.Initialize(id, current_coord, current_coord);
+			Shot_Event_Ptr(current_action.event).Set_Shot_Power (1);
+			current_action.utility := 10;
+		     else
+			-- mi sposto verso la cella oblivium
+			pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto verso Oblivium"));
+			current_action.event := new Move_Event;
+			current_action.event.Initialize (nPlayer_Id => id,
+				    nFrom      => current_coord,
+				    nTo        => Get_Next_Coordinate (current_coord, oblivium));
+			current_action.utility := 10; -- TODO:: cambiare utilita'
 		     end if;
 		  end if;
 	       end if;
@@ -473,6 +552,9 @@ package body Soccer.PlayersPkg is
 		     end if;
 		  end;
 	       end if;
+--  	    else
+	       -- aggiungere la gestione per eventi di gioco
+--  	       null;
 	    end if;
 
 	 when Game_Paused =>
@@ -485,34 +567,32 @@ package body Soccer.PlayersPkg is
 
 	    if current_match_event /= null then
 	       if Get_Match_Event_Id (current_match_event) = Begin_Of_Match then
-		  Put_Line ("[PLAYER_" & I2S (id) & "] Gioco in pausa per inizio primo tempo");
-		  target_coord := TEMP_Get_Coordinate_For_Player (0);
+		  pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Gioco in pausa per inizio primo tempo"));
+--  		  target_coord := TEMP_Get_Coordinate_For_Player (0); -- TODO:: decommenta per farli entrare in campo in ordine!
+		  target_coord := TEMP_Get_Coordinate_For_Player (id);
 
-		  Put_Line ("initial_x = " & I2S (current_coord.coord_x) & " - initial_y = " & I2S (current_coord.coord_y));
+		  pragma Debug (Put_Line ("initial_x = " & I2S (current_coord.coord_x) & " - initial_y = " & I2S (current_coord.coord_y)));
 
 		  current_action.event := new Move_Event;
 		  current_action.event.Initialize(nPlayer_Id => id,
 				    nFrom      => current_coord,
 				    nTo        => target_coord);
 		  current_action.utility := 10;
-		  Put_Line ("[PLAYER_" & I2S (id) & "] Fine creazione Move_Event");
 	       end if;
 	    end if;
-
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Fine ramo Game_Paused");
 
 	 end case;
 
 	 if current_action.event /= null then
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Start");
-	    Game_Entity.Start;
-	    Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Write");
+--  	    Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Start");
+--  	    Game_Entity.Start;
+	    pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Write"));
 	    ControllerPkg.Controller.Write(current_action);
 
 	    current_action.event := null;
 	 end if;
 
-	 delay duration (1); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+	 delay duration (players_delay); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
       end loop;
 
    end Player;

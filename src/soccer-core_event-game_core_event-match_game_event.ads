@@ -8,7 +8,7 @@ package Soccer.Core_Event.Game_Core_Event.Match_Game_Event is
 
    type Match_Event_Id is (Begin_Of_Match,
 			   End_Of_First_Half,
-			   Beginning_Of_Second_Half,
+			   Begin_Of_Second_Half,
 			   End_Of_Match);
 
    procedure Serialize (E : Match_Event; Serialized_Obj : out JSON_Value);

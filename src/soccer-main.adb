@@ -2,6 +2,7 @@ with Soccer.PlayersPkg;
 use Soccer.PlayersPkg;
 
 with Soccer.ControllerPkg;
+use Soccer.ControllerPkg;
 
 with Soccer.BallPkg;
 with Soccer.Motion_AgentPkg;
@@ -18,6 +19,8 @@ with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.G
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 with Soccer.Core_Event; use Soccer.Core_Event;
 with Soccer.TeamPkg; use Soccer.TeamPkg;
+with Soccer.Game; use Soccer.Game;
+with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
 
 
 procedure Soccer.Main is
@@ -58,8 +61,42 @@ begin
       Six : Player (Id    => 6, Ability => 24, Initial_Coord_X => 6, Initial_Coord_Y => 6, Team => Team_Two);
       Seven : Player (Id    => 7, Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
       Eight : Player (Id    => 8, Ability => 6, Initial_Coord_X => 20, Initial_Coord_Y => 10, Team => Team_Two);
+
+      char : Character;
    begin
-      null;
+
+      loop
+	 Get (Item => char);
+
+	 if char = 'p' then
+	    -- metti in pausa il gioco
+	    if Get_Game_Status = Game_Paused then
+	       Set_Game_Status (Game_Blocked);
+	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
+	    else
+	       Set_Game_Status (Game_Paused);
+	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
+	    end if;
+	 elsif char = 'n' then
+	    -- chiama notify
+	    Set_Game_Status (Game_Paused);
+	    Game_Entity.Notify;
+	 elsif char = '1' then
+	    pragma Debug (Put_Line ("[MAIN] Simulating end of 1st half"));
+	    Referee.Simulate_End_Of_1T;
+	 elsif char = '2' then
+	    pragma Debug (Put_Line ("[MAIN] Simulating start of 2nd half"));
+	    Referee.Simulate_Begin_Of_2T;
+	    Game_Entity.Notify;
+	 elsif char = 'e' then
+	    pragma Debug (Put_Line ("[MAIN] Simulating end of 2nd half"));
+	    Referee.Simulate_End_Of_Match;
+	 end if;
+
+
+      end loop;
+
+
    end;
 
 

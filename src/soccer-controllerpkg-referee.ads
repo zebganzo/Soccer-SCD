@@ -26,6 +26,10 @@ package Soccer.ControllerPkg.Referee is
 
    function Get_Nearest_Player (event_coord : in Coordinate; team : in Team_Id) return Integer;
 
+   procedure Simulate_End_Of_1T;
+   procedure Simulate_Begin_Of_2T;
+   procedure Simulate_End_Of_Match;
+
 private
    game_event : Game_Event_Ptr;
    package Manager_Events_Container is new Vectors (Natural, Manager_Event.Event_Ptr);
