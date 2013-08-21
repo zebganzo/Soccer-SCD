@@ -24,6 +24,8 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
+   half_game_duration : Positive := 30;
+
    team_one_goal_starting_coord : Coordinate := Coordinate'(0,9);
    team_two_goal_starting_coord : Coordinate := Coordinate'(31,9);
 
@@ -90,6 +92,7 @@ package Soccer is
    utility_constraint : Utility_Constraint_Type := 2;
 
    num_of_players : Positive := 8;
+   total_players : Positive := 10;
 
    agent_movement_id : Integer := 0;
 

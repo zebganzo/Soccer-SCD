@@ -9,6 +9,8 @@ with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.G
 with Soccer.Utils; use Soccer.Utils;
 with Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event; use Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event;
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Real_Time; use Ada.Real_Time;
+with Soccer.Generic_Timers;
 
 package Soccer.ControllerPkg.Referee is
 
@@ -29,6 +31,10 @@ package Soccer.ControllerPkg.Referee is
    procedure Simulate_End_Of_1T;
    procedure Simulate_Begin_Of_2T;
    procedure Simulate_End_Of_Match;
+   procedure Simulate_Substitution;
+
+   procedure End_Of_First_Half;
+   procedure End_Of_Second_Half;
 
 private
    game_event : Game_Event_Ptr;
@@ -37,5 +43,11 @@ private
    last_ball_holder : Integer;
 
    pending_substitutions : Substitutions_Container.Vector;
+
+   -- Timer
+   half_time_span : constant Time_Span := Seconds (half_game_duration);
+   id : constant String := "[TIMER] Half game timer";
+   package Game_Timer_First_Half is new Generic_Timers (True, id, half_time_span, End_Of_First_Half);
+   package Game_Timer_Second_Half is new Generic_Timers (True, id, half_time_span, End_Of_Second_Half);
 
 end Soccer.ControllerPkg.Referee;

@@ -1,5 +1,5 @@
-with GNATCOLL.JSON; use GNATCOLL.JSON;
 with Soccer.TeamPkg; use Soccer.TeamPkg;
+with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 package Soccer.Manager_Event is
 

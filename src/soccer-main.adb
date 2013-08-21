@@ -91,6 +91,9 @@ begin
 	 elsif char = 'e' then
 	    pragma Debug (Put_Line ("[MAIN] Simulating end of 2nd half"));
 	    Referee.Simulate_End_Of_Match;
+	 elsif char = 's' then
+	    pragma Debug (Put_Line ("[MAIN] Substitution"));
+	    Referee.Simulate_Substitution;
 	 end if;
 
 

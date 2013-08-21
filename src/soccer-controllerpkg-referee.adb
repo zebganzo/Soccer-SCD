@@ -34,6 +34,30 @@ package body Soccer.ControllerPkg.Referee is
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
    end Simulate_End_Of_Match;
 
+   procedure Simulate_Substitution is
+      new_event : Game_Event_Ptr;
+   begin
+      null;
+   end Simulate_Substitution;
+
+   procedure End_Of_First_Half is
+      new_event : Match_Event_Ptr;
+   begin
+      new_event := new Match_Event;
+      new_event.Initialize (End_Of_First_Half, 0);
+      Set_Game_Status (Game_Blocked);
+      Set_Last_Game_Event (Game_Event_Ptr (new_event));
+   end End_Of_First_Half;
+
+   procedure End_Of_Second_Half is
+      new_event : Match_Event_Ptr;
+   begin
+      new_event := new Match_Event;
+      new_event.Initialize (End_Of_Match, 0);
+      Set_Game_Status (Game_Blocked);
+      Set_Last_Game_Event (Game_Event_Ptr (new_event));
+   end End_Of_Second_Half;
+
    --+-----------------------------------
    -- PRE CHECK
    --+-----------------------------------
@@ -58,10 +82,8 @@ package body Soccer.ControllerPkg.Referee is
       end if;
 
       -- controllo lo stato della partita
-
       if current_match_status /= null then
-	 if Get_Match_Event_Id (current_match_status) = Begin_Of_Match
-	   or Get_Match_Event_Id (current_match_status) = Begin_Of_Second_Half then
+	 if Get_Match_Event_Id (current_match_status) = Begin_Of_Match then
 
 	    -- controllo se il gioco puo' partire
 	    pragma Debug (Put_Line ("[PRE_CHECK] Controllo se il gioco puo' ripartire"));
@@ -71,7 +93,9 @@ package body Soccer.ControllerPkg.Referee is
 		     -- ha battuto, il gioco puo' partire
 		     Set_Last_Game_Event (null);
 		     Set_Game_Status (Game_Running);
-		     pragma Debug (Put_Line ("[PRE_CHECK] Il gioco parte!"));
+		     pragma Debug (Put_Line ("[PRE_CHECK] Inizio primo tempo!"));
+		     -- faccio partire il timer del primo tempo
+		     Game_Timer_First_Half.Start;
 		     return; -- TODO:: controlla se serve!
 		  end if;
 	       end if;
@@ -118,9 +142,61 @@ package body Soccer.ControllerPkg.Referee is
 	 elsif Get_Match_Event_Id (current_match_status) = End_Of_First_Half then
 	    --
 	    null;
-	 else
-	    --
-	    null;
+	 elsif Get_Match_Event_Id (current_match_status) = Begin_Of_Second_Half then
+	    -- controllo se il gioco puo' partire
+	    pragma Debug (Put_Line ("[PRE_CHECK] Controllo se il gioco puo' ripartire"));
+	    if Get_Game_Status = Game_Ready then
+	       if e /= null then
+		    if e.all in Shot_Event'Class then
+		     -- ha battuto, il gioco puo' partire
+		     Set_Last_Game_Event (null);
+		     Set_Game_Status (Game_Running);
+		     pragma Debug (Put_Line ("[PRE_CHECK] Inizio secondo tempo!"));
+		     -- faccio partire il timer del secondo tempo
+		     Game_Timer_Second_Half.Start;
+		     return; -- TODO:: controlla se serve!
+		  end if;
+	       end if;
+	    end if;
+
+	    -- inizio del gioco o inizio secondo tempo, tutti i giocatori devono essere nella propria
+	    -- posizione di riferimento e qualcuno ha battuto il calcio d'inizio
+	    declare
+	       first_condition : Boolean := False;
+	       second_condition : Boolean := False;
+	    begin
+	       -- controllo che tutti i giocatori siano in posizione, tranne quello che
+	       -- deve sbloccare il gioco
+	       pragma Debug (Put_Line ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte"));
+	       for i in current_status'Range loop
+		  declare
+		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
+		     current_coord : Coordinate := current_status (i).coord;
+		     ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+		  begin
+		     if i /= kickoff_player then
+			first_condition := False;
+			if Compare_Coordinates (current_coord, ref_coord) then
+			   first_condition := True;
+			end if;
+			exit when not first_condition;
+		     else
+			-- FIXME:: solo per quando si testa con un solo giocatore in campo!
+			first_condition := True;
+		     end if;
+		  end;
+	       end loop;
+
+	       -- controllo che giocatore X abbia la palla
+	       if ball_holder_id = Get_Kick_Off_Player (current_match_status) then
+		  second_condition := True;
+	       end if;
+
+	       -- controlla che entrambe le condizioni siano soddisfatte
+	       if first_condition and second_condition then
+		  Set_Game_Status (Game_Ready);
+	       end if;
+	    end;
 	 end if;
 
 	 return;

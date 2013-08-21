@@ -150,6 +150,11 @@ package body Soccer.ControllerPkg is
       end loop;
    end Initialize;
 
+   procedure Get_Id is
+   begin
+      null;
+   end Get_Id;
+
    --+ Stampa del campo
    procedure Print_Field is
       cell : Integer;
