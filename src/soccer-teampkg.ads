@@ -47,14 +47,16 @@ private
    team_one_defensive_formation : Formation_Scheme := Formation_Scheme'(id        => D_532,
 							       positions => team_one_defensive_positions);
 
-   players_coord : array (0 .. num_of_players) of Coordinate := (Coordinate'(0,5),
-							       Coordinate'(5,5),--);
-							       Coordinate'(25,13),
-							       Coordinate'(17,9),
-							       Coordinate'(10,18),
-							       Coordinate'(28,2),
-							       Coordinate'(6,6),
-							       Coordinate'(14,15),
-							       Coordinate'(20,10));
+   players_coord : array (0 .. total_players) of Coordinate := (Coordinate'(0,5),
+								Coordinate'(5,5),--);
+								Coordinate'(25,13),
+								Coordinate'(17,9),
+								Coordinate'(10,18),
+								Coordinate'(28,2),
+								Coordinate'(6,6),
+								Coordinate'(14,15),
+								Coordinate'(20,10),
+								Coordinate'(12,12),
+								Coordinate'(15,8));
 
 end Soccer.TeamPkg;

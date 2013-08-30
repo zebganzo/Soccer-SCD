@@ -35,7 +35,6 @@ package body Soccer.ControllerPkg.Referee is
    end Simulate_End_Of_Match;
 
    procedure Simulate_Substitution is
-      new_event : Game_Event_Ptr;
    begin
       null;
    end Simulate_Substitution;

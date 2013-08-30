@@ -31,20 +31,33 @@ package body Soccer.Utils is
       myY : Integer := myCoord.coord_y;
       tarX : Integer := targetCoord.coord_x;
       tarY : Integer := targetCoord.coord_y;
+      next_to_oblivium : Coordinate;
    begin
 
+--        if targetCoord = oblivium then
+--  	 if myX = 1 and myY = 1 then
+--  	    return oblivium;
+--  	 end if;
+--
+--  	 if myX = 1 then
+--  	    return Coordinate'(1, myY -1);
+--  	 end if;
+--
+--  	 if myY = 1 then
+--  	    return Coordinate'(myX - 1, 1);
+--  	 end if;
+--        end if;
+
+
       if targetCoord = oblivium then
-	 if myX = 1 and myY = 1 then
+	 next_to_oblivium := oblivium;
+	 next_to_oblivium.coord_y := 1;
+
+	 if myCoord = next_to_oblivium then
 	    return oblivium;
 	 end if;
 
-	 if myX = 1 then
-	    return Coordinate'(1, myY -1);
-	 end if;
-
-	 if myY = 1 then
-	    return Coordinate'(myX - 1, 1);
-	 end if;
+	 return Get_Next_Coordinate (myCoord, next_to_oblivium);
       end if;
 
       if (myX = tarX and myY = tarY) then return myCoord;    -- sovrapposti

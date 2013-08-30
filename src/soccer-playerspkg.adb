@@ -24,6 +24,7 @@ package body Soccer.PlayersPkg is
    end Update_Distance;
 
    task body Player is
+      id : Integer;
       current_coord : Coordinate;
       target_coord : Coordinate;
       current_read_result : Read_Result;
@@ -63,11 +64,18 @@ package body Soccer.PlayersPkg is
 --
 --        delay duration(5);
 
-      delay duration (id / 5);
+--        delay duration (id / 5);
 
-      pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo Start_1T"));
+--        pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo Start_1T"));
+
+      Controller.Get_Id (id);
+--        ControllerPkg.Get_Id (id);
+
+--        pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T"));
       Game_Entity.Start_1T;
-      pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T"));
+
+      -- chiedo il mio ID al controllore
+      pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!"));
 
       current_action.event := new Move_Event;
       current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
@@ -419,15 +427,42 @@ package body Soccer.PlayersPkg is
 		     pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Non devo far riprendere il gioco"));
 		     -- controllo se sono nella mia posizione di riferimento
 		     if not Compare_Coordinates (current_coord, TEMP_Get_Coordinate_For_Player (id)) then
-			pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto nella cella "
-	     & Print_Coord (Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)))
-	     & " verso la mia posizione di riferimento " & Print_Coord (TEMP_Get_Coordinate_For_Player (id))));
-			-- mi sposto sulla mia posizione di riferimento
-			current_action.event := new Move_Event;
-			current_action.event.Initialize (id,
-				    current_coord,
-				    Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)));
-			current_action.utility := 5; -- TODO:: cambiare utilita'
+
+			-- controllo se sono in panchina
+			if Compare_Coordinates (current_coord, Coordinate'(id,0)) then
+			   -- mi sposto su oblivium
+			   pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto verso Oblivium"));
+			   current_action.event := new Move_Event;
+			   current_action.event.Initialize (nPlayer_Id => id,
+				       nFrom      => current_coord,
+				       nTo        => Get_Next_Coordinate (current_coord, oblivium));
+			   current_action.utility := 10; -- TODO:: cambiare utilita'
+			elsif Compare_Coordinates (current_coord, oblivium) then
+			   -- entro in campo
+			   declare
+			      next_to_oblivium : Coordinate;
+			   begin
+			      next_to_oblivium := oblivium;
+			      next_to_oblivium.coord_y := 1;
+
+			      current_action.event := new Move_Event;
+			      current_action.event.Initialize (nPlayer_Id => id,
+					  nFrom      => current_coord,
+					  nTo        => next_to_oblivium);
+			      current_action.utility := 10; -- TODO:: cambiare utilita'
+			   end;
+			else
+			   -- mi sposto nella mia posizione di riferimento
+			   pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto nella cella "
+			     & Print_Coord (Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)))
+			     & " verso la mia posizione di riferimento " & Print_Coord (TEMP_Get_Coordinate_For_Player (id))
+			     & " partendo dalla cella " & Print_Coord (current_coord)));
+			   current_action.event := new Move_Event;
+			   current_action.event.Initialize (id,
+				       current_coord,
+				       Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)));
+			   current_action.utility := 5; -- TODO:: cambiare utilita'
+			end if;
 		     else
 			pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Sono nella mia posizione di riferimento"));
 			current_action.event := null;

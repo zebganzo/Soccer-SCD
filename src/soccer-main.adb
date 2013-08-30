@@ -40,12 +40,11 @@ procedure Soccer.Main is
 --     SevenCoord : Coordinate_Ptr := new Coordinate'(coordX => 1,
 --                                                    coordY => 6);
 
-   players_team_one : Team_Players_List := (1, 2, 3, 4);
-   players_team_two : Team_Players_List := (5, 6, 7, 8);
+   players_team_one : Team_Players_List := (1, 2, 3, 4, 9);
+   players_team_two : Team_Players_List := (5, 6, 7, 8, 10);
 
    t1 : Team_Ptr := new Team'(id => Team_One, players => players_team_one, formation => B_442);
    t2 : Team_Ptr := new Team'(id => Team_Two, players => players_team_two, formation => O_352);
-
 
 begin
 
@@ -53,14 +52,16 @@ begin
 	      second_team => t2);
 
    declare
-      One   : Player (Id    => 1, Ability => 20, Initial_Coord_X => 5, Initial_Coord_Y => 5, Team => Team_One);
-      Two   : Player (Id    => 2, Ability => 15, Initial_Coord_X => 25, Initial_Coord_Y => 13, Team => Team_One);
-      Three : Player (Id    => 3, Ability => 17, Initial_Coord_X => 17, Initial_Coord_Y => 9, Team => Team_One);
-      Four : Player (Id    => 4, Ability => 18, Initial_Coord_X => 10, Initial_Coord_Y => 18, Team => Team_One);
-      Five : Player (Id    => 5, Ability => 12, Initial_Coord_X => 28, Initial_Coord_Y => 2, Team => Team_Two);
-      Six : Player (Id    => 6, Ability => 24, Initial_Coord_X => 6, Initial_Coord_Y => 6, Team => Team_Two);
-      Seven : Player (Id    => 7, Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
-      Eight : Player (Id    => 8, Ability => 6, Initial_Coord_X => 20, Initial_Coord_Y => 10, Team => Team_Two);
+      One   : Player (Ability => 20, Initial_Coord_X => 5, Initial_Coord_Y => 5, Team => Team_One);
+      Two   : Player (Ability => 15, Initial_Coord_X => 25, Initial_Coord_Y => 13, Team => Team_One);
+      Three : Player (Ability => 17, Initial_Coord_X => 17, Initial_Coord_Y => 9, Team => Team_One);
+      Four : Player (Ability => 18, Initial_Coord_X => 10, Initial_Coord_Y => 18, Team => Team_One);
+      Five : Player (Ability => 12, Initial_Coord_X => 28, Initial_Coord_Y => 2, Team => Team_Two);
+      Six : Player (Ability => 24, Initial_Coord_X => 6, Initial_Coord_Y => 6, Team => Team_Two);
+      Seven : Player (Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
+      Eight : Player (Ability => 6, Initial_Coord_X => 20, Initial_Coord_Y => 10, Team => Team_Two);
+      Nine : Player (Ability => 10, Initial_Coord_X => 12, Initial_Coord_Y => 12, Team => Team_One);
+      Ten : Player (Ability => 13, Initial_Coord_X => 15, Initial_Coord_Y => 8, Team => Team_Two);
 
       char : Character;
    begin
@@ -94,6 +95,9 @@ begin
 	 elsif char = 's' then
 	    pragma Debug (Put_Line ("[MAIN] Substitution"));
 	    Referee.Simulate_Substitution;
+	 elsif char = 'k' then
+	    pragma Debug (Put_Line ("[MAIN] Free all zones"));
+	    Controller.Free_Zones;
 	 end if;
 
 
@@ -135,3 +139,11 @@ begin
 
 end Soccer.Main;
 
+--        One   : Player (Id    => 1, Ability => 20, Initial_Coord_X => 5, Initial_Coord_Y => 5, Team => Team_One);
+--        Two   : Player (Id    => 2, Ability => 15, Initial_Coord_X => 25, Initial_Coord_Y => 13, Team => Team_One);
+--        Three : Player (Id    => 3, Ability => 17, Initial_Coord_X => 17, Initial_Coord_Y => 9, Team => Team_One);
+--        Four : Player (Id    => 4, Ability => 18, Initial_Coord_X => 10, Initial_Coord_Y => 18, Team => Team_One);
+--        Five : Player (Id    => 5, Ability => 12, Initial_Coord_X => 28, Initial_Coord_Y => 2, Team => Team_Two);
+--        Six : Player (Id    => 6, Ability => 24, Initial_Coord_X => 6, Initial_Coord_Y => 6, Team => Team_Two);
+--        Seven : Player (Id    => 7, Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
+--        Eight : Player (Id    => 8, Ability => 6, Initial_Coord_X => 20, Initial_Coord_Y => 10, Team => Team_Two);

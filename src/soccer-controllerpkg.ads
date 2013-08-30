@@ -18,7 +18,8 @@ package Soccer.ControllerPkg is
 
    type Player_Status is
       record
-         id : Integer;
+	 id : Integer;
+	 number : Integer;
          team : Team_Id;
          running : Boolean := False;
          on_the_field : Boolean := False;
@@ -27,7 +28,7 @@ package Soccer.ControllerPkg is
          distance : Integer;
       end record;
 
-   type Status is array (1 .. num_of_players) of Player_Status;
+   type Status is array (1 .. total_players) of Player_Status;
 
    package Players_Container is new Vectors (Index_Type   => Natural,
                                              Element_Type => Player_Status);
@@ -64,6 +65,8 @@ package Soccer.ControllerPkg is
 
    function Get_Game_Status return Game_State;
 
+   procedure Get_Id (id : out Integer);
+
    procedure Set_Game_Status (new_status : Game_State);
 
    function Get_Players_Status return Status;
@@ -72,13 +75,18 @@ package Soccer.ControllerPkg is
 
    task Field_Printer;
 
+   procedure Print_Status;
+
+   procedure Print_Zones;
+
    type Field_Zones is new Integer range 0 .. number_of_zones; -- anche la zona fuori dal campo!
    type Released_Zones is array (0 .. number_of_zones) of Boolean;
 
    task Controller is
-      entry Write(current_action : in out Action);
-   private
-      entry Awaiting(Field_Zones)(current_action : in out Action);
+      entry Get_Id (id : out Integer);
+      entry Write (current_action : in out Action);
+      entry Free_Zones;
+      entry Awaiting (Field_Zones) (current_action : in out Action);
    end Controller;
 
 private
