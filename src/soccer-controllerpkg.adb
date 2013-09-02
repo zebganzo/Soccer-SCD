@@ -282,15 +282,17 @@ package body Soccer.ControllerPkg is
 
    procedure Release (coord : Coordinate) is
    begin
-      Released (Get_Zone (coord)) := True;
+--        released (Get_Zone (coord)) := True;
+      null;
    end Release;
 
    function Occupy (coord : Coordinate) return Field_Zones is
-      Zone : Field_Zones;
+--        Zone : Field_Zones;
    begin
-      Zone := Field_Zones (Get_Zone (coord => coord));
-      Released (Integer (Zone)) := False;
-      return Zone;
+--        Zone := Field_Zones (Get_Zone (coord => coord));
+--        released (Integer (Zone)) := False;
+--        return Zone;
+      return 0;
    end Occupy;
 
    type Alternative_Coord_Index_Range is range 1 .. 2;
@@ -437,17 +439,17 @@ package body Soccer.ControllerPkg is
          end if;
          Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (action));
 
-	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id) & " sta per rilasciare la zona con coordinata " & Print_Coord (action.Get_From)));
-	 pragma Debug (Put_Line ("Zona di rilascio: " & I2S (Get_Zone (action.Get_From))));
-	 pragma Debug (Put_Line ("Before release"));
-	 Print_Zones;
-	 Release (action.Get_From);
-	 pragma Debug (Put_Line ("After release"));
-	 Print_Zones;
+--  	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id) & " sta per rilasciare la zona con coordinata " & Print_Coord (action.Get_From)));
+--  	 pragma Debug (Put_Line ("Zona di rilascio: " & I2S (Get_Zone (action.Get_From))));
+--  	 pragma Debug (Put_Line ("Before release"));
+--  	 Print_Zones;
+--  	 Release (action.Get_From);
+--  	 pragma Debug (Put_Line ("After release"));
+--  	 Print_Zones;
          success := True;
       else
 	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
-	    & " ha fallito lo spostamento (val: " & I2S (here_player_result)
+	    & " ha fallito lo spostamento (c'e' " & I2S (here_player_result)
 	    & ") verso la cella " & Print_Coord (action.Get_To)));
          success := False;
       end if;
@@ -466,10 +468,11 @@ package body Soccer.ControllerPkg is
 
    procedure Print_Zones is
    begin
-      for i in released'Range loop
-	 pragma Debug (Put_Line ("Zone " & I2S (i) & " has value: " & Boolean'Image (released (i))));
-	 null;
-      end loop;
+--        for i in released'Range loop
+--  	 pragma Debug (Put_Line ("Zone " & I2S (i) & " has value: " & Boolean'Image (released (i))));
+--  	 null;
+--        end loop;
+      null;
    end Print_Zones;
 
    procedure Compute (action : in Shot_Event_Ptr; success : out Boolean) is
@@ -582,6 +585,24 @@ package body Soccer.ControllerPkg is
       end if;
    end Compute;
 
+   protected body Guard is
+      entry Update (zone : Field_Zones; occupy : Boolean) when True is
+      begin
+	 if occupy then
+	    released (Integer (zone)) := True;
+	 else
+	    released (Integer (zone)) := False;
+	 end if;
+      end Update;
+
+      entry Wait (for zone in Field_Zones) (current_action : in out Action) when not released (Integer (zone)) is
+      begin
+--  	 current_action.utility := current_action.utility - 1;
+	 requeue Controller.Write;
+      end Wait;
+
+   end Guard;
+
    task body Controller is
       utility_constraint : Utility_Constraint_Type := 6;
       compute_result : Boolean;
@@ -618,148 +639,135 @@ package body Soccer.ControllerPkg is
 
       loop
 	 -- aggiungere controllo su flag del gioco (per pausa, fine_gioco, ecc)
-	 for Zone in Field_Zones'Range loop
-	    select
-	       accept Write (current_action : in out Action) do
+	 select
+	    accept Write (current_action : in out Action) do
 
-		  -- provo a soddisfare la richiesta del giocatore
-		  Compute(current_action.event, compute_result, revaluate);
+	       -- provo a soddisfare la richiesta del giocatore
+	       Compute (current_action.event, compute_result, revaluate);
 
-		  if compute_result and current_action.event.all not in Move_Event'Class then
-			last_player_event := current_action.event;
+	       if compute_result then
+		  if Compare_Coordinates (current_action.event.Get_From, oblivium) or current_action.event.Get_From.coord_y /= 0 then
+		     pragma Debug (Put_Line ("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) &
+			 " rilascia la zona " & I2S (Integer (Get_Zone (current_action.event.Get_From)))));
+		     Guard.Update (Field_Zones (Get_Zone (current_action.event.Get_From)), False);
 		  end if;
 
-		  if not compute_result and revaluate then
-		     -- Devo distinguere tra i tipi di mosse
-		     pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato sulla zona " & I2S (Get_Zone (current_action.event.Get_To))));
-		     if(current_action.utility > utility_constraint or current_action.event.Get_To = oblivium) then
-			current_action.utility := current_action.utility - 1;
-			requeue Awaiting (Occupy (current_action.event.Get_To));
-		     else
-			pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere"));
-			declare
-			   old_move : Motion_Event_Ptr := current_action.event;
-			   new_move : Motion_Event_Ptr := new Move_Event;
-			   id : Integer := Get_Player_Id (old_move.all);
-			   from : Coordinate := Get_From (old_move.all);
-			   to : Coordinate := Get_to (old_move.all);
-			   alternative : Coordinate := Get_Alternative_Coord (from, to);
-			begin
-			   revaluate := False;
-			   new_move.Initialize (id, from, alternative);
-			   pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
-	       & " rivalutata alla cella " & Print_Coord (alternative)));
-			   Compute (new_move, compute_result, revaluate);
-			end;
-		     end if;
+		  if current_action.event.all not in Move_Event'Class then
+		     last_player_event := current_action.event;
+		  end if;
+	       end if;
+
+	       if not compute_result and revaluate then
+		  -- Devo distinguere tra i tipi di mosse
+		  pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato sulla zona " & I2S (Get_Zone (current_action.event.Get_To))));
+		  if current_action.utility > utility_constraint or current_action.event.Get_To = oblivium then
+		     current_action.utility := current_action.utility - 1;
+		     Guard.Update (Field_Zones (Get_Zone (current_action.event.Get_To)), True);
+		     requeue Guard.Wait (Field_Zones (Get_Zone (current_action.event.Get_To)));
 		  else
-		     -- stampo il campo
---  		     Print_Field;
-		     -- invocare l'arbitro per controllare lo stato del gioco dopo l'azione
---  		     pragma Debug (Put_Line("[CONTROLLER] Sto per chiamare l'arbitro"));
-		     Referee.Pre_Check (last_player_event);
-		     Referee.Post_Check;
-		     null;
+		     pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere"));
+		     declare
+			old_move : Motion_Event_Ptr := current_action.event;
+			new_move : Motion_Event_Ptr := new Move_Event;
+			id : Integer := Get_Player_Id (old_move.all);
+			from : Coordinate := Get_From (old_move.all);
+			to : Coordinate := Get_to (old_move.all);
+			alternative : Coordinate := Get_Alternative_Coord (from, to);
+		     begin
+			revaluate := False;
+			new_move.Initialize (id, from, alternative);
+			pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
+			  & " rivalutata alla cella " & Print_Coord (alternative)));
+			Compute (new_move, compute_result, revaluate);
+			Guard.Update (Field_Zones (Get_Zone (from)), False);
+		     end;
 		  end if;
-	       end Write;
-            or
-               when released (Integer (Zone)) = True =>
-                  accept Awaiting (Zone) (current_action : in out Action) do
-                     pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " pescato dalla coda"));
+	       else
+		  Referee.Pre_Check (last_player_event);
+		  Referee.Post_Check;
+	       end if;
+	    end Write;
+--  	 or
+--  	    when released (Integer (Zone)) = True =>
+--  	       accept Awaiting (Zone) (current_action : in out Action) do
+--  		  pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " pescato dalla coda"));
+--
+--  		  Compute(current_action.event, compute_result, revaluate);
+--  		  if compute_result then
+--  		     last_player_event := current_action.event;
+--  		  end if;
+--
+--  		  if not compute_result and revaluate then
+--  		     pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id)
+--  		       & " bloccato dal giocatore " & I2S(Check_For_Player_In_Cell(x => current_action.event.Get_To.coord_x, y => current_action.event.Get_To.coord_y))
+--  		       & " alle coordinate " & I2S(current_action.event.Get_To.coord_x) & " " & I2S(current_action.event.Get_To.coord_y)));
+--  		     if(current_action.utility > utility_constraint or current_action.event.Get_To = oblivium) then
+--  			current_action.utility := current_action.utility - 1;
+--  			requeue Awaiting (Occupy (current_action.event.Get_To));
+--  		     else
+--  			pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere (in riaccodamento)"));
+--  			declare
+--  			   old_move : Motion_Event_Ptr := current_action.event;
+--  			   new_move : Motion_Event_Ptr := new Move_Event;
+--  			   id : Integer := Get_Player_Id (old_move.all);
+--  			   from : Coordinate := Get_From (old_move.all);
+--  			   to : Coordinate := Get_to (old_move.all);
+--  			   alternative : Coordinate := Get_Alternative_Coord (from, to);
+--  			begin
+--  			   revaluate := False;
+--  			   new_move.Initialize (id, from, alternative);
+--  			   pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
+--  			     & " rivalutata alla cella " & Print_Coord (alternative)));
+--  			   Compute (new_move, compute_result, revaluate);
+--  			end;
+--  		     end if;
+--  		  else
+--  		     Referee.Pre_Check (last_player_event);
+--  		     Referee.Post_Check;
+--  		     null;
+--  		  end if;
+--  	       end Awaiting;
+	 or
+	    accept Get_Id (id : out Integer) do
+	       declare
+		  team_one_ptr : Team_Ptr := Get_Team (Team_One);
+		  team_two_ptr : Team_Ptr := Get_Team (Team_Two);
+		  result : Integer := 0;
+	       begin
+		  --  		     pragma Debug (Put_Line("[CONTROLLER] Get_Id"));
 
-		     Compute(current_action.event, compute_result, revaluate);
-		     if compute_result then
-			last_player_event := current_action.event;
+		  if not initialized then
+		     --  			pragma Debug (Put_Line("[CONTROLLER] Initializing status"));
+		     Initialize;
+		     initialized := True;
+		  end if;
+
+		  --  		     pragma Debug (Put_Line("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length)));
+
+		  if team_one_players_count <= team_one_ptr.players'Length then
+		     result := team_one_ptr.players (team_one_players_count);
+		     --  			pragma Debug (Put_Line("[CONTROLLER] Team 1 - ID " & I2S (result)));
+
+		     team_one_players_count := team_one_players_count + 1;
+		     --  			pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
+		  else
+		     if team_two_players_count <= team_two_ptr.players'Length then
+			result := team_two_ptr.players (team_two_players_count);
+			--  			   pragma Debug (Put_Line("[CONTROLLER] Team 2 - ID " & I2S (result)));
+
+			team_two_players_count := team_two_players_count + 1;
+			--  			   pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
 		     end if;
+		  end if;
 
-                     if not compute_result and revaluate then
-			pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id)
-			  & " bloccato dal giocatore " & I2S(Check_For_Player_In_Cell(x => current_action.event.Get_To.coord_x, y => current_action.event.Get_To.coord_y))
-			  & " alle coordinate " & I2S(current_action.event.Get_To.coord_x) & " " & I2S(current_action.event.Get_To.coord_y)));
-                        if(current_action.utility > utility_constraint or current_action.event.Get_To = oblivium) then
-                           current_action.utility := current_action.utility - 1;
-                           requeue Awaiting (Occupy (current_action.event.Get_To));
-                        else
-			   pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere (in riaccodamento)"));
-			   declare
-			      old_move : Motion_Event_Ptr := current_action.event;
-			      new_move : Motion_Event_Ptr := new Move_Event;
-			      id : Integer := Get_Player_Id (old_move.all);
-			      from : Coordinate := Get_From (old_move.all);
-			      to : Coordinate := Get_to (old_move.all);
-			      alternative : Coordinate := Get_Alternative_Coord (from, to);
-			   begin
-			      revaluate := False;
-			      new_move.Initialize (id, from, alternative);
-			      pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
-		  & " rivalutata alla cella " & Print_Coord (alternative)));
-			      Compute (new_move, compute_result, revaluate);
-			   end;
-			end if;
-		     else
---  			stampo il campo
---  			Print_Field;
-			-- invocare l'arbitro per controllare lo stato del gioco dopo l'azione
-			Referee.Pre_Check (last_player_event);
-   			Referee.Post_Check;
-			null;
-		     end if;
-		  end Awaiting;
-	    or
-	       accept Get_Id (id : out Integer) do
-		  declare
-		     team_one_ptr : Team_Ptr := Get_Team (Team_One);
-		     team_two_ptr : Team_Ptr := Get_Team (Team_Two);
-		     result : Integer := 0;
-		  begin
---  		     pragma Debug (Put_Line("[CONTROLLER] Get_Id"));
+		  init_players_count := init_players_count + 1;
+		  id := result;
+		  --  		     pragma Debug (Put_Line("[CONTROLLER] Id = " & I2S (id)));
 
-		     if not initialized then
---  			pragma Debug (Put_Line("[CONTROLLER] Initializing status"));
-			Initialize;
-			initialized := True;
-		     end if;
-
---  		     pragma Debug (Put_Line("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length)));
-
-		     if team_one_players_count <= team_one_ptr.players'Length then
-			result := team_one_ptr.players (team_one_players_count);
---  			pragma Debug (Put_Line("[CONTROLLER] Team 1 - ID " & I2S (result)));
-
-			team_one_players_count := team_one_players_count + 1;
---  			pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
-		     else
-			if team_two_players_count <= team_two_ptr.players'Length then
-			   result := team_two_ptr.players (team_two_players_count);
---  			   pragma Debug (Put_Line("[CONTROLLER] Team 2 - ID " & I2S (result)));
-
-			   team_two_players_count := team_two_players_count + 1;
---  			   pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
-			end if;
-		     end if;
-
-		     init_players_count := init_players_count + 1;
-		     id := result;
---  		     pragma Debug (Put_Line("[CONTROLLER] Id = " & I2S (id)));
-
---  		     pragma Debug (Put_Line("[CONTROLLER] Fine Get_Id"));
-		  end;
-	       end Get_Id;
-	    or
-	       accept Free_Zones do
-		  pragma Debug (Put_Line ("[CONTROLLER] All your zones are belong to us"));
-
-		  for i in Field_Zones'Range loop
-
-		     pragma Debug (Put_Line ("[FREE] Awaiting count: " & I2S (Awaiting (i)'Count)));
-
-		     released (Integer (i)) := True;
-		  end loop;
-	       end Free_Zones;
-	    else
-	       null;
-	    end select;
-         end loop;
+		  --  		     pragma Debug (Put_Line("[CONTROLLER] Fine Get_Id"));
+	       end;
+	    end Get_Id;
+	 end select;
       end loop;
 
    end Controller;

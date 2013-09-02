@@ -95,9 +95,6 @@ begin
 	 elsif char = 's' then
 	    pragma Debug (Put_Line ("[MAIN] Substitution"));
 	    Referee.Simulate_Substitution;
-	 elsif char = 'k' then
-	    pragma Debug (Put_Line ("[MAIN] Free all zones"));
-	    Controller.Free_Zones;
 	 end if;
 
 

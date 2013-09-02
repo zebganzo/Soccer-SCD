@@ -85,9 +85,15 @@ package Soccer.ControllerPkg is
    task Controller is
       entry Get_Id (id : out Integer);
       entry Write (current_action : in out Action);
-      entry Free_Zones;
-      entry Awaiting (Field_Zones) (current_action : in out Action);
    end Controller;
+
+   protected Guard is
+      entry Update (zone : Field_Zones; occupy : Boolean);
+      entry Wait (Field_Zones) (current_action : in out Action);
+
+   private
+      released : Released_Zones;
+   end Guard;
 
 private
    last_player_event : Motion_Event_Ptr;
@@ -95,7 +101,5 @@ private
    current_status : Status;
    ball_holder_id : Integer := 0;
    game_status : Game_State;
-
-   released : Released_Zones;
 
 end Soccer.ControllerPkg;

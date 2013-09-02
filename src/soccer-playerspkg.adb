@@ -142,6 +142,7 @@ package body Soccer.PlayersPkg is
 
 	 -- controllo lo stato di gioco e decido l'azione da fare
 	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo lo stato di gioco per decidere l'azione"));
+	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] La mia posizione e' " & Print_Coord (current_coord)));
 	 case current_game_status is
 	 when Game_Running =>
 
