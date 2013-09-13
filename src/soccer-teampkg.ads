@@ -46,7 +46,9 @@ package Soccer.TeamPkg is
 
    function To_String (team : in Team_Id) return String;
 
-   function Get_Coordinate_For_Player (team : in Team_Id; id : in Integer) return Coordinate;
+   function Get_Coordinate_For_Player (my_team : in Team_Id;
+                                       holder_team : in Team_Id;
+                                       number : in Integer) return Coordinate;
 
    function Get_Goalkeeper_Id (team : in Team_Id) return Integer;
 

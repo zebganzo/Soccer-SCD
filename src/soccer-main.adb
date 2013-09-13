@@ -98,8 +98,8 @@ begin
       task6  : Player;
       task7  : Player;
       task8  : Player;
-      task9  : Player;
-      task10 : Player;
+--        task9  : Player;
+--        task10 : Player;
 
       char : Character;
    begin

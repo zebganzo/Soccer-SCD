@@ -48,7 +48,8 @@ package Soccer.ControllerPkg is
 	 nearby : Boolean;      -- palla vicina o no
 	 last_game_event : Game_Event_Ptr;
 	 game_status : Game_State;
-	 substitutions : Substitutions_Container.Vector;
+         substitutions : Substitutions_Container.Vector;
+         holder_team : Team_Id;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
 

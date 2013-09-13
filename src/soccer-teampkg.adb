@@ -46,33 +46,59 @@ package body Soccer.TeamPkg is
       end if;
    end To_String;
 
-   function Get_Coordinate_For_Player (team : in Team_Id; number : in Integer) return Coordinate is
+   function Get_Coordinate_For_Player (my_team : in Team_Id;
+                                       holder_team    : in Team_Id;
+                                       number  : in Integer) return Coordinate is
+      index : Integer;
    begin
-      if team = Team_One then
+      if my_team = Team_One then
          for i in team_1.players'Range loop
             if team_1.number_id(i).number = number then
-
-
-               return Team_One;
-         end if;
+               index := team_1.number_id(i).formation_id;
+            end if;
          end loop;
-
-	 if team_1.formation = O_352 then
-	    return team_one_offensive_formation.positions(id);
-	 elsif team_1.formation = B_442 then
-	    return team_one_balanced_formation.positions(id);
-	 else
-	    return team_one_defensive_formation.positions(id);
-	 end if;
+         if my_team = holder_team then
+            if team_1.formation = O_352 then
+               return t1_352_att_pos(index);
+            elsif team_1.formation = B_442 then
+               return t1_442_att_pos(index);
+            else
+               return t1_532_att_pos(index);
+            end if;
+         else
+            if team_1.formation = O_352 then
+               return t1_352_def_pos(index);
+            elsif team_1.formation = B_442 then
+               return t1_442_def_pos(index);
+            else
+               return t1_532_def_pos(index);
+            end if;
+         end if;
       else
-	 -- TODO:: add team 2
---  	 return Coordinate'(coord_x => -1,
---  		     coord_y => -1);
-	 null;
+         for i in team_2.players'Range loop
+            if team_2.number_id(i).number = number then
+               index := team_2.number_id(i).formation_id;
+            end if;
+         end loop;
+         if my_team = holder_team then
+            if team_2.formation = O_352 then
+               return t1_352_att_pos(index);
+            elsif team_2.formation = B_442 then
+               return t2_442_att_pos(index);
+            else
+               return t2_532_att_pos(index);
+            end if;
+         else
+            if team_2.formation = O_352 then
+               return t2_352_def_pos(index);
+            elsif team_2.formation = B_442 then
+               return t2_442_def_pos(index);
+            else
+               return t2_532_def_pos(index);
+            end if;
+         end if;
       end if;
 
-      return Coordinate'(coord_x => 0,
-			 coord_y => 0);
    end Get_Coordinate_For_Player;
 
    function Get_Goalkeeper_Id (team : in Team_Id) return Integer is

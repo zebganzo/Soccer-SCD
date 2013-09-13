@@ -300,10 +300,10 @@ package body Soccer.PlayersPkg is
          -- Json file name : STATUS<PlayerID>
 	 output_name := "STATUS" & Integer'Image(id);
 	 -- Creates the file
-         Create (File => Output,
+        Create (File => output,
                  Mode => Out_File,
                  Name => output_name);
-	 -- Writes the Json object in the file
+--  	 -- Writes the Json object in the file
   	 String'Write(Stream(Output), json_obj.Write);
 	 Close (Output);
 
@@ -581,11 +581,16 @@ package body Soccer.PlayersPkg is
 	       if player_team = Get_Team (last_game_event) then
 		  -- sono un compagno di squadra di chi deve battere, quindi al
 		  -- massimo vado nella mia posizione di riferimeto, oppure sto fermo
-		  if current_coord /= Get_Coordinate_For_Player (player_team, id) then
+                  if current_coord /= Get_Coordinate_For_Player (player_team,
+                                                                 current_generic_status.holder_team,
+                                                                 player_number) then
 		     current_action.event := new Move_Event;
-		     current_action.event.Initialize (id,
-					current_coord,
-					Get_Next_Coordinate (current_coord, Get_Coordinate_For_Player (player_team, id)));
+                     current_action.event.Initialize (id,
+                                                      current_coord,
+                                                      Get_Next_Coordinate (current_coord,
+                         						   Get_Coordinate_For_Player (player_team,
+                           									      current_generic_status.holder_team,
+                           									      player_number)));
 		     current_action.utility := 10; -- TODO:: cambiare utilita'
 		  end if;
 	       else
@@ -639,7 +644,7 @@ package body Soccer.PlayersPkg is
 		  else
 		     pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Non devo far riprendere il gioco"));
 		     -- controllo se sono nella mia posizione di riferimento
-		     if not Compare_Coordinates (current_coord, Get_Starting_Position (id,current_team)) then
+		     if not Compare_Coordinates (current_coord, Get_Starting_Position (player_number,player_team)) then
 
 			-- controllo se sono in panchina
 			if Compare_Coordinates (current_coord, Coordinate'(id,0)) then
@@ -667,13 +672,13 @@ package body Soccer.PlayersPkg is
 			else
 			   -- mi sposto nella mia posizione di riferimento
 			   pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto nella cella "
-			     & Print_Coord (Get_Next_Coordinate (current_coord, Get_Starting_Position (id,current_team)))
-			     & " verso la mia posizione di riferimento " & Print_Coord (Get_Starting_Position (id,current_team))
+			     & Print_Coord (Get_Next_Coordinate (current_coord, Get_Starting_Position (player_number,player_team)))
+			     & " verso la mia posizione di riferimento " & Print_Coord (Get_Starting_Position (player_number,player_team))
 			     & " partendo dalla cella " & Print_Coord (current_coord)));
 			   current_action.event := new Move_Event;
 			   current_action.event.Initialize (id,
 				       current_coord,
-				       Get_Next_Coordinate (current_coord, Get_Starting_Position (id,current_team)));
+				       Get_Next_Coordinate (current_coord, Get_Starting_Position (player_number,player_team)));
 			   current_action.utility := 5; -- TODO:: cambiare utilita'
 			end if;
 		     else
@@ -785,18 +790,22 @@ package body Soccer.PlayersPkg is
 		  declare
 		     opponents_team : Team_Id;
 		  begin
-		     for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
-			if current_read_result.players_in_my_zone.Element (i).id = id then
-			   opponents_team := current_read_result.players_in_my_zone.Element (i).team;
-			   exit;
-			end if;
-		     end loop;
+--  		     for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
+--  			if current_read_result.players_in_my_zone.Element (i).id = id then
+--  			   opponents_team := current_read_result.players_in_my_zone.Element (i).team;
+--  			   exit;
+--  			end if;
+--  		     end loop;
 
 		     if Distance (current_coord, Get_Coordinate (last_game_event)) < free_kick_area then
 			current_action.event := new Move_Event;
 			current_action.event.Initialize (nPlayer_Id => id,
 				    nFrom      => current_coord,
-				    nTo        => Back_Off (current_coord, Get_Coordinate_For_Player (opponents_team, id), Get_Coordinate (last_game_event)));
+                                    nTo        => Back_Off (current_coord,
+                                      			    Get_Coordinate_For_Player (player_team,
+                                                                 		       current_generic_status.holder_team,
+                                        					       player_number),
+                                      			    Get_Coordinate (last_game_event)));
 		     end if;
 		  end;
 	       end if;
@@ -817,7 +826,7 @@ package body Soccer.PlayersPkg is
 	       if Get_Match_Event_Id (current_match_event) = Begin_Of_Match then
 		  pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Gioco in pausa per inizio primo tempo"));
 --  		  target_coord := TEMP_Get_Coordinate_For_Player (0); -- TODO:: decommenta per farli entrare in campo in ordine!
-		  target_coord := Get_Starting_Position (id,current_team);
+		  target_coord := Get_Starting_Position (player_number,player_team);
 
 		  pragma Debug (Put_Line ("initial_x = " & I2S (current_coord.coord_x) & " - initial_y = " & I2S (current_coord.coord_y)));
 

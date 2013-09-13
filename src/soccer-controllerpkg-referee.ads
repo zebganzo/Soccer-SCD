@@ -26,6 +26,8 @@ package Soccer.ControllerPkg.Referee is
 
    procedure Set_Last_Ball_Holder (holder : Integer);
 
+   function Get_Last_Ball_Holder return Integer;
+
    function Get_Nearest_Player (event_coord : in Coordinate; team : in Team_Id) return Integer;
 
    procedure Simulate_End_Of_1T;

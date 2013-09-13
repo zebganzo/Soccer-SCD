@@ -100,7 +100,7 @@ package body Soccer.ControllerPkg.Referee is
 	       end if;
 	    end if;
 
-	    -- inizio del gioco o inizio secondo tempo, tutti i giocatori devono essere nella propria
+	    -- inizio del gioco, tutti i giocatori devono essere nella propria
 	    -- posizione di riferimento e qualcuno ha battuto il calcio d'inizio
 	    declare
 	       first_condition : Boolean := False;
@@ -110,23 +110,25 @@ package body Soccer.ControllerPkg.Referee is
 	       -- deve sbloccare il gioco
 	       pragma Debug (Put_Line ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte"));
 	       for i in current_status'Range loop
-		  declare
-		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
-		     current_coord : Coordinate := current_status (i).coord;
-		     -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
-                     ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
-		  begin
-		     if i /= kickoff_player then
-			first_condition := False;
-			if Compare_Coordinates (current_coord, ref_coord) then
-			   first_condition := True;
-			end if;
-			exit when not first_condition;
-		     else
-			-- FIXME:: solo per quando si testa con un solo giocatore in campo!
-			first_condition := True;
-		     end if;
-		  end;
+                  if current_status(i).on_the_field then
+                     declare
+                        kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
+                        current_coord : Coordinate := current_status (i).coord;
+                        -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+                        ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
+                     begin
+                        if i /= kickoff_player then
+                           first_condition := False;
+                           if Compare_Coordinates (current_coord, ref_coord) then
+                              first_condition := True;
+                           end if;
+                           exit when not first_condition;
+                        else
+                           -- FIXME:: solo per quando si testa con un solo giocatore in campo!
+                           first_condition := True;
+                        end if;
+                     end;
+                  end if;
 	       end loop;
 
 	       -- controllo che giocatore X abbia la palla
@@ -159,7 +161,7 @@ package body Soccer.ControllerPkg.Referee is
 	       end if;
 	    end if;
 
-	    -- inizio del gioco o inizio secondo tempo, tutti i giocatori devono essere nella propria
+	    -- inizio secondo tempo, tutti i giocatori devono essere nella propria
 	    -- posizione di riferimento e qualcuno ha battuto il calcio d'inizio
 	    declare
 	       first_condition : Boolean := False;
@@ -168,24 +170,26 @@ package body Soccer.ControllerPkg.Referee is
 	       -- controllo che tutti i giocatori siano in posizione, tranne quello che
 	       -- deve sbloccare il gioco
 	       pragma Debug (Put_Line ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte"));
-	       for i in current_status'Range loop
-		  declare
-		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
-		     current_coord : Coordinate := current_status (i).coord;
-		     -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
-		     ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
-		  begin
-		     if i /= kickoff_player then
-			first_condition := False;
-			if Compare_Coordinates (current_coord, ref_coord) then
-			   first_condition := True;
-			end if;
-			exit when not first_condition;
-		     else
-			-- FIXME:: solo per quando si testa con un solo giocatore in campo!
-			first_condition := True;
-		     end if;
-		  end;
+               for i in current_status'Range loop
+                  if current_status(i).on_the_field then
+                     declare
+                        kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
+                        current_coord : Coordinate := current_status (i).coord;
+                        -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+                        ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
+                     begin
+                        if i /= kickoff_player then
+                           first_condition := False;
+                           if Compare_Coordinates (current_coord, ref_coord) then
+                              first_condition := True;
+                           end if;
+                           exit when not first_condition;
+                        else
+                           -- FIXME:: solo per quando si testa con un solo giocatore in campo!
+                           first_condition := True;
+                        end if;
+                     end;
+                  end if;
 	       end loop;
 
 	       -- controllo che giocatore X abbia la palla
@@ -723,5 +727,10 @@ package body Soccer.ControllerPkg.Referee is
    procedure Set_Last_Ball_Holder (holder : Integer) is begin
       last_ball_holder := holder;
    end Set_Last_Ball_Holder;
+
+   function Get_Last_Ball_Holder return Integer is
+   begin
+      return last_ball_holder;
+   end Get_Last_Ball_Holder;
 
 end Soccer.ControllerPkg.Referee;
