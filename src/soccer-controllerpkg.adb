@@ -734,37 +734,36 @@ package body Soccer.ControllerPkg is
 		  team_two_ptr : Team_Ptr := Get_Team (Team_Two);
 		  result : Integer := 0;
 	       begin
-		  --  		     pragma Debug (Put_Line("[CONTROLLER] Get_Id"));
+		  -- pragma Debug (Put_Line("[CONTROLLER] Get_Id"));
 
 		  if not initialized then
-		     --  			pragma Debug (Put_Line("[CONTROLLER] Initializing status"));
+		     -- pragma Debug (Put_Line("[CONTROLLER] Initializing status"));
 		     Initialize;
 		     initialized := True;
 		  end if;
 
-		  --  		     pragma Debug (Put_Line("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length)));
+		  -- pragma Debug (Put_Line("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length)));
 
 		  if team_one_players_count <= team_one_ptr.players'Length then
 		     result := team_one_ptr.players (team_one_players_count);
-		     --  			pragma Debug (Put_Line("[CONTROLLER] Team 1 - ID " & I2S (result)));
+		     -- pragma Debug (Put_Line("[CONTROLLER] Team 1 - ID " & I2S (result)));
 
 		     team_one_players_count := team_one_players_count + 1;
-		     --  			pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
+		     -- pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
 		  else
 		     if team_two_players_count <= team_two_ptr.players'Length then
 			result := team_two_ptr.players (team_two_players_count);
-			--  			   pragma Debug (Put_Line("[CONTROLLER] Team 2 - ID " & I2S (result)));
+			-- pragma Debug (Put_Line("[CONTROLLER] Team 2 - ID " & I2S (result)));
 
 			team_two_players_count := team_two_players_count + 1;
-			--  			   pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
+			-- pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
 		     end if;
 		  end if;
 
 		  init_players_count := init_players_count + 1;
 		  id := result;
-		  --  		     pragma Debug (Put_Line("[CONTROLLER] Id = " & I2S (id)));
-
-		  --  		     pragma Debug (Put_Line("[CONTROLLER] Fine Get_Id"));
+		  -- pragma Debug (Put_Line("[CONTROLLER] Id = " & I2S (id)));
+		  -- pragma Debug (Put_Line("[CONTROLLER] Fine Get_Id"));
 	       end;
 	    end Get_Id;
 	 end select;
