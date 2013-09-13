@@ -113,7 +113,8 @@ package body Soccer.ControllerPkg.Referee is
 		  declare
 		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
 		     current_coord : Coordinate := current_status (i).coord;
-		     ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+		     -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+                     ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
 		  begin
 		     if i /= kickoff_player then
 			first_condition := False;
@@ -171,7 +172,8 @@ package body Soccer.ControllerPkg.Referee is
 		  declare
 		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
 		     current_coord : Coordinate := current_status (i).coord;
-		     ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+		     -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+		     ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
 		  begin
 		     if i /= kickoff_player then
 			first_condition := False;
@@ -240,7 +242,7 @@ package body Soccer.ControllerPkg.Referee is
 	       -- controllo se il gioco puo' riprendere
 	       if Get_Game_Status = Game_Ready
 		 and e.all in Shot_Event'Class
-		 and Get_Team_From_Id (e.Get_Player_Id) = opposite_team then
+		 and Get_Player_Team_From_Id (e.Get_Player_Id) = opposite_team then
 		  -- ha iniziato, quindi il gioco puo' riprendere
 		  Set_Last_Game_Event (null);
 		  Set_Game_Status (Game_Running);
@@ -467,7 +469,7 @@ package body Soccer.ControllerPkg.Referee is
    -- POST CHECK
    --+-----------------------------------
       procedure Post_Check is
-      last_team_possession : Team_Id := Get_Team_From_Id (id => last_ball_holder);
+      last_team_possession : Team_Id := Get_Player_Team_From_Id (id => last_ball_holder);
       new_game_status : Unary_Event_Ptr;
    begin
       -- controlla se e' finito il tempo, in quel caso setta l'evento di tipo
@@ -494,7 +496,7 @@ package body Soccer.ControllerPkg.Referee is
 	       if evt.Get_Event_Id = Foul then
 		  declare
 		     evt_coord : Coordinate := evt.Get_Coordinate;
-		     assigned_team : Team_Id := Get_Team_From_Id (evt.Get_Id_Player_2);
+		     assigned_team : Team_Id := Get_Player_Team_From_Id (evt.Get_Id_Player_2);
 		     foul_event : Unary_Event_Ptr := new Unary_Event;
 		     is_penalty : Boolean := Is_In_Penalty_Area (team  => assigned_team,
 						   coord => evt_coord);

@@ -1,6 +1,12 @@
 with Ada.Text_IO;
 use Ada.Text_IO;
 
+with Ada.Text_IO.Text_Streams;
+use Ada.Text_IO.Text_Streams;
+
+with GNATCOLL.JSON;
+use GNATCOLL.JSON;
+
 with Ada.Numerics;
 with Ada.Numerics.Discrete_Random;
 
@@ -35,6 +41,6 @@ package Soccer.PlayersPkg is
    -- Il package Players contiene il task Player...non credo vi sia bisogno di descriverlo
 
    -- Entità attiva    : Player
-   task type Player (ability : Integer; initial_coord_x : Positive; initial_coord_y : Positive; team : Team_Id);
+   task type Player;
 
 end Soccer.PlayersPkg;

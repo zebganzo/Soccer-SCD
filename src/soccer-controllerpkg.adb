@@ -31,14 +31,16 @@ package body Soccer.ControllerPkg is
 
    --+ Ritorna la posizione in base all'id
    function Get_Generic_Status(id : in Integer) return Generic_Status_Ptr is
-      coord_result : Coordinate;
+      coord_result  : Coordinate;
       holder_result : Boolean := False;
       nearby_result : Boolean := False;
-      gen_stat : Generic_Status_Ptr := new Generic_Status;
+      number_result : Integer;
+      gen_stat      : Generic_Status_Ptr := new Generic_Status;
    begin
       for i in current_status'Range loop
          if current_status (i).id = id then
             coord_result := current_status (i).coord;
+            number_result := current_status(i).number;
             if ball_holder_id = current_status (i).id then
                holder_result := True;
             elsif Distance(From => Ball.Get_Position,
@@ -52,7 +54,8 @@ package body Soccer.ControllerPkg is
       end loop;
 
       gen_stat.coord := coord_result;
-      gen_stat.team := Get_Team_From_Id (id);
+      gen_stat.number := number_result;
+      gen_stat.team := Get_Team_From_Id (number_result);
       gen_stat.holder := holder_result;
       gen_stat.nearby := nearby_result;
       gen_stat.last_game_event := last_game_event;
@@ -88,16 +91,28 @@ package body Soccer.ControllerPkg is
       return current_status;
    end Get_Players_Status;
 
+   -- Returns the player's team, given the player's id
+   function Get_Player_Team_From_Id(id : in Integer) return Team_Id is
+      player_team : Team_Id;
+   begin
+      for i in current_status'Range loop
+         if id = current_status(i).id then
+            player_team := current_status(i).team;
+         end if;
+      end loop;
+      return player_team;
+   end Get_Player_Team_From_Id;
+
    --+ Ritorna un Vector di Coordinate (id, x, y) dei giocatori di distanza <= a r
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result is
       result : Read_Result := new Read_Result_Type;
-      dist : Integer := 0;
+      dist   : Integer := 0;
    begin
       for i in current_status'Range loop
          dist := Distance(x1 => x,
-                       x2 => current_status (i).coord.coord_x,
-                       y1 => y,
-                       y2 => current_status (i).coord.coord_y);
+                          x2 => current_status (i).coord.coord_x,
+                          y1 => y,
+                          y2 => current_status (i).coord.coord_y);
          if dist <= r and dist /= 0 then
             result.players_in_my_zone.Append (New_Item => current_status (i));
          end if;
@@ -147,16 +162,22 @@ package body Soccer.ControllerPkg is
       team_two_ptr : Team_Ptr := Get_Team (Team_Two);
       counter : Integer := 1;
    begin
+  --    pragma Debug (Put_Line ("TEAM ONE:" & Boolean'Image(team_one_ptr = null)));
+  --    pragma Debug (Put_Line ("TEAM ONE:" & I2S(team_one_ptr.players'Length)));
+  --    pragma Debug (Put_Line ("TEAM ONE:" & Team_Id'Image(team_one_ptr.id)));
       for i in team_one_ptr.players'Range loop
 	 declare
 	    current_player : Integer;
 	 begin
-	    current_player := team_one_ptr.players (i);
+            current_player := team_one_ptr.players (i);
 
-	    current_status (counter).id := counter;
+            current_status (counter).id := counter;
+--  pragma Debug (Put_Line ("ID: " & I2S(counter)));
 	    current_status (counter).number := current_player;
+            --pragma Debug (Put_Line ("MAGLIA: " & I2S(current_player)));
 	    current_status (counter).coord := Coordinate'(counter,0);
 	    current_status (counter).team := Team_One;
+            --pragma Debug (Put_Line ("TEAM: " & "TEAM_ONE"));
 
 	    counter := counter + 1;
 	 end;
@@ -745,14 +766,14 @@ package body Soccer.ControllerPkg is
 		  --  		     pragma Debug (Put_Line("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length)));
 
 		  if team_one_players_count <= team_one_ptr.players'Length then
-		     result := team_one_ptr.players (team_one_players_count);
+		     result := current_status(team_one_players_count).id;
 		     --  			pragma Debug (Put_Line("[CONTROLLER] Team 1 - ID " & I2S (result)));
 
 		     team_one_players_count := team_one_players_count + 1;
 		     --  			pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
 		  else
 		     if team_two_players_count <= team_two_ptr.players'Length then
-			result := team_two_ptr.players (team_two_players_count);
+			result := current_status(team_two_players_count).id;
 			--  			   pragma Debug (Put_Line("[CONTROLLER] Team 2 - ID " & I2S (result)));
 
 			team_two_players_count := team_two_players_count + 1;

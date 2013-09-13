@@ -42,9 +42,10 @@ package Soccer.ControllerPkg is
    type Generic_Status is
       record
 	 coord : Coordinate;
+	 number : Integer;
 	 team : Team_Id;
-         holder : Boolean;
-	 nearby : Boolean;
+         holder : Boolean;	-- ho la palla o no
+	 nearby : Boolean;      -- palla vicina o no
 	 last_game_event : Game_Event_Ptr;
 	 game_status : Game_State;
 	 substitutions : Substitutions_Container.Vector;
@@ -72,6 +73,9 @@ package Soccer.ControllerPkg is
    function Get_Players_Status return Status;
 
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result;
+
+   -- Returns the player's team, given the player's id
+   function Get_Player_Team_From_Id(id : in Integer) return Team_Id;
 
    task Field_Printer;
 

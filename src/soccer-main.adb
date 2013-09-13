@@ -25,43 +25,81 @@ with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
 
 procedure Soccer.Main is
 
---     OneCoord : Coordinate_Ptr := new Coordinate'(coordX => 5,
---                                                  coordY => 5);
---     TwoCoord : Coordinate_Ptr := new Coordinate'(coordX => 14,
---                                                  coordY => 9);
---     ThreeCoord : Coordinate_Ptr := new Coordinate'(coordX => 12,
---                                                    coordY => 3);
---     FourCoord : Coordinate_Ptr := new Coordinate'(coordX => 10,
---                                                   coordY => 7);
---     FiveCoord : Coordinate_Ptr := new Coordinate'(coordX => 2,
---                                                   coordY => 3);
---     SixCoord : Coordinate_Ptr := new Coordinate'(coordX => 3,
---                                                  coordY => 9);
---     SevenCoord : Coordinate_Ptr := new Coordinate'(coordX => 1,
---                                                    coordY => 6);
+   players_team_one : Team_Players_List := (12, 2, 7, 10, 60);
+   players_team_two : Team_Players_List := (6, 56, 1, 4, 10);
 
-   players_team_one : Team_Players_List := (1, 2, 3, 4, 9);
-   players_team_two : Team_Players_List := (5, 6, 7, 8, 10);
+   type Pos_Id is array (Positive range <>) of Integer;
+   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,3,4,5,1);
+   t2_pos_id : Pos_Id(1 .. total_players/2) := (4,5,6,7,1);
 
-   t1 : Team_Ptr := new Team'(id => Team_One, players => players_team_one, formation => B_442);
-   t2 : Team_Ptr := new Team'(id => Team_Two, players => players_team_two, formation => O_352);
+   t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
+   t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
+
+   formation_id_t1 : Team_Number_Map(1 .. total_players/2);
+   formation_id_t2 : Team_Number_Map(1 .. total_players/2);
+
+   -- players statistics for team 1
+   -- (attack, defense, goal_keeping, power, precision, speed, tackle)
+   players_stats_team_1 : Team_Players_Statistics :=
+     (1   => (30, 80, 0, 75, 60, 60, 80),
+      2   => (30, 80, 0, 75, 60, 60, 80),
+      3   => (30, 80, 0, 75, 60, 60, 80),
+      4   => (30, 80, 0, 75, 60, 60, 80),
+      5   => (30, 80, 0, 75, 60, 60, 80));
+
+   -- players statistics for team 2
+   -- (attack, defense, goal_keeping, power, precision, speed, tackle)
+   players_stats_team_2 : Team_Players_Statistics :=
+     (1   => (40, 70, 0, 85, 50, 70, 70),
+      2   => (40, 70, 0, 85, 50, 70, 70),
+      3   => (40, 70, 0, 85, 50, 70, 70),
+      4   => (40, 70, 0, 85, 50, 70, 70),
+      5   => (40, 70, 0, 85, 50, 70, 70));
+
+   t1 : Team_Ptr;
+   t2 : Team_Ptr;
 
 begin
-
+   for i in 1..total_players/2 loop
+         formation_id_t1(i).number        := players_team_one(i);
+     --    pragma Debug (Put_Line ("NUMBER:" & I2S(players_team_one(i))));
+         formation_id_t1(i).formation_id  := t1_pos_id(i);
+     --   pragma Debug (Put_Line ("FORMATION ID:" & I2S(t1_pos_id(i))));
+         formation_id_t1(i).statistics_id := t1_stat_id(i);
+     --    pragma Debug (Put_Line ("STAT ID:" & I2S(t1_stat_id(i))));
+         formation_id_t2(i).number        := players_team_two(i);
+     --    pragma Debug (Put_Line ("NUMBER:" & I2S(players_team_two(i))));
+         formation_id_t2(i).formation_id  := t2_pos_id(i);
+     --    pragma Debug (Put_Line ("FORMATION ID:" & I2S(t2_pos_id(i))));
+	 formation_id_t2(i).statistics_id := t2_stat_id(i);
+     --    pragma Debug (Put_Line ("STAT ID:" & I2S(t2_stat_id(i))));
+      end loop;
+   t1 := new Team'(id         => Team_One,
+                   players    => players_team_one,
+                   statistics => players_stats_team_1,
+                   number_id  => formation_id_t1,
+                   formation  => O_352);
+   t2 := new Team'(id         => Team_Two,
+                   players    => players_team_two,
+                   statistics => players_stats_team_2,
+                   number_id  => formation_id_t2,
+                   formation  => B_442);
    Set_Teams (first_team  => t1,
-	      second_team => t2);
+              second_team => t2);
+
+-- pragma Debug (Put_Line ("LENGTH:" & I2S(t2.players'Length)));
 
    declare
-      One   : Player (Ability => 20, Initial_Coord_X => 5, Initial_Coord_Y => 5, Team => Team_One);
-      Two   : Player (Ability => 15, Initial_Coord_X => 25, Initial_Coord_Y => 13, Team => Team_One);
-      Three : Player (Ability => 17, Initial_Coord_X => 17, Initial_Coord_Y => 9, Team => Team_One);
-      Four : Player (Ability => 18, Initial_Coord_X => 10, Initial_Coord_Y => 18, Team => Team_One);
-      Five : Player (Ability => 12, Initial_Coord_X => 28, Initial_Coord_Y => 2, Team => Team_Two);
-      Six : Player (Ability => 24, Initial_Coord_X => 6, Initial_Coord_Y => 6, Team => Team_Two);
-      Seven : Player (Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
-      Eight : Player (Ability => 6, Initial_Coord_X => 20, Initial_Coord_Y => 10, Team => Team_Two);
-      Nine : Player (Ability => 10, Initial_Coord_X => 12, Initial_Coord_Y => 12, Team => Team_One);
-      Ten : Player (Ability => 13, Initial_Coord_X => 15, Initial_Coord_Y => 8, Team => Team_Two);
+      task1  : Player;
+      task2  : Player;
+      task3  : Player;
+      task4  : Player;
+      task5  : Player;
+      task6  : Player;
+      task7  : Player;
+      task8  : Player;
+      task9  : Player;
+      task10 : Player;
 
       char : Character;
    begin
@@ -103,32 +141,6 @@ begin
 
    end;
 
-
---     team_one_offensive_positions := (Coordinate'(coord_x => 10, -- goalie
---  						coord_y => 15),
---       				    Coordinate'(coord_x => 5, -- defensors
---  			 			coord_y => 24),
---       				    Coordinate'(coord_x => 10,
---  			 			coord_y => 24),
---       				    Coordinate'(coord_x => 15,
---  			 			coord_y => 24),
---       				    Coordinate'(coord_x => 3, -- midfielders
---  			 			coord_y => 12),
---       				    Coordinate'(coord_x => 5,
---  			 			coord_y => 17),
---       				    Coordinate'(coord_x => 10,
---  			 			coord_y => 12),
---       				    Coordinate'(coord_x => 12,
---  			 			coord_y => 17),
---       				    Coordinate'(coord_x => 17,
---  			 			coord_y => 12),
---       				    Coordinate'(coord_x => 7, -- attackers
---  			 			coord_y => 8),
---       				    Coordinate'(coord_x => 12,
---  			 			coord_y => 8));
-
-
-
 --     Soccer.Server.WebServer.Start;
 
 --     delay 10.0;
@@ -136,11 +148,3 @@ begin
 
 end Soccer.Main;
 
---        One   : Player (Id    => 1, Ability => 20, Initial_Coord_X => 5, Initial_Coord_Y => 5, Team => Team_One);
---        Two   : Player (Id    => 2, Ability => 15, Initial_Coord_X => 25, Initial_Coord_Y => 13, Team => Team_One);
---        Three : Player (Id    => 3, Ability => 17, Initial_Coord_X => 17, Initial_Coord_Y => 9, Team => Team_One);
---        Four : Player (Id    => 4, Ability => 18, Initial_Coord_X => 10, Initial_Coord_Y => 18, Team => Team_One);
---        Five : Player (Id    => 5, Ability => 12, Initial_Coord_X => 28, Initial_Coord_Y => 2, Team => Team_Two);
---        Six : Player (Id    => 6, Ability => 24, Initial_Coord_X => 6, Initial_Coord_Y => 6, Team => Team_Two);
---        Seven : Player (Id    => 7, Ability => 13, Initial_Coord_X => 14, Initial_Coord_Y => 15, Team => Team_Two);
---        Eight : Player (Id    => 8, Ability => 6, Initial_Coord_X => 20, Initial_Coord_Y => 10, Team => Team_Two);

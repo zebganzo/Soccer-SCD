@@ -93,11 +93,11 @@ package Soccer is
    utility_constraint : Utility_Constraint_Type := 2;
 
    num_of_players : Positive := 8;
-   total_players : Positive := 10;
+   total_players  : Positive := 10;
 
    agent_movement_id : Integer := 0;
 
-   type Positions_Array is array (1 .. total_players) of Coordinate;
+   type Positions_Array is array (1 .. 11) of Coordinate;
 
    type Game_State is (Game_Running,
 		       Game_Ready,

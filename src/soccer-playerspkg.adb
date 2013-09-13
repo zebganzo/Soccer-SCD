@@ -7,11 +7,7 @@ package body Soccer.PlayersPkg is
    type Rand_Range is range 1 .. 8;
    package Rand_Int is new Ada.Numerics.Discrete_Random(Rand_Range);
 
-   --
-   --     Rand_Int.Reset(seedX); Integer(Rand_Int.Random(seedX)
-   --     Rand_Int.Reset(seedY); Integer(Rand_Int.Random(seedY))
-
-   pass_range : Integer := 3;
+   pass_range   : Integer := 3;
    tackle_range : Integer := 2;
 
    procedure Update_Distance (index : in Integer; players : in out Vector; distance : in Integer) is
@@ -37,37 +33,37 @@ package body Soccer.PlayersPkg is
       current_action : Action;
       seed_x : Rand_Int.Generator;
       seed_y : Rand_Int.Generator;
+
+      -- Artificial Intelligence Related Variables
+      json_obj      : JSON_Value;			-- JSON object
+      coords_array  : JSON_Array;			-- Array of coordinates
+      event         : Game_Event_Ptr;			-- generic Game Event ptr
+      ball_team     : Team_Id;				-- team holding the ball
+      player_team   : Team_Id;				-- player's team
+      player_stats  : Player_Statistics(1..7);		-- player's statistics
+      nearby_folks  : JSON_Array;			-- nearby players list
+      nearby_player : JSON_Array;			-- naerby player info
+      player_number : Integer;				-- player's number
+
+      -- width of the "influence bubble" of the player. It is computed by
+      -- dividing the sum of the player's statistics by a factor
+      player_radius : Integer;
+
+      -- factor by which divide the sum of the statistics
+      -- (Max_Stat_Value * Num_Stats) / (Field_Height/2)
+      factor : Integer := (100*7) / (field_max_y/2);
+
+      -- Unary Event (Goal_Kick, Corner_Kick, ...) pointer
+      u_event : Unary_Event_Ptr;
+
+      -- Match Event (Begin_Of_Match, End_Of_First_Half, ...) pointer
+      m_event : Match_Event_Ptr;
+
+      -- Output file with JSON object
+      output      : File_Type;
+      output_name : String(1..8);			-- output file name
+
    begin
-
---        Rand_Int.Reset(seed_x);
---        Rand_Int.Reset(seed_y);
---
---  --        target_coord := Coordinate'(coord_x => initial_coord_x,
---  --  				  coord_y => initial_coord_y);
---
---        -- all'inizio, cerco di occupare la cella 0,0 per l'ingresso in campo
---        target_coord := TEMP_Get_Coordinate_For_Player (0);
---
---        current_action.event := new Move_Event;
---        current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
---        current_coord := current_generic_status.coord;
---
---        current_action.event.Initialize(nPlayer_Id => id,
---  				      nFrom      => current_coord,
---  				      nTo        => target_coord);
---        current_action.utility := 10;
---
---        Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Start");
---        Game_Entity.Start;
---        Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Write");
---        ControllerPkg.Controller.Write(current_action => current_action);
---
---        delay duration(5);
-
---        delay duration (id / 5);
-
---        pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo Start_1T"));
-
       Controller.Get_Id (id);
 --        ControllerPkg.Get_Id (id);
 
@@ -92,9 +88,225 @@ package body Soccer.PlayersPkg is
       loop
 	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Leggo Generic Status"));
 	 current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
+     --    pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] MAGLIA: " & I2S(current_generic_status.number) &
+     --     " TEAM: " & Team_Id'Image(current_generic_status.team)));
 	 current_coord := current_generic_status.coord;
-
 	 current_game_status := current_generic_status.game_status;
+
+         -- Creates an empty JSON object
+         json_obj := Create_Object;
+
+	 -- Get player current position
+   	 Append(coords_array, Create(current_generic_status.coord.coord_x));
+  	 Append(coords_array, Create(current_generic_status.coord.coord_y));
+   	 json_obj.Set_Field(Field_Name => "position",
+                    	    Field      => coords_array);
+	 coords_array := Empty_Array;
+
+	 -- Get player's team
+	 player_team := current_generic_status.team;
+         if player_team = Team_One then
+            json_obj.Set_Field(Field_Name => "team",
+                               Field 	  => "team1");
+         else
+            json_obj.Set_Field(Field_Name => "team",
+                               Field 	  => "team2");
+         end if;
+
+         -- Get player's number
+         player_number := current_generic_status.number;
+
+         -- Get player's starting position
+         Append(coords_array, Create(Get_Starting_Position(player_number, player_team).coord_x));
+	 Append(coords_array, Create(Get_Starting_Position(player_number, player_team).coord_y));
+         json_obj.Set_Field(Field_Name => "starting_position",
+                            Field      => coords_array);
+         coords_array := Empty_Array;
+
+         -- Get player's defense position
+         Append(coords_array, Create(Get_Defense_Position(player_number, player_team).coord_x));
+	 Append(coords_array, Create(Get_Defense_Position(player_number, player_team).coord_y));
+         json_obj.Set_Field(Field_Name => "defense_position",
+                            Field      => coords_array);
+         coords_array := Empty_Array;
+
+	 -- Get player's attack position
+	 Append(coords_array, Create(Get_Attack_Position(player_number, player_team).coord_x));
+	 Append(coords_array, Create(Get_Attack_Position(player_number, player_team).coord_y));
+         json_obj.Set_Field(Field_Name => "attack_position",
+                            Field      => coords_array);
+         coords_array := Empty_Array;
+
+         -- Do I have the ball?
+         if current_generic_status.holder then
+            json_obj.Set_Field(Field_Name => "possession",
+                               Field      => "has");
+         else
+            json_obj.Set_Field(Field_Name => "possession",
+                               Field 	  => "has_not");
+         end if;
+
+         -- Get game status (running, blocked)
+         if current_generic_status.game_status = Game_Running then
+            json_obj.Set_Field(Field_Name => "game",
+                               Field 	  => "running");
+         elsif current_generic_status.game_status = Game_Blocked then
+            json_obj.Set_Field(Field_Name => "game",
+                               Field 	  => "blocked");
+         end if;
+
+         -- Get goal position
+         if player_team = Team_One then
+            Append(coords_array, Create(51));
+            Append(coords_array, Create(15));
+            Append(coords_array, Create(51));
+            Append(coords_array, Create(19));
+         else
+            Append(coords_array, Create(1));
+            Append(coords_array, Create(15));
+            Append(coords_array, Create(1));
+            Append(coords_array, Create(19));
+         end if;
+         json_obj.Set_Field(Field_Name => "goal_position",
+                            Field      => coords_array);
+         coords_array := Empty_Array;
+
+         -- Get player's statistics
+         player_stats := Get_Statistics(player_number,player_team);
+--	 json_obj.Set_Field(Field_Name => "attack",
+--                     	    Field      => Create(player_stats(1)));
+--         json_obj.Set_Field(Field_Name => "defense",
+--                            Field      => Create(player_stats(2)));
+--         json_obj.Set_Field(Field_Name => "goal_keeping",
+--                            Field      => Create(player_stats(3)));
+--         json_obj.Set_Field(Field_Name => "power",
+--                            Field      => Create(player_stats(4)));
+--         json_obj.Set_Field(Field_Name => "precision",
+--                            Field      => Create(player_stats(5)));
+--         json_obj.Set_Field(Field_Name => "speed",
+--                            Field      => Create(player_stats(6)));
+--         json_obj.Set_Field(Field_Name => "tackle",
+--                            Field      => Create(player_stats(7)));
+
+        -- Compute player's radius
+         player_radius := (player_stats(1) +
+                           player_stats(2) +
+           		   player_stats(3) +
+           		   player_stats(4) +
+           		   player_stats(5) +
+           		   player_stats(6) +
+                           player_stats(7)) / factor;
+         json_obj.Set_Field(Field_Name => "radius",
+                            Field      => Create(player_radius));
+
+         -- Get game event.
+         -- It could be either an Unary_Event_Ptr (Goal_Kick, Corner_Kick, ...)
+         -- or a Match_Event_Ptr (Begin_Of_Match, End_Of_First_Half, ...)
+	 event := Game_Event_Ptr(current_generic_status.last_game_event);
+         if event /= null then
+	    -- Match Event
+            if event.all in Match_Event'Class then
+	       m_event := Match_Event_Ptr(event);
+	       -- Match Event: Begin_Of_Match or Begin_Of_Second_Half
+               if Get_Match_Event_Id(m_event) = Begin_Of_Match
+                 or Get_Match_Event_Id(m_event) = Begin_Of_Second_Half then
+                  json_obj.Set_Field(Field_Name => "event",
+                                     Field 	=> "init");
+
+                  -- If it's my duty to start the game
+                  if Get_Kick_Off_Player(m_event) = id then
+                     -- Get the ball coordinates
+                     Append(coords_array, Create(Ball.Get_Position.coord_x));
+                     Append(coords_array, Create(Ball.Get_Position.coord_y));
+                     json_obj.Set_Field(Field_Name => "reference_position",
+                                        Field      => coords_array);
+                     coords_array := Empty_Array;
+                  end if;
+               else
+		  -- Match Event: End_Of_First_Half or End_Of_Match
+                  json_obj.Set_Field(Field_Name => "event",
+                                     Field 	=> "end");
+               end if;
+	    else
+	       -- Unary Event
+	       u_event := Unary_Event_Ptr(event);
+	       json_obj.Set_Field(Field_Name => "event",
+                                  Field      => "inactive_ball");
+
+	       -- If it's my duty to resume the game
+               if Get_Player_Id(u_event) = id then
+		  -- Get the event coordinates
+                  Append(coords_array, Create(Get_Coordinate(u_event).coord_x));
+                  Append(coords_array, Create(Get_Coordinate(u_event).coord_y));
+                  json_obj.Set_Field(Field_Name => "reference_position",
+                                     Field      => coords_array);
+               	  coords_array := Empty_Array;
+               end if;
+            end if;
+         end if;
+
+         -- Get the ball coordinates
+         Append(coords_array, Create(Ball.Get_Position.coord_x));
+         Append(coords_array, Create(Ball.Get_Position.coord_y));
+         json_obj.Set_Field(Field_Name => "ball_position",
+                            Field      => coords_array);
+         coords_array := Empty_Array;
+
+         -- Read Specific Status
+         -- Returns players near me and the player currently holding the ball
+         current_read_result :=
+           ControllerPkg.Read_Status(x => current_generic_status.coord.coord_x,
+	                             y => current_generic_status.coord.coord_y,
+                                     r => player_radius);
+
+         -- Get the team with ball possession
+         if Ball.Get_Controlled then
+            ball_team := Get_Team_From_Id(current_read_result.holder_id);
+            if ball_team = Team_One then
+               json_obj.Set_Field(Field_Name => "team_possession",
+                                  Field      => "team1");
+            else
+               json_obj.Set_Field(Field_Name => "team_possession",
+                                  Field      => "team2");
+            end if;
+         else
+            json_obj.Set_Field(Field_Name => "team_possession",
+                               Field      => "none");
+         end if;
+
+         for i in current_read_result.players_in_my_zone.First_Index ..
+           current_read_result.players_in_my_zone.Last_Index loop
+            Append(nearby_player,
+                   Create(current_read_result.players_in_my_zone.Element(i).coord.coord_x));
+            Append(nearby_player,
+                   Create(current_read_result.players_in_my_zone.Element(i).coord.coord_y));
+            if current_read_result.holder_id = current_read_result.players_in_my_zone.Element(i).id then
+               Append(nearby_player, Create("has"));
+            else
+               Append(nearby_player, Create("has_not"));
+            end if;
+            if current_read_result.players_in_my_zone.Element(i).team = Team_One then
+               Append(nearby_player, Create("team1"));
+            else
+               Append(nearby_player, Create("team2"));
+            end if;
+            Append(nearby_folks, Create(nearby_player));
+            nearby_player := Empty_Array;
+            json_obj.Set_Field(Field_Name => "nearby",
+                               Field      => nearby_folks);
+            nearby_folks := Empty_Array;
+         end loop;
+
+         -- Json file name : STATUS<PlayerID>
+	 output_name := "STATUS" & Integer'Image(id);
+	 -- Creates the file
+         Create (File => Output,
+                 Mode => Out_File,
+                 Name => output_name);
+	 -- Writes the Json object in the file
+  	 String'Write(Stream(Output), json_obj.Write);
+	 Close (Output);
+
 
 	 pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Controllo che tipo di evento c'e'"));
 	 if current_generic_status.last_game_event /= null then
@@ -112,7 +324,7 @@ package body Soccer.PlayersPkg is
 	 current_team := current_generic_status.team;
 
 	 if current_generic_status.holder then
-	    current_range := ability;
+	    current_range := player_radius;
 	 elsif current_generic_status.nearby then
 	    current_range := nearby_distance;
 	 else
@@ -160,7 +372,7 @@ package body Soccer.PlayersPkg is
 		  foundPlayer : Boolean := False;
 	       begin
 		  for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
-		     if current_read_result.players_in_my_zone.Element(Index => i).team /= team and
+		     if current_read_result.players_in_my_zone.Element(Index => i).team /= player_team and
 		       current_read_result.players_in_my_zone.Element(Index => i).distance <= pass_range then
 			foundPlayer := True;
 		     end if;
@@ -171,7 +383,7 @@ package body Soccer.PlayersPkg is
 			playerTarget : Integer := -1;
 		     begin
 			for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
-			   if current_read_result.players_in_my_zone.Element(Index => i).team = team and
+			   if current_read_result.players_in_my_zone.Element(Index => i).team = player_team and
 			     current_read_result.players_in_my_zone.Element(Index => i).distance <= 10 then -- tutti con la stessa forza di tiro
 			      playerTarget := i;
 			   end if;
@@ -227,7 +439,7 @@ package body Soccer.PlayersPkg is
 			-- controllata da un giocatore
 			for i in current_read_result.players_in_my_zone.First_Index .. current_read_result.players_in_my_zone.Last_Index loop
 			   if current_read_result.players_in_my_zone.Element(Index => i).id = current_read_result.holder_id then
-			      if current_read_result.players_in_my_zone.Element(Index => i).team /= team then
+			      if current_read_result.players_in_my_zone.Element(Index => i).team /= player_team then
 				 -- la controlla un avversario
 				 targetPlayer := current_read_result.players_in_my_zone.Element(Index => i).coord;
 				 targetPlayerId := current_read_result.players_in_my_zone.Element(Index => i).id;
@@ -314,7 +526,7 @@ package body Soccer.PlayersPkg is
 			   declare
 			      current_player_status : Player_Status := current_read_result.players_in_my_zone.Element (i);
 			   begin
-			      if current_player_status.team = team then
+			      if current_player_status.team = player_team then
 				 if Distance (current_player_status.coord, current_coord) > Distance (shot_target, current_coord) then
 				    shot_target := current_player_status.coord;
 				 end if;
@@ -347,7 +559,7 @@ package body Soccer.PlayersPkg is
 		     declare
 			current_player_status : Player_Status := current_read_result.players_in_my_zone.Element (i);
 		     begin
-			if current_player_status.team = team then
+			if current_player_status.team = player_team then
 			   if Distance (current_player_status.coord, current_coord) >
 			     Distance (shot_target, current_coord) then
 			      shot_target := current_player_status.coord;
@@ -366,14 +578,14 @@ package body Soccer.PlayersPkg is
 	       end;
 	    else
 	       -- sono uno degli altri giocatori
-	       if team = Get_Team (last_game_event) then
+	       if player_team = Get_Team (last_game_event) then
 		  -- sono un compagno di squadra di chi deve battere, quindi al
 		  -- massimo vado nella mia posizione di riferimeto, oppure sto fermo
-		  if current_coord /= Get_Coordinate_For_Player (team, id) then
+		  if current_coord /= Get_Coordinate_For_Player (player_team, id) then
 		     current_action.event := new Move_Event;
 		     current_action.event.Initialize (id,
 					current_coord,
-					Get_Next_Coordinate (current_coord, Get_Coordinate_For_Player (team, id)));
+					Get_Next_Coordinate (current_coord, Get_Coordinate_For_Player (player_team, id)));
 		     current_action.utility := 10; -- TODO:: cambiare utilita'
 		  end if;
 	       else
@@ -427,7 +639,7 @@ package body Soccer.PlayersPkg is
 		  else
 		     pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Non devo far riprendere il gioco"));
 		     -- controllo se sono nella mia posizione di riferimento
-		     if not Compare_Coordinates (current_coord, TEMP_Get_Coordinate_For_Player (id)) then
+		     if not Compare_Coordinates (current_coord, Get_Starting_Position (id,current_team)) then
 
 			-- controllo se sono in panchina
 			if Compare_Coordinates (current_coord, Coordinate'(id,0)) then
@@ -455,13 +667,13 @@ package body Soccer.PlayersPkg is
 			else
 			   -- mi sposto nella mia posizione di riferimento
 			   pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Mi sposto nella cella "
-			     & Print_Coord (Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)))
-			     & " verso la mia posizione di riferimento " & Print_Coord (TEMP_Get_Coordinate_For_Player (id))
+			     & Print_Coord (Get_Next_Coordinate (current_coord, Get_Starting_Position (id,current_team)))
+			     & " verso la mia posizione di riferimento " & Print_Coord (Get_Starting_Position (id,current_team))
 			     & " partendo dalla cella " & Print_Coord (current_coord)));
 			   current_action.event := new Move_Event;
 			   current_action.event.Initialize (id,
 				       current_coord,
-				       Get_Next_Coordinate (current_coord, TEMP_Get_Coordinate_For_Player (id)));
+				       Get_Next_Coordinate (current_coord, Get_Starting_Position (id,current_team)));
 			   current_action.utility := 5; -- TODO:: cambiare utilita'
 			end if;
 		     else
@@ -605,7 +817,7 @@ package body Soccer.PlayersPkg is
 	       if Get_Match_Event_Id (current_match_event) = Begin_Of_Match then
 		  pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Gioco in pausa per inizio primo tempo"));
 --  		  target_coord := TEMP_Get_Coordinate_For_Player (0); -- TODO:: decommenta per farli entrare in campo in ordine!
-		  target_coord := TEMP_Get_Coordinate_For_Player (id);
+		  target_coord := Get_Starting_Position (id,current_team);
 
 		  pragma Debug (Put_Line ("initial_x = " & I2S (current_coord.coord_x) & " - initial_y = " & I2S (current_coord.coord_y)));
 
@@ -632,7 +844,5 @@ package body Soccer.PlayersPkg is
       end loop;
 
    end Player;
-
-
 
 end Soccer.PlayersPkg;
