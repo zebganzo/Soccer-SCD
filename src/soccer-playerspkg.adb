@@ -65,8 +65,6 @@ package body Soccer.PlayersPkg is
 
    begin
       Controller.Get_Id (id);
---        ControllerPkg.Get_Id (id);
-
 --        pragma Debug (Put_Line ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T"));
       Game_Entity.Start_1T;
 
@@ -115,6 +113,14 @@ package body Soccer.PlayersPkg is
 
          -- Get player's number
          player_number := current_generic_status.number;
+         json_obj.Set_Field(Field_Name => "number",
+                            Field      => Create(player_number));
+
+         -- Check if the player is the goalkeeper
+         if player_number = Get_Goalkeeper_Number(player_team) then
+            json_obj.Set_Field(Field_Name => "goalkeeper",
+                               Field      => "yes");
+         end if;
 
          -- Get player's starting position
          Append(coords_array, Create(Get_Starting_Position(player_number, player_team).coord_x));
@@ -146,13 +152,16 @@ package body Soccer.PlayersPkg is
                                Field 	  => "has_not");
          end if;
 
-         -- Get game status (running, blocked)
+         -- Get game status (running, blocked, ready)
          if current_generic_status.game_status = Game_Running then
             json_obj.Set_Field(Field_Name => "game",
                                Field 	  => "running");
          elsif current_generic_status.game_status = Game_Blocked then
             json_obj.Set_Field(Field_Name => "game",
                                Field 	  => "blocked");
+         elsif current_generic_status.game_status = Game_Ready then
+           json_obj.Set_Field(Field_Name => "game",
+                              Field 	 => "ready");
          end if;
 
          -- Get goal position
@@ -230,8 +239,13 @@ package body Soccer.PlayersPkg is
 	    else
 	       -- Unary Event
 	       u_event := Unary_Event_Ptr(event);
-	       json_obj.Set_Field(Field_Name => "event",
-                                  Field      => "inactive_ball");
+               if current_generic_status.game_status = Game_Ready then
+                  json_obj.Set_Field(Field_Name => "event",
+                                     Field      => Create(Unary_Event_Id'Image(Get_Type(u_event))));
+               elsif current_generic_status.game_status = Game_Blocked then
+                  json_obj.Set_Field(Field_Name => "event",
+                                     Field      => Create("inactive_ball"));
+               end if;
 
 	       -- If it's my duty to resume the game
                if Get_Player_Id(u_event) = id then
@@ -261,7 +275,7 @@ package body Soccer.PlayersPkg is
 
          -- Get the team with ball possession
          if Ball.Get_Controlled then
-            ball_team := Get_Team_From_Id(current_read_result.holder_id);
+            ball_team := Get_Player_Team_From_Id(current_read_result.holder_id);
             if ball_team = Team_One then
                json_obj.Set_Field(Field_Name => "team_possession",
                                   Field      => "team1");
@@ -292,15 +306,19 @@ package body Soccer.PlayersPkg is
             end if;
             Append(nearby_folks, Create(nearby_player));
             nearby_player := Empty_Array;
-            json_obj.Set_Field(Field_Name => "nearby",
-                               Field      => nearby_folks);
-            nearby_folks := Empty_Array;
          end loop;
+         json_obj.Set_Field(Field_Name => "nearby",
+                               Field   => nearby_folks);
+         nearby_folks := Empty_Array;
 
          -- Json file name : STATUS<PlayerID>
-	 output_name := "STATUS" & Integer'Image(id);
+--           if current_generic_status.game_status = Game_Ready then
+--              output_name := "READYS" & Integer'Image(id);
+--           else
+            output_name := "STATUS" & Integer'Image(id);
+--           end if;
 	 -- Creates the file
-        Create (File => output,
+         Create (File => output,
                  Mode => Out_File,
                  Name => output_name);
 --  	 -- Writes the Json object in the file

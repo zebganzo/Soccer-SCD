@@ -366,7 +366,7 @@ package body Soccer.ControllerPkg.Referee is
 		  -- di chi deve battere il calcio di rigore
 		  for i in current_status'Range loop
 		     if i /= current_player_status.id
-		       and i /= Get_Goalkeeper_Id (team => opponent_team)
+		       and i /= Get_Id_From_Number(Get_Goalkeeper_Number(team => opponent_team))
 		       and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
 			second_condition := True;
 		     end if;
@@ -650,7 +650,7 @@ package body Soccer.ControllerPkg.Referee is
 			   pragma Debug (Put_Line("[POST_CHECK] rimessa dal fondo per Team_Two"));
 			   Set_Coord_X (coord => new_evt_coord, value => field_max_x + 1);
 			   new_event.Initialize (new_event_id    => Goal_Kick,
-			    new_player_id   => Get_Goalkeeper_Id (Team_Two),
+			    new_player_id   => Get_Id_From_Number(Get_Goalkeeper_Number(Team_Two)),
 			    new_team_id     => Team_Two,
 			    new_event_coord => new_evt_coord);
 			end if;

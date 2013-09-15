@@ -33,8 +33,6 @@ package Soccer.TeamPkg is
       end record;
    type Team_Ptr is access Team;
 
-   function Get_Team_From_Id (id : Integer) return Team_Id;
-
    -- Get Team Id from the player's number
    function Get_Team_From_Number (number : Integer) return Team_Id;
 
@@ -50,11 +48,7 @@ package Soccer.TeamPkg is
                                        holder_team : in Team_Id;
                                        number : in Integer) return Coordinate;
 
-   function Get_Goalkeeper_Id (team : in Team_Id) return Integer;
-
-   function Check_For_Initial_Position_Of_Players (team : in Team_Id) return Boolean;
-
-   function TEMP_Get_Coordinate_For_Player (id : in Integer) return Coordinate;
+   function Get_Goalkeeper_Number (team : in Team_Id) return Integer;
 
    -- returns a player's statistics array, given his number and his team
    function Get_Statistics(number : in Integer;
@@ -138,7 +132,7 @@ private
    -- Formation Scheme 3-5-2: team 1 players' reference positions
    -- during an attack phase
    t1_352_att_pos : Positions_Array :=
-     (1  => Coordinate'(1,17),				-- goal keeper
+     (1  => Coordinate'(8,17),				-- goal keeper
       2  => Coordinate'(25,17),				-- back 1
       3  => Coordinate'(28,9),				-- back 2
       4  => Coordinate'(28,25),				-- back 3
@@ -153,7 +147,7 @@ private
    -- Formation Scheme 3-5-2: team 2 players' reference positions
    -- during an attack phase
    t2_352_att_pos : Positions_Array :=
-     (1  => Coordinate'(51,17),				-- goal keeper
+     (1  => Coordinate'(44,17),				-- goal keeper
       2  => Coordinate'(27,17),				-- back 1
       3  => Coordinate'(24,25),				-- back 2
       4  => Coordinate'(24,9),				-- back 3
@@ -226,7 +220,7 @@ private
    -- Formation Scheme 4-4-2: team 1 players' reference positions
    -- during an attack phase
    t1_442_att_pos : Positions_Array :=
-     (1  => Coordinate'(1,17),				-- goal keeper
+     (1  => Coordinate'(8,17),				-- goal keeper
       2  => Coordinate'(28,13),				-- back 1
       3  => Coordinate'(28,21),				-- back 2
       4  => Coordinate'(31,5),				-- back 3
@@ -241,7 +235,7 @@ private
    -- Formation Scheme 4-4-2: team 2 players' reference positions
    -- during an attack phase
    t2_442_att_pos : Positions_Array :=
-     (1  => Coordinate'(51,17),				-- goal keeper
+     (1  => Coordinate'(44,17),				-- goal keeper
       2  => Coordinate'(24,21),				-- back 1
       3  => Coordinate'(24,13),				-- back 2
       4  => Coordinate'(21,29),				-- back 3
@@ -314,7 +308,7 @@ private
    -- Formation Scheme 5-3-2: team 1 players' reference positions
    -- during an attack phase
    t1_532_att_pos : Positions_Array :=
-     (1  => Coordinate'(1,17),				-- goal keeper
+     (1  => Coordinate'(8,17),				-- goal keeper
       2  => Coordinate'(28,11),				-- back 1
       3  => Coordinate'(28,23),				-- back 2
       4  => Coordinate'(31,5),				-- back 3
@@ -329,7 +323,7 @@ private
    -- Formation Scheme 5-3-2: team 2 players' reference positions
    -- during an attack phase
    t2_532_att_pos : Positions_Array :=
-     (1  => Coordinate'(51,17),				-- goal keeper
+     (1  => Coordinate'(44,17),				-- goal keeper
       2  => Coordinate'(24,23),				-- back 1
       3  => Coordinate'(24,11),				-- back 2
       4  => Coordinate'(21,29),				-- back 3
@@ -340,39 +334,5 @@ private
       9  => Coordinate'(11,10),				-- midfielder 3
       10 => Coordinate'(5,20),				-- forward 1
       11 => Coordinate'(5,14));				-- forward 2
-
-   team_one_balanced_positions : Positions_Array;
-   team_one_defensive_positions : Positions_Array;
-
-   --+ contengono SOLO i giocatori che sono in campo
-   -- Formation Scheme : 3-5-2. Team 1 starting positions
-   team_one_offensive_formation : Formation_Scheme :=
-     Formation_Scheme'(id        => O_352,
-                       positions => t1_352_start_pos);
-
-    -- Formation Scheme : 3-5-2. Team 2 starting positions
-   team_two_offensive_formation : Formation_Scheme :=
-     Formation_Scheme'(id        => O_352,
-                       positions => t2_352_start_pos);
-
-   team_one_balanced_formation : Formation_Scheme :=
-     Formation_Scheme'(id        => B_442,
-                       positions => team_one_balanced_positions);
-
-   team_one_defensive_formation : Formation_Scheme :=
-     Formation_Scheme'(id        => D_532,
-		       positions => team_one_defensive_positions);
-
-   players_coord : array (0 .. total_players) of Coordinate := (Coordinate'(0,5),
-								Coordinate'(5,5),--);
-								Coordinate'(25,13),
-								Coordinate'(17,9),
-								Coordinate'(10,18),
-								Coordinate'(28,2),
-								Coordinate'(6,6),
-								Coordinate'(14,15),
-								Coordinate'(20,10),
-								Coordinate'(12,12),
-								Coordinate'(15,8));
 
 end Soccer.TeamPkg;

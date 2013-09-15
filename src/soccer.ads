@@ -71,7 +71,7 @@ package Soccer is
    upper_right_corner : Coordinate := Coordinate'(51,33);
 
    -- oblivium
-   oblivium : Coordinate := Coordinate'(field_max_x / 2,0);
+   oblivium : Coordinate := Coordinate'((field_max_x/2)+1,0);
 
    buffer_dim : Positive := 10;
    nearby_distance : Integer := 3;

@@ -78,6 +78,9 @@ package Soccer.ControllerPkg is
    -- Returns the player's team, given the player's id
    function Get_Player_Team_From_Id(id : in Integer) return Team_Id;
 
+   -- Returns the player's id, given his number
+   function Get_Id_From_Number(number : in Integer) return Integer;
+
    task Field_Printer;
 
    procedure Print_Status;

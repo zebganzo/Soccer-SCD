@@ -1,11 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 package body Soccer.TeamPkg is
 
-   function Get_Team_From_Id (id : Integer) return Team_Id is
-   begin
-      return Team_One;
-   end Get_Team_From_Id;
-
    -- Get Team Id from the player's number
    function Get_Team_From_Number (number : Integer) return Team_Id is
    begin
@@ -101,28 +96,25 @@ package body Soccer.TeamPkg is
 
    end Get_Coordinate_For_Player;
 
-   function Get_Goalkeeper_Id (team : in Team_Id) return Integer is
+   function Get_Goalkeeper_Number (team : in Team_Id) return Integer is
+      keeper_number : Integer;
    begin
       if team = Team_One then
-	 return team_1.players(1);
+         for i in team_1.number_id'Range loop
+            if team_1.number_id(i).formation_id = 1 then
+               keeper_number := team_1.number_id(i).number;
+            end if;
+         end loop;
       else
-	 return team_2.players(1);
-      end if;
-   end Get_Goalkeeper_Id;
-
-   function Check_For_Initial_Position_Of_Players (team : in Team_Id) return Boolean is
-   begin
-      if team = Team_One then
-	 return False; -- TODO:: finire
+	 for i in team_2.number_id'Range loop
+            if team_2.number_id(i).formation_id = 1 then
+               keeper_number := team_2.number_id(i).number;
+            end if;
+         end loop;
       end if;
 
-      return False;
-   end Check_For_Initial_Position_Of_Players;
-
-   function TEMP_Get_Coordinate_For_Player (id : in Integer) return Coordinate is
-   begin
-      return players_coord (id);
-   end TEMP_Get_Coordinate_For_Player;
+      return keeper_number;
+   end Get_Goalkeeper_Number;
 
    -- returns a player's statistics array
    function Get_Statistics(number : in Integer;
