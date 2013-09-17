@@ -24,7 +24,7 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
-   half_game_duration : Positive := 5;
+   half_game_duration : Positive := 60;
 
    team_one_goal_starting_coord : Coordinate := Coordinate'(0,9);
    team_two_goal_starting_coord : Coordinate := Coordinate'(31,9);
@@ -71,7 +71,7 @@ package Soccer is
    upper_right_corner : Coordinate := Coordinate'(51,33);
 
    -- oblivium
-   oblivium : Coordinate := Coordinate'(field_max_x / 2,0);
+   oblivium : Coordinate := Coordinate'((field_max_x/2)+1,0);
 
    buffer_dim : Positive := 10;
    nearby_distance : Integer := 3;
@@ -80,7 +80,7 @@ package Soccer is
 
    number_of_zones : Integer := 4;
 
-   ball_speed : Float := 1.0;
+   ball_speed : Float := 0.4;
    players_delay : Float := 0.7;
    print_delay : Float := 0.5;
 
@@ -93,11 +93,11 @@ package Soccer is
    utility_constraint : Utility_Constraint_Type := 2;
 
    num_of_players : Positive := 8;
-   total_players : Positive := 10;
+   total_players  : Positive := 10;
 
    agent_movement_id : Integer := 0;
 
-   type Positions_Array is array (1 .. total_players) of Coordinate;
+   type Positions_Array is array (1 .. 11) of Coordinate;
 
    type Game_State is (Game_Running,
 		       Game_Ready,

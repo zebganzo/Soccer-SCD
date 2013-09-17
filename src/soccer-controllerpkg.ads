@@ -10,6 +10,10 @@ package Soccer.ControllerPkg is
 
    -- New Types
 
+   --+-------------
+   debug : Boolean := True;
+   --+-------------
+
    type Action is
       record
          event : Motion_Event_Ptr;
@@ -42,12 +46,15 @@ package Soccer.ControllerPkg is
    type Generic_Status is
       record
 	 coord : Coordinate;
+	 number : Integer;
 	 team : Team_Id;
-         holder : Boolean;
-	 nearby : Boolean;
+         holder : Boolean;	-- ho la palla o no
+	 nearby : Boolean;      -- palla vicina o no
 	 last_game_event : Game_Event_Ptr;
 	 game_status : Game_State;
-	 substitutions : Substitutions_Container.Vector;
+         substitutions : Substitutions_Container.Vector;
+         holder_team : Team_Id;
+	 last_ball_holder_id : Integer;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
 
@@ -72,6 +79,12 @@ package Soccer.ControllerPkg is
    function Get_Players_Status return Status;
 
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result;
+
+   -- Returns the player's team, given the player's id
+   function Get_Player_Team_From_Id(id : in Integer) return Team_Id;
+
+   -- Returns the player's id, given his number
+   function Get_Id_From_Number(number : in Integer) return Integer;
 
    task Field_Printer;
 

@@ -2,6 +2,14 @@ with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.G
 
 package body Soccer.ControllerPkg.Referee is
 
+   procedure Print (input : String) is
+   begin
+      if debug then
+	 Print (input);
+	 null;
+      end if;
+   end Print;
+
    procedure Notify_Game_Event (event : Game_Event_Ptr) is begin
       game_event := event;
    end Notify_Game_Event;
@@ -85,14 +93,14 @@ package body Soccer.ControllerPkg.Referee is
 	 if Get_Match_Event_Id (current_match_status) = Begin_Of_Match then
 
 	    -- controllo se il gioco puo' partire
-	    pragma Debug (Put_Line ("[PRE_CHECK] Controllo se il gioco puo' ripartire"));
+	    Print ("[PRE_CHECK] Controllo se il gioco puo' ripartire");
 	    if Get_Game_Status = Game_Ready then
 	       if e /= null then
 		    if e.all in Shot_Event'Class then
 		     -- ha battuto, il gioco puo' partire
 		     Set_Last_Game_Event (null);
 		     Set_Game_Status (Game_Running);
-		     pragma Debug (Put_Line ("[PRE_CHECK] Inizio primo tempo!"));
+		     Print ("[PRE_CHECK] Inizio primo tempo!");
 		     -- faccio partire il timer del primo tempo
 		     Game_Timer_First_Half.Start;
 		     return; -- TODO:: controlla se serve!
@@ -100,7 +108,7 @@ package body Soccer.ControllerPkg.Referee is
 	       end if;
 	    end if;
 
-	    -- inizio del gioco o inizio secondo tempo, tutti i giocatori devono essere nella propria
+	    -- inizio del gioco, tutti i giocatori devono essere nella propria
 	    -- posizione di riferimento e qualcuno ha battuto il calcio d'inizio
 	    declare
 	       first_condition : Boolean := False;
@@ -108,24 +116,27 @@ package body Soccer.ControllerPkg.Referee is
 	    begin
 	       -- controllo che tutti i giocatori siano in posizione, tranne quello che
 	       -- deve sbloccare il gioco
-	       pragma Debug (Put_Line ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte"));
+	       Print ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte");
 	       for i in current_status'Range loop
-		  declare
-		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
-		     current_coord : Coordinate := current_status (i).coord;
-		     ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
-		  begin
-		     if i /= kickoff_player then
-			first_condition := False;
-			if Compare_Coordinates (current_coord, ref_coord) then
-			   first_condition := True;
-			end if;
-			exit when not first_condition;
-		     else
-			-- FIXME:: solo per quando si testa con un solo giocatore in campo!
-			first_condition := True;
-		     end if;
-		  end;
+                  if current_status(i).on_the_field then
+                     declare
+                        kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
+                        current_coord : Coordinate := current_status (i).coord;
+                        -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+                        ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
+                     begin
+                        if i /= kickoff_player then
+                           first_condition := False;
+                           if Compare_Coordinates (current_coord, ref_coord) then
+                              first_condition := True;
+                           end if;
+                           exit when not first_condition;
+                        else
+                           -- FIXME:: solo per quando si testa con un solo giocatore in campo!
+                           first_condition := True;
+                        end if;
+                     end;
+                  end if;
 	       end loop;
 
 	       -- controllo che giocatore X abbia la palla
@@ -143,14 +154,14 @@ package body Soccer.ControllerPkg.Referee is
 	    null;
 	 elsif Get_Match_Event_Id (current_match_status) = Begin_Of_Second_Half then
 	    -- controllo se il gioco puo' partire
-	    pragma Debug (Put_Line ("[PRE_CHECK] Controllo se il gioco puo' ripartire"));
+	    Print ("[PRE_CHECK] Controllo se il gioco puo' ripartire");
 	    if Get_Game_Status = Game_Ready then
 	       if e /= null then
 		    if e.all in Shot_Event'Class then
 		     -- ha battuto, il gioco puo' partire
 		     Set_Last_Game_Event (null);
 		     Set_Game_Status (Game_Running);
-		     pragma Debug (Put_Line ("[PRE_CHECK] Inizio secondo tempo!"));
+		     Print ("[PRE_CHECK] Inizio secondo tempo!");
 		     -- faccio partire il timer del secondo tempo
 		     Game_Timer_Second_Half.Start;
 		     return; -- TODO:: controlla se serve!
@@ -158,7 +169,7 @@ package body Soccer.ControllerPkg.Referee is
 	       end if;
 	    end if;
 
-	    -- inizio del gioco o inizio secondo tempo, tutti i giocatori devono essere nella propria
+	    -- inizio secondo tempo, tutti i giocatori devono essere nella propria
 	    -- posizione di riferimento e qualcuno ha battuto il calcio d'inizio
 	    declare
 	       first_condition : Boolean := False;
@@ -166,24 +177,27 @@ package body Soccer.ControllerPkg.Referee is
 	    begin
 	       -- controllo che tutti i giocatori siano in posizione, tranne quello che
 	       -- deve sbloccare il gioco
-	       pragma Debug (Put_Line ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte"));
-	       for i in current_status'Range loop
-		  declare
-		     kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
-		     current_coord : Coordinate := current_status (i).coord;
-		     ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
-		  begin
-		     if i /= kickoff_player then
-			first_condition := False;
-			if Compare_Coordinates (current_coord, ref_coord) then
-			   first_condition := True;
-			end if;
-			exit when not first_condition;
-		     else
-			-- FIXME:: solo per quando si testa con un solo giocatore in campo!
-			first_condition := True;
-		     end if;
-		  end;
+	       Print ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte");
+               for i in current_status'Range loop
+                  if current_status(i).on_the_field then
+                     declare
+                        kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
+                        current_coord : Coordinate := current_status (i).coord;
+                        -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
+                        ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
+                     begin
+                        if i /= kickoff_player then
+                           first_condition := False;
+                           if Compare_Coordinates (current_coord, ref_coord) then
+                              first_condition := True;
+                           end if;
+                           exit when not first_condition;
+                        else
+                           -- FIXME:: solo per quando si testa con un solo giocatore in campo!
+                           first_condition := True;
+                        end if;
+                     end;
+                  end if;
 	       end loop;
 
 	       -- controllo che giocatore X abbia la palla
@@ -240,7 +254,7 @@ package body Soccer.ControllerPkg.Referee is
 	       -- controllo se il gioco puo' riprendere
 	       if Get_Game_Status = Game_Ready
 		 and e.all in Shot_Event'Class
-		 and Get_Team_From_Id (e.Get_Player_Id) = opposite_team then
+		 and Get_Player_Team_From_Id (e.Get_Player_Id) = opposite_team then
 		  -- ha iniziato, quindi il gioco puo' riprendere
 		  Set_Last_Game_Event (null);
 		  Set_Game_Status (Game_Running);
@@ -360,7 +374,7 @@ package body Soccer.ControllerPkg.Referee is
 		  -- di chi deve battere il calcio di rigore
 		  for i in current_status'Range loop
 		     if i /= current_player_status.id
-		       and i /= Get_Goalkeeper_Id (team => opponent_team)
+		       and i /= Get_Id_From_Number(Get_Goalkeeper_Number(team => opponent_team))
 		       and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
 			second_condition := True;
 		     end if;
@@ -467,7 +481,7 @@ package body Soccer.ControllerPkg.Referee is
    -- POST CHECK
    --+-----------------------------------
       procedure Post_Check is
-      last_team_possession : Team_Id := Get_Team_From_Id (id => last_ball_holder);
+      last_team_possession : Team_Id := Get_Player_Team_From_Id (id => last_ball_holder);
       new_game_status : Unary_Event_Ptr;
    begin
       -- controlla se e' finito il tempo, in quel caso setta l'evento di tipo
@@ -484,9 +498,9 @@ package body Soccer.ControllerPkg.Referee is
       --
 
       -- controllo il game event (dovrebbe essere un fallo)
-      pragma Debug (Put_Line("[POST_CHECK] Controllo se c'e' stato un fallo"));
+      Print ("[POST_CHECK] Controllo se c'e' stato un fallo");
       if game_event /= null then
-	 pragma Debug (Put_Line("[POST_CHECK] C'e' stato un fallo!"));
+	 Print ("[POST_CHECK] C'e' stato un fallo!");
 	 if game_event.all in Binary_Event'Class then
 	    declare
 	       evt : Binary_Event_Ptr := Binary_Event_Ptr (game_event);
@@ -494,7 +508,7 @@ package body Soccer.ControllerPkg.Referee is
 	       if evt.Get_Event_Id = Foul then
 		  declare
 		     evt_coord : Coordinate := evt.Get_Coordinate;
-		     assigned_team : Team_Id := Get_Team_From_Id (evt.Get_Id_Player_2);
+		     assigned_team : Team_Id := Get_Player_Team_From_Id (evt.Get_Id_Player_2);
 		     foul_event : Unary_Event_Ptr := new Unary_Event;
 		     is_penalty : Boolean := Is_In_Penalty_Area (team  => assigned_team,
 						   coord => evt_coord);
@@ -532,10 +546,10 @@ package body Soccer.ControllerPkg.Referee is
       end if;
 
       -- SE IL GIOCO E' FERMO, controllo eventi della distribuzione
-      pragma Debug (Put_Line("[POST_CHECK] Controllo se ci sono eventi dalla distribuzione"));
+      Print ("[POST_CHECK] Controllo se ci sono eventi dalla distribuzione");
       if Get_Game_Status = Game_Blocked then
 	 if manager_events.Length > 0 then
-	    pragma Debug (Put_Line("[POST_CHECK] Ci sono eventi dalla distribuzione!"));
+	    Print ("[POST_CHECK] Ci sono eventi dalla distribuzione!");
 	    for i in manager_events.First_Index .. manager_events.Last_Index loop
 	       -- controllo se l'evento e' un cambio di formazione o una sostituzione
 	       if manager_events(i).all in Formation_Event'Class then
@@ -565,7 +579,7 @@ package body Soccer.ControllerPkg.Referee is
 	 end if;
       end if;
 
-      pragma Debug (Put_Line("[POST_CHECK] Controllo se la palla e' uscita e ne determino la causa"));
+      Print ("[POST_CHECK] Controllo se la palla e' uscita e ne determino la causa");
       if Get_Game_Status = Game_Running then
 	 -- controllo delle coordinate della palla
 	 declare
@@ -578,7 +592,7 @@ package body Soccer.ControllerPkg.Referee is
 
 	    if ball_coord.coord_x < 1 or ball_coord.coord_x > field_x or ball_coord.coord_y < 1 or ball_coord.coord_y > field_y then
 
-	       pragma Debug (Put_Line("[POST_CHECK] La palla e' uscita dal campo"));
+	       Print ("[POST_CHECK] La palla e' uscita dal campo");
 
 	       -- controllo se e' stato fatto un goal
 
@@ -590,13 +604,13 @@ package body Soccer.ControllerPkg.Referee is
 		     if ball_coord.coord_x = team_two_goal_starting_coord.coord_x and ball_coord.coord_y >= team_two_goal_starting_coord.coord_y
 		       and ball_coord.coord_y <= team_two_goal_starting_coord.coord_y + goal_length then
 			scoring_team := Team_One;
-			pragma Debug (Put_Line("[POST_CHECK] Team_One ha segnato!"));
+			Print ("[POST_CHECK] Team_One ha segnato!");
 		     end if;
 		  else
 		     if ball_coord.coord_x = team_one_goal_starting_coord.coord_x and ball_coord.coord_y >= team_one_goal_starting_coord.coord_y
 		       and ball_coord.coord_y <= team_one_goal_starting_coord.coord_y + goal_length then
 			scoring_team := Team_Two;
-			pragma Debug (Put_Line("[POST_CHECK] Team_Two ha segnato!"));
+			Print ("[POST_CHECK] Team_Two ha segnato!");
 		     end if;
 		  end if;
 
@@ -608,7 +622,7 @@ package body Soccer.ControllerPkg.Referee is
 
 	       -- controllo se va assegnata una rimessa laterale
 	       if (ball_coord.coord_y = 0 or ball_coord.coord_y = field_max_y + 1) and ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
-		  pragma Debug (Put_Line("[POST_CHECK] rimessa laterale"));
+		  Print ("[POST_CHECK] rimessa laterale");
 		  new_game_status := new Unary_Event;
 		  new_game_status.Initialize (new_event_id    => Throw_In,
 				new_player_id   => Get_Nearest_Player (ball_coord, last_team_possession),
@@ -618,7 +632,7 @@ package body Soccer.ControllerPkg.Referee is
 
 	       -- controllo se va assegnato un calcio d'angolo o un rinvio dal
 	       -- fondo (non controllo la x perche' ho gia' controllato il gol)
-	       pragma Debug (Put_Line("[POST_CHECK] Controllo se va assegnato un calcio d'angolo o un rinvio dal fondo"));
+	       Print ("[POST_CHECK] Controllo se va assegnato un calcio d'angolo o un rinvio dal fondo");
 	       if ball_coord.coord_y = 0 or ball_coord.coord_y = field_max_y + 1 then
 		  declare
 		     new_event : Unary_Event_Ptr := new Unary_Event;
@@ -633,7 +647,7 @@ package body Soccer.ControllerPkg.Referee is
 		     if last_team_possession = Team_One then
 			if ball_coord.coord_x = 0 then
 			   -- assegna un calcio d'angolo a Team_Two
-			   pragma Debug (Put_Line("[POST_CHECK] calcio d'angolo per Team_Two"));
+			   Print ("[POST_CHECK] calcio d'angolo per Team_Two");
 			   Set_Coord_X (coord => new_evt_coord, value => 0);
 			   new_event.Initialize (new_event_id    => Corner_Kick,
 			    new_player_id   => Get_Nearest_Player (new_evt_coord, Team_Two),
@@ -641,17 +655,17 @@ package body Soccer.ControllerPkg.Referee is
 			    new_event_coord => new_evt_coord);
 			elsif ball_coord.coord_x = field_max_x + 1 then
 			   -- assegna una rimessa dal fondo a Team_Two
-			   pragma Debug (Put_Line("[POST_CHECK] rimessa dal fondo per Team_Two"));
+			   Print ("[POST_CHECK] rimessa dal fondo per Team_Two");
 			   Set_Coord_X (coord => new_evt_coord, value => field_max_x + 1);
 			   new_event.Initialize (new_event_id    => Goal_Kick,
-			    new_player_id   => Get_Goalkeeper_Id (Team_Two),
+			    new_player_id   => Get_Id_From_Number(Get_Goalkeeper_Number(Team_Two)),
 			    new_team_id     => Team_Two,
 			    new_event_coord => new_evt_coord);
 			end if;
 		     else
 			if ball_coord.coord_x = 0 then
 			   -- assegna una rimessa dal fondo a Team_One
-			   pragma Debug (Put_Line("[POST_CHECK] rimessa dal fondo per Team_One"));
+			   Print ("[POST_CHECK] rimessa dal fondo per Team_One");
 			   Set_Coord_X (coord => new_evt_coord, value => 0);
 			   new_event.Initialize (new_event_id    => Goal_Kick,
 			    new_player_id   => 1, -- portiere
@@ -659,7 +673,7 @@ package body Soccer.ControllerPkg.Referee is
 			    new_event_coord => new_evt_coord);
 			elsif ball_coord.coord_x = field_max_x + 1 then
 			   -- assegna un calcio d'angolo a Team_One
-			   pragma Debug (Put_Line("[POST_CHECK] calcio d'angolo per Team_One"));
+			   Print ("[POST_CHECK] calcio d'angolo per Team_One");
 			   Set_Coord_X (coord => new_evt_coord, value => field_max_x + 1);
 			   new_event.Initialize (new_event_id    => Corner_Kick,
 			    new_player_id   => Get_Nearest_Player (new_evt_coord, Team_One),
@@ -677,16 +691,16 @@ package body Soccer.ControllerPkg.Referee is
       end if;
 
       -- setto il nuovo stato di gioco, se c'e'
-      pragma Debug (Put_Line("[POST_CHECK] Se c'e' un nuovo stato di gioco, lo setto"));
+      Print ("[POST_CHECK] Se c'e' un nuovo stato di gioco, lo setto");
       if new_game_status /= null then
-	 pragma Debug (Put_Line("[POST_CHECK] Imposto il nuovo stato di gioco"));
+	 Print ("[POST_CHECK] Imposto il nuovo stato di gioco");
 	 Set_Last_Game_Event (event => Game_Event_Ptr (new_game_status));
 
 	 -- setto la nuova posizione della palla
 	 Ball.Set_Position (new_position => Get_Coordinate (new_game_status));
       end if;
 
-      pragma Debug (Put_Line("[POST_CHECK] Fine controlli"));
+      Print ("[POST_CHECK] Fine controlli");
 
    end Post_Check;
 
@@ -721,5 +735,10 @@ package body Soccer.ControllerPkg.Referee is
    procedure Set_Last_Ball_Holder (holder : Integer) is begin
       last_ball_holder := holder;
    end Set_Last_Ball_Holder;
+
+   function Get_Last_Ball_Holder return Integer is
+   begin
+      return last_ball_holder;
+   end Get_Last_Ball_Holder;
 
 end Soccer.ControllerPkg.Referee;

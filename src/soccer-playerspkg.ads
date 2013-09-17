@@ -1,6 +1,21 @@
 with Ada.Text_IO;
 use Ada.Text_IO;
 
+-----------------------------------------------------------------------------
+--  needed to launch Intelligence.jar and read the output file with JSON object
+with Ada.Text_IO.Text_Streams;
+use Ada.Text_IO.Text_Streams;
+
+with GNAT.OS_Lib;
+use GNAT.OS_Lib;
+
+with Ada.Directories;
+with Ada.Direct_IO;
+-----------------------------------------------------------------------------
+
+with GNATCOLL.JSON;
+use GNATCOLL.JSON;
+
 with Ada.Numerics;
 with Ada.Numerics.Discrete_Random;
 
@@ -32,9 +47,13 @@ use Soccer.Core_Event.Motion_Core_Event;
 
 package Soccer.PlayersPkg is
 
+   --+-------------
+   debug : Boolean := True;
+   --+-------------
+
    -- Il package Players contiene il task Player...non credo vi sia bisogno di descriverlo
 
    -- Entità attiva    : Player
-   task type Player (ability : Integer; initial_coord_x : Positive; initial_coord_y : Positive; team : Team_Id);
+   task type Player;
 
 end Soccer.PlayersPkg;

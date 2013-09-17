@@ -14,6 +14,10 @@ with Soccer.Generic_Timers;
 
 package Soccer.ControllerPkg.Referee is
 
+   --+-------------
+   debug : Boolean := True;
+   --+-------------
+
    pragma Suppress (Elaboration_Check);
 
    procedure Notify_Game_Event (event : Game_Event_Ptr);
@@ -25,6 +29,8 @@ package Soccer.ControllerPkg.Referee is
    procedure Notify_Manager_Event (event : Manager_Event.Event_Ptr);
 
    procedure Set_Last_Ball_Holder (holder : Integer);
+
+   function Get_Last_Ball_Holder return Integer;
 
    function Get_Nearest_Player (event_coord : in Coordinate; team : in Team_Id) return Integer;
 

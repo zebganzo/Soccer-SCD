@@ -31,14 +31,16 @@ package body Soccer.ControllerPkg is
 
    --+ Ritorna la posizione in base all'id
    function Get_Generic_Status(id : in Integer) return Generic_Status_Ptr is
-      coord_result : Coordinate;
+      coord_result  : Coordinate;
       holder_result : Boolean := False;
       nearby_result : Boolean := False;
-      gen_stat : Generic_Status_Ptr := new Generic_Status;
+      number_result : Integer;
+      gen_stat      : Generic_Status_Ptr := new Generic_Status;
    begin
       for i in current_status'Range loop
          if current_status (i).id = id then
             coord_result := current_status (i).coord;
+            number_result := current_status(i).number;
             if ball_holder_id = current_status (i).id then
                holder_result := True;
             elsif Distance(From => Ball.Get_Position,
@@ -52,13 +54,18 @@ package body Soccer.ControllerPkg is
       end loop;
 
       gen_stat.coord := coord_result;
-      gen_stat.team := Get_Team_From_Id (id);
+      gen_stat.number := number_result;
+      gen_stat.team := Get_Player_Team_From_Id (id);
       gen_stat.holder := holder_result;
       gen_stat.nearby := nearby_result;
       gen_stat.last_game_event := last_game_event;
       gen_stat.game_status := game_status;
+      gen_stat.holder_team := Get_Player_Team_From_Id(ball_holder_id);
+      gen_stat.last_ball_holder_id := Referee.Get_Last_Ball_Holder;
 
-      pragma Debug (Put_Line ("[CONTROLLER] Generic Status for Player " & I2S (id)));
+--        Print ("[CONTROLLER] Generic Status for Player " & I2S (id));
+--          Print ("MAGLIA: " & I2S(gen_stat.number) &
+--            " TEAM: " & Team_Id'Image(gen_stat.team));
 
       return gen_stat;
 
@@ -88,16 +95,67 @@ package body Soccer.ControllerPkg is
       return current_status;
    end Get_Players_Status;
 
+   procedure Print (input : String) is
+   begin
+      if debug then
+	 Print (input);
+	 null;
+      end if;
+   end Print;
+
+   -- Returns the player's team, given the player's id
+   function Get_Player_Team_From_Id(id : in Integer) return Team_Id is
+      player_team : Team_Id;
+      m_event     : Match_Event_Ptr;
+   begin
+      if id = 0 then
+         if last_game_event /= null then
+	    -- Match Event
+            if last_game_event.all in Match_Event'Class then
+	       m_event := Match_Event_Ptr(last_game_event);
+	       -- Match Event: Begin_Of_Match or Begin_Of_Second_Half
+               if Get_Match_Event_Id(m_event) = Begin_Of_Match then
+                  return Team_One;
+               elsif Get_Match_Event_Id(m_event) = Begin_Of_Second_Half then
+                  return Team_Two;
+               end if;
+            end if;
+         else
+            return Get_Player_Team_From_Id(Get_Last_Ball_Holder);
+         end if;
+      end if;
+
+      for i in current_status'Range loop
+         if id = current_status(i).id then
+            player_team := current_status(i).team;
+         end if;
+      end loop;
+
+      return player_team;
+   end Get_Player_Team_From_Id;
+
+   -- Returns the player's id, given his number
+   function Get_Id_From_Number(number : in Integer) return Integer is
+      player_id : Integer;
+   begin
+      for i in current_status'Range loop
+         if number = current_status(i).number then
+            player_id := current_status(i).id;
+         end if;
+      end loop;
+      return player_id;
+   end Get_Id_From_Number;
+
    --+ Ritorna un Vector di Coordinate (id, x, y) dei giocatori di distanza <= a r
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result is
       result : Read_Result := new Read_Result_Type;
-      dist : Integer := 0;
+      dist   : Integer := 0;
    begin
       for i in current_status'Range loop
          dist := Distance(x1 => x,
-                       x2 => current_status (i).coord.coord_x,
-                       y1 => y,
-                       y2 => current_status (i).coord.coord_y);
+                          x2 => current_status (i).coord.coord_x,
+                          y1 => y,
+                          y2 => current_status (i).coord.coord_y);
          if dist <= r and dist /= 0 then
             result.players_in_my_zone.Append (New_Item => current_status (i));
          end if;
@@ -112,9 +170,9 @@ package body Soccer.ControllerPkg is
       for i in current_status'Range loop
          if current_status (i).coord.coord_x = x and current_status (i).coord.coord_y = y then
             if current_status (i).id = ball_holder_id then
-               return -1 * current_status (i).id;
+               return -1 * current_status (i).number;
             else
-               return current_status (i).id;
+               return current_status (i).number;
             end if;
          end if;
       end loop;
@@ -147,16 +205,22 @@ package body Soccer.ControllerPkg is
       team_two_ptr : Team_Ptr := Get_Team (Team_Two);
       counter : Integer := 1;
    begin
+  --    Print ("TEAM ONE:" & Boolean'Image(team_one_ptr = null));
+  --    Print ("TEAM ONE:" & I2S(team_one_ptr.players'Length));
+  --    Print ("TEAM ONE:" & Team_Id'Image(team_one_ptr.id));
       for i in team_one_ptr.players'Range loop
 	 declare
 	    current_player : Integer;
 	 begin
-	    current_player := team_one_ptr.players (i);
+            current_player := team_one_ptr.players (i);
 
-	    current_status (counter).id := counter;
+            current_status (counter).id := counter;
+--              Print ("ID: " & I2S(counter));
 	    current_status (counter).number := current_player;
+--              Print ("MAGLIA: " & I2S(current_player));
 	    current_status (counter).coord := Coordinate'(counter,0);
 	    current_status (counter).team := Team_One;
+--              Print ("TEAM: " & "TEAM_ONE));
 
 	    counter := counter + 1;
 	 end;
@@ -169,9 +233,12 @@ package body Soccer.ControllerPkg is
 	    current_player := team_two_ptr.players (i);
 
 	    current_status (counter).id := counter;
+--              Print ("ID: " & I2S(counter));
 	    current_status (counter).number := current_player;
+--              Print ("MAGLIA: " & I2S(current_player));
 	    current_status (counter).coord := Coordinate'(counter,0);
 	    current_status (counter).team := Team_Two;
+--              Print ("TEAM: " & "TEAM_TWO");
 
 	    counter := counter + 1;
 	 end;
@@ -189,37 +256,37 @@ package body Soccer.ControllerPkg is
       team_two_ptr : Team_Ptr := Get_Team (Team_Two);
       result : Integer := 0;
    begin
-      pragma Debug (Put_Line("[CONTROLLER] Get_Id"));
+      Print ("[CONTROLLER] Get_Id");
 
       if not initialized then
-	 pragma Debug (Put_Line("[CONTROLLER] Initializing status"));
+	 Print ("[CONTROLLER] Initializing status");
 	 Initialize;
 	 initialized := True;
       end if;
 
-      pragma Debug (Put_Line("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length)));
+--        Print ("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length));
 
       if team_one_players_count <= team_one_ptr.players'Length then
 	 result := team_one_ptr.players (team_one_players_count);
-	 pragma Debug (Put_Line("[CONTROLLER] Team 1 - ID " & I2S (result)));
+--  	 Print ("[CONTROLLER] Team 1 - ID " & I2S (result));
 
 	 team_one_players_count := team_one_players_count + 1;
-	 pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
+--  	 Print ("[CONTROLLER] New count " & I2S (team_one_players_count));
       else
 	 if team_two_players_count <= team_two_ptr.players'Length then
 	    result := team_two_ptr.players (team_two_players_count);
-	    pragma Debug (Put_Line("[CONTROLLER] Team 2 - ID " & I2S (result)));
+--  	    Print ("[CONTROLLER] Team 2 - ID " & I2S (result));
 
 	    team_two_players_count := team_two_players_count + 1;
-	    pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
+--  	    Print ("[CONTROLLER] New count " & I2S (team_one_players_count));
 	 end if;
       end if;
 
       init_players_count := init_players_count + 1;
       id := result;
-      pragma Debug (Put_Line("[CONTROLLER] Id = " & I2S (id)));
+--       Print ("[CONTROLLER] Id = " & I2S (id));
 
-      pragma Debug (Put_Line("[CONTROLLER] Fine Get_Id"));
+--        Print ("[CONTROLLER] Fine Get_Id");
 
    end Get_Id;
 
@@ -273,7 +340,7 @@ package body Soccer.ControllerPkg is
 
    function Get_Zone (coord : Coordinate) return Integer is
    begin
-      if Compare_Coordinates (coord, oblivium) then -- TEMP_Get_Coordinate_For_Player (0)
+      if Compare_Coordinates (coord, oblivium) then
 	 return 0;
       end if;
 
@@ -431,26 +498,26 @@ package body Soccer.ControllerPkg is
 
       if here_player_result = 0 or here_player_result = 100 then
 	 -- il giocatore si sposta li'
-	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
-	    & " si e' spostato sulla cella " & Print_Coord (action.Get_To)));
+	 Print ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
+	    & " si e' spostato sulla cella " & Print_Coord (action.Get_To));
          current_status (action.Get_Player_Id).coord := action.Get_To;
          if ball_holder_id = action.Get_Player_Id then
             Ball.Move_Player(new_coord => action.Get_To);
          end if;
          Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (action));
 
---  	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id) & " sta per rilasciare la zona con coordinata " & Print_Coord (action.Get_From)));
---  	 pragma Debug (Put_Line ("Zona di rilascio: " & I2S (Get_Zone (action.Get_From))));
---  	 pragma Debug (Put_Line ("Before release"));
+--  	 Print ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id) & " sta per rilasciare la zona con coordinata " & Print_Coord (action.Get_From));
+--  	 Print ("Zona di rilascio: " & I2S (Get_Zone (action.Get_From)));
+--  	 Print ("Before release");
 --  	 Print_Zones;
 --  	 Release (action.Get_From);
---  	 pragma Debug (Put_Line ("After release"));
+--  	 Print ("After release");
 --  	 Print_Zones;
          success := True;
       else
-	 pragma Debug (Put_Line ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
+	 Print ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id)
 	    & " ha fallito lo spostamento (c'e' " & I2S (here_player_result)
-	    & ") verso la cella " & Print_Coord (action.Get_To)));
+	    & ") verso la cella " & Print_Coord (action.Get_To));
          success := False;
       end if;
 
@@ -461,7 +528,7 @@ package body Soccer.ControllerPkg is
    procedure Print_Status is
    begin
       for i in current_status'Range loop
-	 pragma Debug (Put_Line (I2S(current_status (i).id) & ": [" & Print_Coord (current_status (i).coord) & "]"));
+	 Print (I2S(current_status (i).id) & ": [" & Print_Coord (current_status (i).coord) & "]");
 	 null;
       end loop;
    end Print_Status;
@@ -469,7 +536,7 @@ package body Soccer.ControllerPkg is
    procedure Print_Zones is
    begin
 --        for i in released'Range loop
---  	 pragma Debug (Put_Line ("Zone " & I2S (i) & " has value: " & Boolean'Image (released (i))));
+--  	 Print ("Zone " & I2S (i) & " has value: " & Boolean'Image (released (i)));
 --  	 null;
 --        end loop;
       null;
@@ -477,7 +544,7 @@ package body Soccer.ControllerPkg is
 
    procedure Compute (action : in Shot_Event_Ptr; success : out Boolean) is
    begin
-      pragma Debug (Put_Line("[CONTROLLER] Shot_Event"));
+      Print ("[CONTROLLER] Shot_Event");
       if Utils.Compare_Coordinates(coord1 => Ball.Get_Position,
                                    coord2 => action.Get_From) then
          Ball.Set_Controlled(new_status => False);
@@ -499,7 +566,7 @@ package body Soccer.ControllerPkg is
       with_foul : Boolean := False;
       tackle_success : Boolean;
    begin
-      pragma Debug (Put_Line("[CONTROLLER] Tackle_Event"));
+      Print ("[CONTROLLER] Tackle_Event");
       if Utils.Compare_Coordinates(coord1 => action.Get_To,
 				   coord2 => current_status(action.Get_Other_Player_Id).coord) then
 	    -- Tento di rubargli la palla!
@@ -513,7 +580,7 @@ package body Soccer.ControllerPkg is
 	    foul_event : Binary_Event_Ptr := new Binary_Event;
 	 begin
 	    if with_foul then
-	       pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id)));
+	       Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
 	       foul_event.Initialize(new_event_id    => Foul,
 			      new_player_1_id => action.Get_Player_Id,
 			      new_player_2_id => action.Get_Other_Player_Id,
@@ -525,7 +592,7 @@ package body Soccer.ControllerPkg is
 
 	 if tackle_success then
 	    -- hell yeah! Mi prendo la palla
-	    pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla"));
+	    Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla");
 	    ball.Move_Player(new_coord => action.Get_From);
 	    ball_holder_id := action.Get_Player_Id;
 	    Set_Last_Ball_Holder (holder => ball_holder_id);
@@ -552,15 +619,15 @@ package body Soccer.ControllerPkg is
 
    procedure Compute (action : in Catch_Event_Ptr; success : out Boolean) is
    begin
-      pragma Debug (Put_Line("[CONTROLLER] Catch_Event"));
+      Print ("[CONTROLLER] Catch_Event");
       Ball.Catch(player_coord => action.Get_To,
                  succeded      => success);
       if success then
-	 pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla!"));
+	 Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla!");
 	 ball_holder_id := action.Get_Player_Id;
 	 Set_Last_Ball_Holder (ball_holder_id);
       else
-	 pragma Debug (Put_Line("[CONTROLLER] Catch fallita"));
+	 Print ("[CONTROLLER] Catch fallita");
 	 null;
       end if;
    end Compute;
@@ -634,6 +701,7 @@ package body Soccer.ControllerPkg is
 
       -- metto la palla al centro del campo (circa)
       ball_holder_id := 0;
+
       Ball.Set_Controlled (False);
       Ball.Set_Position (Coordinate'(field_max_x / 2, field_max_y / 2));
 
@@ -647,8 +715,8 @@ package body Soccer.ControllerPkg is
 
 	       if compute_result then
 		  if Compare_Coordinates (current_action.event.Get_From, oblivium) or current_action.event.Get_From.coord_y /= 0 then
-		     pragma Debug (Put_Line ("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) &
-			 " rilascia la zona " & I2S (Integer (Get_Zone (current_action.event.Get_From)))));
+		     Print ("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) &
+			 " rilascia la zona " & I2S (Integer (Get_Zone (current_action.event.Get_From))));
 		     Guard.Update (Field_Zones (Get_Zone (current_action.event.Get_From)), False);
 		  end if;
 
@@ -659,13 +727,15 @@ package body Soccer.ControllerPkg is
 
 	       if not compute_result and revaluate then
 		  -- Devo distinguere tra i tipi di mosse
-		  pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato sulla zona " & I2S (Get_Zone (current_action.event.Get_To))));
-		  if current_action.utility > utility_constraint or current_action.event.Get_To = oblivium then
-		     current_action.utility := current_action.utility - 1;
+                  if current_action.utility > utility_constraint or current_action.event.Get_To = oblivium then
+                     Print ("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato sulla zona " & I2S (Get_Zone (current_action.event.Get_To)));
+                     if current_action.utility > 1 then
+                        current_action.utility := current_action.utility - 1;
+                     end if;
 		     Guard.Update (Field_Zones (Get_Zone (current_action.event.Get_To)), True);
 		     requeue Guard.Wait (Field_Zones (Get_Zone (current_action.event.Get_To)));
 		  else
-		     pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere"));
+		     Print ("[CONTROLLER] Mossa da rivedere");
 		     declare
 			old_move : Motion_Event_Ptr := current_action.event;
 			new_move : Motion_Event_Ptr := new Move_Event;
@@ -676,8 +746,8 @@ package body Soccer.ControllerPkg is
 		     begin
 			revaluate := False;
 			new_move.Initialize (id, from, alternative);
-			pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
-			  & " rivalutata alla cella " & Print_Coord (alternative)));
+			Print ("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
+			  & " rivalutata alla cella " & Print_Coord (alternative));
 			Compute (new_move, compute_result, revaluate);
 			Guard.Update (Field_Zones (Get_Zone (from)), False);
 		     end;
@@ -690,7 +760,7 @@ package body Soccer.ControllerPkg is
 --  	 or
 --  	    when released (Integer (Zone)) = True =>
 --  	       accept Awaiting (Zone) (current_action : in out Action) do
---  		  pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " pescato dalla coda"));
+--  		  Print ("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " pescato dalla coda"));
 --
 --  		  Compute(current_action.event, compute_result, revaluate);
 --  		  if compute_result then
@@ -698,14 +768,14 @@ package body Soccer.ControllerPkg is
 --  		  end if;
 --
 --  		  if not compute_result and revaluate then
---  		     pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id)
+--  		     Print ("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id)
 --  		       & " bloccato dal giocatore " & I2S(Check_For_Player_In_Cell(x => current_action.event.Get_To.coord_x, y => current_action.event.Get_To.coord_y))
 --  		       & " alle coordinate " & I2S(current_action.event.Get_To.coord_x) & " " & I2S(current_action.event.Get_To.coord_y)));
 --  		     if(current_action.utility > utility_constraint or current_action.event.Get_To = oblivium) then
 --  			current_action.utility := current_action.utility - 1;
 --  			requeue Awaiting (Occupy (current_action.event.Get_To));
 --  		     else
---  			pragma Debug (Put_Line("[CONTROLLER] Mossa da rivedere (in riaccodamento)"));
+--  			Print ("[CONTROLLER] Mossa da rivedere (in riaccodamento)"));
 --  			declare
 --  			   old_move : Motion_Event_Ptr := current_action.event;
 --  			   new_move : Motion_Event_Ptr := new Move_Event;
@@ -716,7 +786,7 @@ package body Soccer.ControllerPkg is
 --  			begin
 --  			   revaluate := False;
 --  			   new_move.Initialize (id, from, alternative);
---  			   pragma Debug (Put_Line("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
+--  			   Print ("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
 --  			     & " rivalutata alla cella " & Print_Coord (alternative)));
 --  			   Compute (new_move, compute_result, revaluate);
 --  			end;
@@ -734,36 +804,40 @@ package body Soccer.ControllerPkg is
 		  team_two_ptr : Team_Ptr := Get_Team (Team_Two);
 		  result : Integer := 0;
 	       begin
-		  -- pragma Debug (Put_Line("[CONTROLLER] Get_Id"));
+		  -- Print ("[CONTROLLER] Get_Id");
 
 		  if not initialized then
-		     -- pragma Debug (Put_Line("[CONTROLLER] Initializing status"));
+--                       Print ("[CONTROLLER] Initializing status");
 		     Initialize;
 		     initialized := True;
 		  end if;
 
-		  -- pragma Debug (Put_Line("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length)));
+--  		  Print ("[CONTROLLER] Length is " & I2S (team_one_ptr.players'Length));
 
-		  if team_one_players_count <= team_one_ptr.players'Length then
-		     result := team_one_ptr.players (team_one_players_count);
-		     -- pragma Debug (Put_Line("[CONTROLLER] Team 1 - ID " & I2S (result)));
+		  if team_one_players_count <= num_of_players/2 then
+                     result := current_status(team_one_players_count).id;
+                     current_status(result).on_the_field := True;
+--                       Print ("[CONTROLLER] Team 1 - ID " & I2S (result) & " - NUMBER "
+--                                     & I2S(current_status(result).number));
 
 		     team_one_players_count := team_one_players_count + 1;
-		     -- pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
-		  else
-		     if team_two_players_count <= team_two_ptr.players'Length then
-			result := team_two_ptr.players (team_two_players_count);
-			-- pragma Debug (Put_Line("[CONTROLLER] Team 2 - ID " & I2S (result)));
+--                       Print ("[CONTROLLER] New count " & I2S (team_one_players_count));
+                  else
+		     if team_two_players_count <= num_of_players/2 then
+			result := current_status(team_one_players_count + team_two_players_count).id;
+                        current_status(result).on_the_field := True;
+--                          Print ("[CONTROLLER] Team 2 - ID " & I2S (result) & " - NUMBER "
+--                                     & I2S(current_status(result).number));
 
 			team_two_players_count := team_two_players_count + 1;
-			-- pragma Debug (Put_Line("[CONTROLLER] New count " & I2S (team_one_players_count)));
+--                          Print ("[CONTROLLER] New count " & I2S (team_one_players_count));
 		     end if;
 		  end if;
 
 		  init_players_count := init_players_count + 1;
 		  id := result;
-		  -- pragma Debug (Put_Line("[CONTROLLER] Id = " & I2S (id)));
-		  -- pragma Debug (Put_Line("[CONTROLLER] Fine Get_Id"));
+		  -- Print ("[CONTROLLER] Id = " & I2S (id));
+		  -- Print ("[CONTROLLER] Fine Get_Id");
 	       end;
 	    end Get_Id;
 	 end select;
