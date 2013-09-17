@@ -1,8 +1,17 @@
 with Ada.Text_IO;
 use Ada.Text_IO;
 
+-----------------------------------------------------------------------------
+--  needed to launch Intelligence.jar and read the output file with JSON object
 with Ada.Text_IO.Text_Streams;
 use Ada.Text_IO.Text_Streams;
+
+with GNAT.OS_Lib;
+use GNAT.OS_Lib;
+
+with Ada.Directories;
+with Ada.Direct_IO;
+-----------------------------------------------------------------------------
 
 with GNATCOLL.JSON;
 use GNATCOLL.JSON;

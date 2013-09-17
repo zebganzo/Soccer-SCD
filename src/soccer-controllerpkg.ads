@@ -50,6 +50,7 @@ package Soccer.ControllerPkg is
 	 game_status : Game_State;
          substitutions : Substitutions_Container.Vector;
          holder_team : Team_Id;
+	 last_ball_holder_id : Integer;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
 

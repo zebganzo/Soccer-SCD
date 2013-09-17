@@ -24,7 +24,7 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
-   half_game_duration : Positive := 10;
+   half_game_duration : Positive := 60;
 
    team_one_goal_starting_coord : Coordinate := Coordinate'(0,9);
    team_two_goal_starting_coord : Coordinate := Coordinate'(31,9);
@@ -80,7 +80,7 @@ package Soccer is
 
    number_of_zones : Integer := 4;
 
-   ball_speed : Float := 1.0;
+   ball_speed : Float := 0.4;
    players_delay : Float := 0.7;
    print_delay : Float := 0.5;
 

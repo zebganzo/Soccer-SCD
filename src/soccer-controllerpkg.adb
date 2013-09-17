@@ -61,10 +61,11 @@ package body Soccer.ControllerPkg is
       gen_stat.last_game_event := last_game_event;
       gen_stat.game_status := game_status;
       gen_stat.holder_team := Get_Player_Team_From_Id(ball_holder_id);
+      gen_stat.last_ball_holder_id := Referee.Get_Last_Ball_Holder;
 
 --        pragma Debug (Put_Line ("[CONTROLLER] Generic Status for Player " & I2S (id)));
---        pragma Debug (Put_Line ("MAGLIA: " & I2S(gen_stat.number) &
---          " TEAM: " & Team_Id'Image(gen_stat.team)));
+--          pragma Debug (Put_Line ("MAGLIA: " & I2S(gen_stat.number) &
+--            " TEAM: " & Team_Id'Image(gen_stat.team)));
 
       return gen_stat;
 
@@ -109,10 +110,10 @@ package body Soccer.ControllerPkg is
                   return Team_One;
                elsif Get_Match_Event_Id(m_event) = Begin_Of_Second_Half then
                   return Team_Two;
-               else
-                  return Get_Player_Team_From_Id(Get_Last_Ball_Holder);
                end if;
             end if;
+         else
+            return Get_Player_Team_From_Id(Get_Last_Ball_Holder);
          end if;
       end if;
 
@@ -718,9 +719,11 @@ package body Soccer.ControllerPkg is
 
 	       if not compute_result and revaluate then
 		  -- Devo distinguere tra i tipi di mosse
-		  pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato sulla zona " & I2S (Get_Zone (current_action.event.Get_To))));
-		  if current_action.utility > utility_constraint or current_action.event.Get_To = oblivium then
-		     current_action.utility := current_action.utility - 1;
+                  if current_action.utility > utility_constraint or current_action.event.Get_To = oblivium then
+                     pragma Debug (Put_Line("[CONTROLLER] Giocatore " & I2S(current_action.event.Get_Player_Id) & " riaccodato sulla zona " & I2S (Get_Zone (current_action.event.Get_To))));
+                     if current_action.utility > 1 then
+                        current_action.utility := current_action.utility - 1;
+                     end if;
 		     Guard.Update (Field_Zones (Get_Zone (current_action.event.Get_To)), True);
 		     requeue Guard.Wait (Field_Zones (Get_Zone (current_action.event.Get_To)));
 		  else

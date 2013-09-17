@@ -29,7 +29,7 @@ procedure Soccer.Main is
    players_team_two : Team_Players_List := (6, 56, 1, 4, 10);
 
    type Pos_Id is array (Positive range <>) of Integer;
-   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,3,4,5,1);
+   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,3,4,8,1);
    t2_pos_id : Pos_Id(1 .. total_players/2) := (4,5,6,7,1);
 
    t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
