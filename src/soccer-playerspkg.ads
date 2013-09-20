@@ -48,7 +48,7 @@ use Soccer.Core_Event.Motion_Core_Event;
 package Soccer.PlayersPkg is
 
    --+-------------
-   debug : Boolean := True;
+   debug : Boolean := False;
    --+-------------
 
    -- Il package Players contiene il task Player...non credo vi sia bisogno di descriverlo

@@ -6,6 +6,14 @@ package body Soccer.BallPkg is
 
    protected body Ball is
 
+      procedure Print (input : String) is
+      begin
+         if debug then
+            pragma Debug (Put_Line (input));
+            null;
+         end if;
+      end Print;
+
       function Get_Position return Coordinate is
       begin
          return current_position;
@@ -31,12 +39,9 @@ package body Soccer.BallPkg is
          moving := new_status;
       end Set_Moving;
 
-      procedure Catch (player_coord : Coordinate; succeded : out Boolean) is
+      procedure Catch (catch_coord : Coordinate; player_coord : Coordinate; succeded : out Boolean) is
       begin
-         if(Utils.distance(x1 => player_coord.coord_x,
-                           x2 => current_position.coord_x,
-                           y1 => player_coord.coord_y,
-                           y2 => current_position.coord_y) <= 1) then
+         if Compare_Coordinates (catch_coord, current_position) then
             current_position := player_coord;
             controlled := True;
             moving := False;
@@ -49,13 +54,13 @@ package body Soccer.BallPkg is
       procedure Move_Player (new_coord : Coordinate) is
       begin
          current_position := new_coord;
-         pragma Debug (Put_Line ("[BALL] Player moved ball to (" & I2S(current_position.coord_x) & "," & I2S(current_position.coord_y) & ")"));
+         Print("[BALL] Player moved ball to (" & I2S(current_position.coord_x) & "," & I2S(current_position.coord_y) & ")");
       end Move_Player;
 
       entry Move_Agent (new_coord : Coordinate)
         when controlled = False is
       begin
-         pragma Debug (Put_Line("[BALL] Motion agent enabled"));
+         Print("[BALL] Motion agent enabled");
          current_position := new_coord;
       end Move_Agent;
 
@@ -67,7 +72,9 @@ package body Soccer.BallPkg is
 
       procedure Set_Position (new_position : in Coordinate) is
       begin
-	 current_position := new_position;
+         current_position := new_position;
+         controlled := False;
+         moving := False;
       end Set_Position;
 
    end Ball;

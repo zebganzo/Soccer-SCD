@@ -24,7 +24,7 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
-   half_game_duration : Positive := 60;
+   half_game_duration : Positive := 120;
 
    team_one_goal_starting_coord : Coordinate := Coordinate'(0,9);
    team_two_goal_starting_coord : Coordinate := Coordinate'(31,9);
@@ -32,8 +32,8 @@ package Soccer is
    goal_length : Positive := 5;
 
    -- team one [LEFT]
-   team_one_goal_lower_coord : Coordinate := Coordinate'(1,15);
-   team_one_goal_upper_coord : Coordinate := Coordinate'(1,19);
+   team_one_goal_lower_coord : Coordinate := Coordinate'(0,15);
+   team_one_goal_upper_coord : Coordinate := Coordinate'(0,19);
 
    team_one_goalkeeper_coord : Coordinate := Coordinate'(1,17);
 
@@ -45,8 +45,8 @@ package Soccer is
    team_one_penalty_coord : Coordinate := Coordinate'(6,17);
 
    -- team two [RIGHT]
-   team_two_goal_lower_coord : Coordinate := Coordinate'(51,15);
-   team_two_goal_upper_coord : Coordinate := Coordinate'(51,19);
+   team_two_goal_lower_coord : Coordinate := Coordinate'(field_max_x + 1,15);
+   team_two_goal_upper_coord : Coordinate := Coordinate'(field_max_x + 1,19);
 
    team_two_goalkeeper_coord : Coordinate := Coordinate'(51,17);
 
@@ -84,7 +84,7 @@ package Soccer is
    players_delay : Float := 0.7;
    print_delay : Float := 0.5;
 
-   type Power_Range is range 0 .. 10;
+   type Power_Range is range 0 .. 15;
 
    --+ Utility di una mossa x/10
    subtype Utility_Range is Integer range 1 .. 10;

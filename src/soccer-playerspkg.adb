@@ -59,7 +59,7 @@ package body Soccer.PlayersPkg is
    procedure Print (input : String) is
    begin
       if debug then
-	 Print (input);
+	 pragma Debug (Put_Line (input));
 	 null;
       end if;
    end Print;
@@ -67,14 +67,9 @@ package body Soccer.PlayersPkg is
    task body Player is
       id : Integer;
       current_coord : Coordinate;
-      target_coord : Coordinate;
       current_read_result : Read_Result;
       current_generic_status : Generic_Status_Ptr;
       current_game_status : Game_State;
-      current_team : Team_Id;
-      last_game_event : Unary_Event_Ptr;
-      current_match_event : Match_Event_Ptr;
-      current_range : Integer;
       current_action : Action;
       seed_x : Rand_Int.Generator;
       seed_y : Rand_Int.Generator;
@@ -122,7 +117,6 @@ package body Soccer.PlayersPkg is
       command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
-      filename    : String(1..11);
       file        : File_Type;
       json        : JSON_Value;
 
@@ -135,17 +129,17 @@ package body Soccer.PlayersPkg is
       -- chiedo il mio ID al controllore
       Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
 
-      current_action.event := new Move_Event;
-      current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
-      current_coord := current_generic_status.coord;
-      target_coord := oblivium;
-
-      current_action.event.Initialize(nPlayer_Id => id,
-				      nFrom      => current_coord,
-				      nTo        => target_coord);
-      current_action.utility := 10;
-
-      Controller.Write(current_action => current_action);
+--        current_action.event := new Move_Event;
+--        current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
+--        current_coord := current_generic_status.coord;
+--        target_coord := oblivium;
+--
+--        current_action.event.Initialize(nPlayer_Id => id,
+--  				      nFrom      => current_coord,
+--  				      nTo        => target_coord);
+--        current_action.utility := 10;
+--
+--        Controller.Write(current_action => current_action);
 
       loop
 	 Print ("[PLAYER_" & I2S (id) & "] Leggo Generic Status");
@@ -425,7 +419,7 @@ package body Soccer.PlayersPkg is
 --           if current_generic_status.game_status = Game_Ready then
 --              output_name := "READYS" & Integer'Image(id);
 --           else
-            output_name := "STATUS" & Integer'Image(id);
+            output_name := "STATUS " & I2S(id);
 --           end if;
 	 -- Creates the file
          Create (File => output,
@@ -453,10 +447,13 @@ package body Soccer.PlayersPkg is
 --                        Field => "Decision"));
 
          decision_x := Integer'Value(Get(Val   => json,
-                           	        Field => "X"));
+                                         Field  => "X"));
+         if decision_x = 1000 then
+            decision_x := id;
+         end if;
          decision_y := Integer'Value(Get(Val   => json,
-                           	        Field => "Y"));
-         decision := Get(Val => json,
+                           	        Field  => "Y"));
+         decision := Get(Val   => json,
                          Field => "Decision");
 
          if decision = "shot" or decision = "pass" then
@@ -468,7 +465,7 @@ package body Soccer.PlayersPkg is
                new_shot_event.Initialize(id,
                                          current_coord,
                                          Coordinate'(decision_x,decision_y));
-               new_shot_event.Set_Shot_Power(10);
+               new_shot_event.Set_Shot_Power(15);
                current_action.event := Motion_Event_Ptr(new_shot_event);
                current_action.utility := 10;
             end;
@@ -521,13 +518,42 @@ package body Soccer.PlayersPkg is
                else
                   current_action.utility := Get_Move_Utility(current_coord, Coordinate'(ball_x,ball_y));
                end if;
-               Print ("[PLAYER_" & I2S (id) & " UTILITY: " & I2S(current_action.utility));
+               --                 Print ("[PLAYER_" & I2S (id) & " UTILITY: " & I2S(current_action.utility));
                if current_coord.coord_x = decision_x and
                  current_coord.coord_y = decision_y then
                   do_nothing := True;
                end if;
+
+               if event /= null then
+                  -- Match Event
+                  if event.all in Match_Event'Class then
+                     m_event := Match_Event_Ptr(event);
+                     if Get_Match_Event_Id(m_event) = End_Of_First_Half then
+                        if current_coord = Coordinate'(id, 0) then
+                           current_action.event := null;
+
+                           -- aspetto l'inizio del secondo tempo
+                           Game_Entity.Rest;
+                           delay duration (id / 5);
+                           Game_Entity.Start_2T;
+                        end if;
+                     elsif Get_Match_Event_Id(m_event) = End_Of_Match then
+                        if current_coord = Coordinate'(id, 0) then
+                           current_action.event := null;
+                           Game_Entity.End_Match;
+                        end if;
+                     end if;
+                  end if;
+               end if;
             end;
          end if;
+
+         Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
+                  ") ] Starting coord: " & Print_Coord (current_coord));
+
+         Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
+                  ") ] Target coord: " & Print_Coord (Coordinate'(decision_x, decision_y)) &
+               "Decision: " & Ada.Strings.Unbounded.To_String(decision));
 
 	 if current_action.event /= null and not do_nothing then
 --  	    Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Start");

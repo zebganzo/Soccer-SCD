@@ -98,7 +98,7 @@ package body Soccer.ControllerPkg is
    procedure Print (input : String) is
    begin
       if debug then
-	 Print (input);
+	 pragma Debug (Put_Line (input));
 	 null;
       end if;
    end Print;
@@ -297,30 +297,42 @@ package body Soccer.ControllerPkg is
       --Utils.CLS;
 
       for i in  1 .. field_max_x loop
-         Put("-");
+         Put("---");
       end loop;
       Put_Line("");
       for y in reverse 1 .. field_max_y loop
-         Put("|");
+         if y < 15 or y > 19 then
+            Put("|");
+         end if;
          for x in 1 .. field_max_x loop
             cell := Check_For_Player_In_Cell(x => x, y => y);
             if cell = 0 then
-               Put(" ");
+               Put("   ");
             elsif cell = 100 then
-               Put ("*");
+               Put (" * ");
             else
                if(cell < 0) then
-                  Put ("*" & I2S (cell));
+                  if cell >= 10 then
+                     Put ("*" & I2S (cell));
+                  else
+                     Put (" *" & I2S (cell));
+                  end if;
                else
-                  Put("" & I2S(cell));
+                  if cell >= 10 then
+                     Put (" " & I2S (cell));
+                  else
+                     Put (" " & I2S (cell) & " ");
+                  end if;
                end if;
             end if;
          end loop;
-         Put("|");
+         if y < 15 or y > 19 then
+            Put("|");
+         end if;
          Put_Line("");
       end loop;
       for i in  1 .. field_max_x loop
-         Put("-");
+         Put("---");
       end loop;
       Put_Line("");
    end Print_Field;
@@ -620,10 +632,12 @@ package body Soccer.ControllerPkg is
    procedure Compute (action : in Catch_Event_Ptr; success : out Boolean) is
    begin
       Print ("[CONTROLLER] Catch_Event");
-      Ball.Catch(player_coord => action.Get_To,
-                 succeded      => success);
+      Ball.Catch (catch_coord => action.Get_To,
+                  player_coord => action.Get_From,
+                  succeded     => success);
       if success then
-	 Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla!");
+         Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla!");
+         Motion_Enabler.Stop;
 	 ball_holder_id := action.Get_Player_Id;
 	 Set_Last_Ball_Holder (ball_holder_id);
       else
@@ -703,7 +717,7 @@ package body Soccer.ControllerPkg is
       ball_holder_id := 0;
 
       Ball.Set_Controlled (False);
-      Ball.Set_Position (Coordinate'(field_max_x / 2, field_max_y / 2));
+      Ball.Set_Position (middle_field_coord);
 
       loop
 	 -- aggiungere controllo su flag del gioco (per pausa, fine_gioco, ecc)

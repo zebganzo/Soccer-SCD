@@ -2,6 +2,8 @@ package Soccer.BallPkg is
 
    protected Ball is
 
+      procedure Print (input : String);
+
       function Get_Position return Coordinate;
       function Get_Controlled return Boolean;
       function Get_Moving return Boolean;
@@ -9,7 +11,7 @@ package Soccer.BallPkg is
       procedure Set_Controlled (new_status : Boolean);
       procedure Set_Moving (new_status : Boolean);
 
-      procedure Catch (player_coord : in Coordinate; succeded : out Boolean);
+      procedure Catch (catch_coord : Coordinate; player_coord : Coordinate; succeded : out Boolean);
       procedure Move_Player (new_coord : Coordinate);
       entry Move_Agent (new_coord : Coordinate);
 
@@ -17,9 +19,10 @@ package Soccer.BallPkg is
 
       procedure Release;
 
-      private
---        mCoord : Coordinate := Coordinate'(coordX => Field_Max_X / 2,
---                                           coordY => Field_Max_Y / 2);
+   private
+      --+-------------
+      debug : Boolean := False;
+      --+-------------
       current_position : Coordinate;
       controlled : Boolean := False;
       moving : Boolean := False;

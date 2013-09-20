@@ -31,8 +31,8 @@ procedure Soccer.Main is
    players_team_two : Team_Players_List := (6, 56, 1, 4, 10);
 
    type Pos_Id is array (Positive range <>) of Integer;
-   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,3,4,8,1);
-   t2_pos_id : Pos_Id(1 .. total_players/2) := (4,5,6,7,1);
+   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,3,1,10,5);
+   t2_pos_id : Pos_Id(1 .. total_players/2) := (4,5,1,10,6);
 
    t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
    t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
@@ -64,17 +64,11 @@ procedure Soccer.Main is
 begin
    for i in 1..total_players/2 loop
          formation_id_t1(i).number        := players_team_one(i);
-     --    pragma Debug (Put_Line ("NUMBER:" & I2S(players_team_one(i))));
          formation_id_t1(i).formation_id  := t1_pos_id(i);
-     --   pragma Debug (Put_Line ("FORMATION ID:" & I2S(t1_pos_id(i))));
          formation_id_t1(i).statistics_id := t1_stat_id(i);
-     --    pragma Debug (Put_Line ("STAT ID:" & I2S(t1_stat_id(i))));
          formation_id_t2(i).number        := players_team_two(i);
-     --    pragma Debug (Put_Line ("NUMBER:" & I2S(players_team_two(i))));
          formation_id_t2(i).formation_id  := t2_pos_id(i);
-     --    pragma Debug (Put_Line ("FORMATION ID:" & I2S(t2_pos_id(i))));
 	 formation_id_t2(i).statistics_id := t2_stat_id(i);
-     --    pragma Debug (Put_Line ("STAT ID:" & I2S(t2_stat_id(i))));
       end loop;
    t1 := new Team'(id         => Team_One,
                    players    => players_team_one,

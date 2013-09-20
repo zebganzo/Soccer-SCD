@@ -33,8 +33,8 @@ package Soccer.TeamPkg is
       end record;
    type Team_Ptr is access Team;
 
-   -- Get Team Id from the player's number
-   function Get_Team_From_Number (number : Integer) return Team_Id;
+   function Get_Number_From_formation (formation_id : Integer;
+                                       team         : Team_Id) return Integer;
 
    procedure Set_Teams (first_team : Team_Ptr; second_team : Team_Ptr);
 

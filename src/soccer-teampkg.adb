@@ -1,17 +1,25 @@
 with Ada.Text_IO; use Ada.Text_IO;
 package body Soccer.TeamPkg is
 
-   -- Get Team Id from the player's number
-   function Get_Team_From_Number (number : Integer) return Team_Id is
+   function Get_Number_From_formation (formation_id : Integer;
+                                       team	    : Team_Id) return Integer is
+      number : Integer;
    begin
-      for i in team_1.players'First .. team_1.players'Last loop
-	 if team_1.number_id(i).number = number then
-	    return Team_One;
-         end if;
-      end loop;
-
-      return Team_Two;
-   end Get_Team_From_Number;
+      if team = Team_One then
+         for i in team_1.number_id'Range loop
+            if team_1.number_id(i).formation_id = formation_id then
+               number := team_1.number_id(i).number;
+            end if;
+         end loop;
+      else
+         for i in team_2.number_id'Range loop
+            if team_2.number_id(i).formation_id = formation_id then
+               number := team_2.number_id(i).number;
+            end if;
+         end loop;
+      end if;
+      return number;
+   end Get_Number_From_formation;
 
    procedure Set_Teams (first_team : Team_Ptr; second_team : Team_Ptr) is
    begin

@@ -17,8 +17,8 @@ project Scd is
       case Build is
          when "DEBUG" =>
             for Default_Switches ("ada") use
---                ("-gnato", "-g", "-gnata"); -- DEBUG
-                ("-gnato", "-g");
+              ("-gnato", "-g", "-gnata"); -- DEBUG
+--                  ("-gnato", "-g");
             for Switches ("screen_output.adb") use
               ("-g");
 
