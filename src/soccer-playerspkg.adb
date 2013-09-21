@@ -1,3 +1,4 @@
+with Ada.Directories; use Ada.Directories;
 
 package body Soccer.PlayersPkg is
 
@@ -19,10 +20,7 @@ package body Soccer.PlayersPkg is
    end Update_Distance;
 
    -- needed to read the output file from Intelligence.jar
-   function Load_File
-     (Filename : in String)
-      return String
-   is
+   function Load_File (Filename : in String) return String is
       use Ada.Directories;
 
       File_Size    : constant Natural := Natural (Size (Filename));
@@ -114,14 +112,17 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+--        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
       json        : JSON_Value;
 
-
    begin
+
+--        Set_Directory (ai_basedir);
+
       Controller.Get_Id (id);
 --        Print ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T");
       Game_Entity.Start_1T;
@@ -421,6 +422,7 @@ package body Soccer.PlayersPkg is
 --           else
             output_name := "STATUS " & I2S(id);
 --           end if;
+
 	 -- Creates the file
          Create (File => output,
                  Mode => Out_File,
@@ -431,9 +433,9 @@ package body Soccer.PlayersPkg is
 
          -- Load Intelligence.jar and read output file
 --           Put_Line("************LOAD JAR" & Integer'Image(id) & "************");
-         arguments := Argument_String_To_List(command & Integer'Image(id));
-         exit_status := Spawn(Program_Name => arguments(arguments'First).all,
-                              Args	   => arguments(arguments'First + 1 .. arguments'Last));
+	 arguments := Argument_String_To_List (command & Integer'Image(id));
+         exit_status := Spawn (Program_Name => arguments(arguments'First).all,
+                               Args	    => arguments(arguments'First + 1 .. arguments'Last));
 
          json := Read(Strm     => Load_File("DECISION" & Integer'Image(id)),
                       Filename => "");
