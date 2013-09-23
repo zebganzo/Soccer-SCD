@@ -16,7 +16,7 @@ midfield_position(26,17).
 % Ball "safe zone" for inactive balls. Corner, free kick, penalty... events cannot be started unless every player is outside this zone
 % ball_safe_zone(
 %	Width)																			radius of the zone	
-ball_safe_zone(3).	
+ball_safe_zone(4).	
 
 /***************************************************************************************************************
  *												UTILITY RULES												   *

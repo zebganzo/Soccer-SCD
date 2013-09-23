@@ -354,7 +354,7 @@ package body Soccer.PlayersPkg is
             current_read_result :=
               ControllerPkg.Read_Status(x => current_generic_status.coord.coord_x,
                                         y => current_generic_status.coord.coord_y,
-                                        r => player_radius + 10);
+                                        r => player_radius + 100);
             -- reset resume_player variable
             resume_player := False;
          else
@@ -438,13 +438,13 @@ package body Soccer.PlayersPkg is
          json := Read(Strm     => Load_File("DECISION" & Integer'Image(id)),
                       Filename => "");
 
---           Put_Line("************JSON RESULT" & Integer'Image(id) & "************");
---           Put_Line(Get(Val   => json,
---                        Field => "X"));
---           Put_Line(Get(Val   => json,
---                        Field => "Y"));
---           Put_Line(Get(Val   => json,
---                        Field => "Decision"));
+--           Print("************JSON RESULT" & Integer'Image(id) & "************");
+--           Print(Get(Val   => json,
+--                     Field => "X"));
+--           Print(Get(Val   => json,
+--                     Field => "Y"));
+--           Print(Get(Val   => json,
+--                     Field => "Decision"));
 
          decision_x := Integer'Value(Get(Val   => json,
                                          Field  => "X"));
@@ -464,7 +464,8 @@ package body Soccer.PlayersPkg is
 
                new_shot_event.Initialize(id,
                                          current_coord,
-                                         Coordinate'(decision_x,decision_y));
+                                         Coordinate'(26,0));
+--                                           Coordinate'(decision_x,decision_y));
                new_shot_event.Set_Shot_Power(15);
                current_action.event := Motion_Event_Ptr(new_shot_event);
                current_action.utility := 10;

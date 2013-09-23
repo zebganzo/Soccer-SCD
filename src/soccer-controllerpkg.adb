@@ -146,6 +146,19 @@ package body Soccer.ControllerPkg is
       return player_id;
    end Get_Id_From_Number;
 
+   -- Returns the player number from id
+   function Get_Number_From_Id (id : in Integer) return Integer is
+      player_number : Integer;
+   begin
+      for i in current_status'Range loop
+         if id = current_status(i).id then
+            player_number := current_status(i).number;
+         end if;
+      end loop;
+      return player_number;
+   end Get_Number_From_Id;
+
+
    --+ Ritorna un Vector di Coordinate (id, x, y) dei giocatori di distanza <= a r
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result is
       result : Read_Result := new Read_Result_Type;
@@ -475,27 +488,73 @@ package body Soccer.ControllerPkg is
 
    end Get_Alternative_Coord;
 
-   type Rand_Range is range 1 .. 10;
+   type Rand_Range is range -5 .. 5;
    package Rand_Int is new Ada.Numerics.Discrete_Random(Rand_Range);
 
+   type Binary_Range is range 0 .. 1;
+   package Rand_Bin is new Ada.Numerics.Discrete_Random(Binary_Range);
+
+
    procedure Calculate_Tackle (attacker_id : in Integer; ball_owner_id : in Integer; with_foul : out Boolean; success : out Boolean) is
-      tackle_seed : Rand_Int.Generator;
+      tackle_seed       : Rand_Int.Generator;
+      attacker_defense  : Integer;
+      attacker_tackle   : Integer;
+      ball_owner_attack : Integer;
+      ball_owner_speed  : Integer;
+      first_parameter   : Integer;
+      second_parameter  : Integer;
+      outcome           : Integer;
+      foul_outcome      : Integer;
    begin
-      Rand_Int.Reset(tackle_seed);
-      if Integer(Rand_Int.Random(tackle_seed)) > 5 then
-         success := True;
-      else
-         success := False;
+      attacker_defense  := Get_Defense(Get_Number_From_Id(attacker_id), Get_Player_Team_From_Id(attacker_id));
+      attacker_tackle   := Get_Tackle(Get_Number_From_Id(attacker_id), Get_Player_Team_From_Id(attacker_id));
+      ball_owner_attack := Get_Attack(Get_Number_From_Id(ball_owner_id), Get_Player_Team_From_Id(ball_owner_id));
+      ball_owner_speed  := Get_Speed(Get_Number_From_Id(ball_owner_id), Get_Player_Team_From_Id(ball_owner_id));
+
+      first_parameter := ball_owner_attack - attacker_defense;
+      if first_parameter <= -10 then
+         first_parameter := -10;
+      elsif first_parameter >= 10 then
+         first_parameter := 10;
+      end if;
+
+      second_parameter := ball_owner_speed - attacker_tackle;
+      if second_parameter <= -10 then
+         second_parameter := -10;
+      elsif second_parameter >= 10 then
+         second_parameter := 10;
       end if;
 
       Rand_Int.Reset(tackle_seed);
---        if Integer(Rand_Int.Random(tackle_seed)) = 1 then -- TODO::FIXME tackle sulla base delle caratteristiche del giocatore!
---  	 with_foul := True;
---        else
---  	 with_foul := False;
---        end if;
+      outcome := first_parameter + second_parameter + Integer(Rand_Int.Random(tackle_seed));
+      if outcome > 0 then
+         success := False;
+      elsif outcome < 0 then
+         success := True;
+      else
+         declare
+            new_outcome : Integer;
+            binary_seed : Rand_Bin.Generator;
+         begin
+            Rand_Bin.Reset(binary_seed);
+            new_outcome := Integer(Rand_Bin.Random(binary_seed));
+            if new_outcome = 0 then
+               success := False;
+            else
+               success := True;
+            end if;
+         end;
+      end if;
 
-      with_foul := False;
+      Rand_Int.Reset(tackle_seed);
+      foul_outcome := Integer(Rand_Int.Random(tackle_seed));
+      if foul_outcome = 1 or foul_outcome = 5 or foul_outcome = 10 then
+	 with_foul := True;
+      else
+	 with_foul := False;
+      end if;
+
+--        with_foul := True;
 
    end Calculate_Tackle;
 
@@ -587,39 +646,38 @@ package body Soccer.ControllerPkg is
 		      with_foul => with_foul,
 		      success => tackle_success);
 
-	 -- Notifico l'arbitro se c'e' stato un contrasto con fallo
-	 declare
-	    foul_event : Binary_Event_Ptr := new Binary_Event;
-	 begin
-	    if with_foul then
-	       Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
-	       foul_event.Initialize(new_event_id    => Foul,
-			      new_player_1_id => action.Get_Player_Id,
-			      new_player_2_id => action.Get_Other_Player_Id,
-			      new_event_coord => action.Get_To);
-
-	       Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
-	    end if;
-	 end;
-
-	 if tackle_success then
-	    -- hell yeah! Mi prendo la palla
-	    Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla");
-	    ball.Move_Player(new_coord => action.Get_From);
-	    ball_holder_id := action.Get_Player_Id;
-	    Set_Last_Ball_Holder (holder => ball_holder_id);
-
+         if tackle_success then
+            -- Notifico l'arbitro se c'e' stato un contrasto con fallo
             declare
-               new_action : Motion_Event_Ptr := new Motion_Event;
+               foul_event : Binary_Event_Ptr := new Binary_Event;
             begin
-               new_action.Initialize(nPlayer_Id => 0,
-                                     nFrom      => action.Get_To,
-                                     nTo        => action.Get_From);
-               Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (new_action));
-               Buffer_Wrapper.Send;
-            end;
+               success := True;
+               if with_foul then
+                  Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
+                  foul_event.Initialize(new_event_id    => Foul,
+                                        new_player_1_id => action.Get_Player_Id,
+                                        new_player_2_id => action.Get_Other_Player_Id,
+                                        new_event_coord => action.Get_To);
+		  ball_holder_id := 0;
+                  Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
+               else
+                  -- hell yeah! Mi prendo la palla
+                  Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla");
+                  ball.Move_Player(new_coord => action.Get_From);
+                  ball_holder_id := action.Get_Player_Id;
+                  Set_Last_Ball_Holder (holder => ball_holder_id);
 
-            success := True;
+--                    declare
+--                       new_action : Motion_Event_Ptr := new Motion_Event;
+--                    begin
+--                       new_action.Initialize(nPlayer_Id => 0,
+--                                             nFrom      => action.Get_To,
+--                                             nTo        => action.Get_From);
+--                       Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (new_action));
+--                       Buffer_Wrapper.Send;
+--                    end;
+               end if;
+            end;
          else
             -- oh no :-(
             success := False;
@@ -748,7 +806,7 @@ package body Soccer.ControllerPkg is
                      end if;
 		     Guard.Update (Field_Zones (Get_Zone (current_action.event.Get_To)), True);
 		     requeue Guard.Wait (Field_Zones (Get_Zone (current_action.event.Get_To)));
-		  else
+                  else
 		     Print ("[CONTROLLER] Mossa da rivedere");
 		     declare
 			old_move : Motion_Event_Ptr := current_action.event;

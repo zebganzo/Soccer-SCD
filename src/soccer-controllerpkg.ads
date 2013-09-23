@@ -11,7 +11,7 @@ package Soccer.ControllerPkg is
    -- New Types
 
    --+-------------
-   debug : Boolean := False;
+   debug : Boolean := True;
    --+-------------
 
    type Action is
@@ -85,6 +85,9 @@ package Soccer.ControllerPkg is
 
    -- Returns the player's id, given his number
    function Get_Id_From_Number(number : in Integer) return Integer;
+
+   -- Returns the player number from id
+   function Get_Number_From_Id (id : in Integer) return Integer;
 
    task Field_Printer;
 

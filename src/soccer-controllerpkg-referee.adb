@@ -328,34 +328,44 @@ package body Soccer.ControllerPkg.Referee is
                   current_player_status : Player_Status := current_status (assigned_player);
                   assigned_player_position : Coordinate := current_player_status.coord;
                   first_condition : Boolean := False;
-                  second_condition : Boolean := False;
+                  second_condition : Boolean := True;
                begin
                   -- controllo se il gioco puo' riprendere
-                  if Get_Game_Status /= Game_Ready and e.all in Shot_Event'Class then
+                  if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
                      -- ha tirato, quindi il gioco puo' riprendere
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
-                  end if;
-
-                  if Get_Game_Status /= Game_Ready then
+                  else
                      -- controllo che chi deve battere sia in posizione, se non lo e' esco
-                     if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
-                                             coord2 => current_event_coord) then
+                     if current_player_status.id = ball_holder_id then
                         first_condition := True;
                      end if;
 
                      -- controllo che non ci siano giocatori attorno alla posizione
                      -- di chi deve battere (della squadra avversaria)
                      for i in current_status'Range loop
-                        if i /= current_player_status.id
+--                          Print("CHECKING PLAYER: " & I2S(current_status(i).id) & " (" & I2S(current_status(i).number) & ") " &
+--                                  "DISTANCE: " & Boolean'Image(Distance (From => assigned_player_position,
+--                                                                         To => current_status (i).coord) > free_kick_area) &
+--                              " ON THE FIELD: " & Boolean'Image(current_status(i).on_the_field));
+
+                        if current_status(i).id /= current_player_status.id
                           and current_player_status.team /= current_status(i).team
-                          and Distance (From => assigned_player_position,
-                                        To => current_status (i).coord) < free_kick_area then
-                           second_condition := True;
+                          and current_status(i).on_the_field then
+                           if Distance (From => assigned_player_position,
+                                        To => current_status (i).coord) <= free_kick_area then
+                           second_condition := False;
+                           end if;
                         end if;
+
                         exit when not second_condition;
                      end loop;
                   end if;
+--                    Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
+                  if first_condition and second_condition then
+                     Set_Game_Status (Game_Ready);
+                  end if;
+
                end;
 
             when Penalty_Kick =>
@@ -549,12 +559,8 @@ package body Soccer.ControllerPkg.Referee is
 			      evt_coord);
 
 		     -- setto il risultato (stato di gioco)
+                     game_event := null;
 		     new_game_status := foul_event;
-		     -- notifico il nuovo stato di gioco (e lo fermo)
-		     Set_Last_Game_Event (Game_Event_Ptr (new_game_status));
-		     Set_Game_Status (Game_Blocked);
-		     -- setto la nuova posizione della palla
-		     Ball.Set_Position (new_position => Get_Coordinate (new_game_status));
 		  end;
 	       end if;
 	    end;
@@ -644,7 +650,7 @@ package body Soccer.ControllerPkg.Referee is
                   new_game_status := goal_event;
                end;
                -- controllo se va assegnata una rimessa laterale
-            elsif (ball_coord.coord_y = 0 or ball_coord.coord_y = field_max_y + 1)
+            elsif (ball_coord.coord_y <= 0 or ball_coord.coord_y >= field_max_y + 1)
               and ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
                Print ("[POST_CHECK] rimessa laterale");
                new_game_status := new Unary_Event;
@@ -722,7 +728,10 @@ package body Soccer.ControllerPkg.Referee is
          if Ball.Get_Moving then
             Motion_Enabler.Stop;
          end if;
-	 Ball.Set_Position (new_position => Get_Coordinate (new_game_status));
+
+         Ball.Set_Position (new_position => Get_Coordinate (new_game_status));
+         Ball.Set_Controlled (False);
+         Ball.Set_Moving (False);
       end if;
 
       Print ("[POST_CHECK] Fine controlli");

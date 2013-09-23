@@ -27,7 +27,7 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 procedure Soccer.Main is
 
-   players_team_one : Team_Players_List := (12, 2, 7, 10, 60);
+   players_team_one : Team_Players_List := (12, 2, 7, 8, 60);
    players_team_two : Team_Players_List := (6, 56, 1, 4, 10);
 
    type Pos_Id is array (Positive range <>) of Integer;
