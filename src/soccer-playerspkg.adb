@@ -90,6 +90,7 @@ package body Soccer.PlayersPkg is
       decision_x    : Integer;
       decision_y    : Integer;
       do_nothing    : Boolean := False;
+      formation_pos : Coordinate;
 
       -- True if the player is the one assigned to resume the game after a
       -- game event
@@ -181,22 +182,25 @@ package body Soccer.PlayersPkg is
          end if;
 
          -- Get player's starting position
-         Append(coords_array, Create(Get_Starting_Position(player_number, player_team).coord_x));
-	 Append(coords_array, Create(Get_Starting_Position(player_number, player_team).coord_y));
+         formation_pos := Get_Starting_Position(player_number, player_team);
+         Append(coords_array, Create(formation_pos.coord_x));
+	 Append(coords_array, Create(formation_pos.coord_y));
          json_obj.Set_Field(Field_Name => "starting_position",
                             Field      => coords_array);
          coords_array := Empty_Array;
 
          -- Get player's defense position
-         Append(coords_array, Create(Get_Defense_Position(player_number, player_team).coord_x));
-	 Append(coords_array, Create(Get_Defense_Position(player_number, player_team).coord_y));
+         formation_pos := Get_Defense_Position(player_number, player_team);
+         Append(coords_array, Create(formation_pos.coord_x));
+	 Append(coords_array, Create(formation_pos.coord_y));
          json_obj.Set_Field(Field_Name => "defense_position",
                             Field      => coords_array);
          coords_array := Empty_Array;
 
-	 -- Get player's attack position
-	 Append(coords_array, Create(Get_Attack_Position(player_number, player_team).coord_x));
-	 Append(coords_array, Create(Get_Attack_Position(player_number, player_team).coord_y));
+         -- Get player's attack position
+         formation_pos := Get_Attack_Position(player_number, player_team);
+	 Append(coords_array, Create(formation_pos.coord_x));
+	 Append(coords_array, Create(formation_pos.coord_y));
          json_obj.Set_Field(Field_Name => "attack_position",
                             Field      => coords_array);
          coords_array := Empty_Array;
@@ -324,10 +328,22 @@ package body Soccer.PlayersPkg is
                   end case;
                elsif current_generic_status.game_status = Game_Blocked then
                   case Get_Type(u_event) is
-                     when Goal         		   => json_obj.Set_Field(Field_Name => "event",
-                                                                         Field      => "goal");
-                     when Throw_In .. Penalty_Kick => json_obj.Set_Field(Field_Name => "event",
-                                                                         Field      => "inactive_ball");
+                     when Goal =>
+                        json_obj.Set_Field(Field_Name => "event",
+                                           Field      => "goal");
+                     when Goal_Kick =>
+                        json_obj.Set_Field(Field_Name => "event",
+                                           Field      => "goal_kick");
+                        -- get player's goal kick position
+                        formation_pos := Get_Goal_Kick_Position(player_number, player_team);
+                        Append(coords_array, Create(formation_pos.coord_x));
+                        Append(coords_array, Create(formation_pos.coord_y));
+                        json_obj.Set_Field(Field_Name => "goal_kick_position",
+                                           Field      => coords_array);
+                        coords_array := Empty_Array;
+                     when Throw_In .. Penalty_Kick =>
+                        json_obj.Set_Field(Field_Name => "event",
+                                           Field      => "inactive_ball");
                   end case;
                end if;
 
@@ -464,8 +480,7 @@ package body Soccer.PlayersPkg is
 
                new_shot_event.Initialize(id,
                                          current_coord,
-                                         Coordinate'(26,0));
---                                           Coordinate'(decision_x,decision_y));
+                                         Coordinate'(decision_x,decision_y));
                new_shot_event.Set_Shot_Power(15);
                current_action.event := Motion_Event_Ptr(new_shot_event);
                current_action.utility := 10;

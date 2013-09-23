@@ -66,18 +66,35 @@ package Soccer.TeamPkg is
    function Get_Attack_Position(number : in Integer;
                                 team   : in Team_Id) return Coordinate;
 
+   -- returns player's goal kick position, given his number and his team
+   function Get_Goal_Kick_Position(number : in Integer;
+                                   team   : in Team_Id) return Coordinate;
+
+   -- returns player's attack statistic
    function Get_Attack(number : in Integer;
                        team   : Team_Id) return Integer;
+
+   -- returns player's defense statistic
    function Get_Defense(number : in Integer;
                         team   : Team_Id) return Integer;
+
+   -- returns player's goal_keeping statistic
    function Get_Goal_Keeping(number : in Integer;
                              team   : Team_Id) return Integer;
+
+   -- returns player's power statistic
    function Get_Power(number : in Integer;
                       team   : Team_Id) return Integer;
+
+   -- returns player's precision statistic
    function Get_Precision(number : in Integer;
                           team   : Team_Id) return Integer;
+
+   -- returns player's speed statistic
    function Get_Speed(number : in Integer;
                       team   : Team_Id) return Integer;
+
+   -- returns player's tackle statistic
    function Get_Tackle(number : in Integer;
                        team   : Team_Id) return Integer;
 
