@@ -80,7 +80,7 @@ package Soccer is
 
    number_of_zones : Integer := 4;
 
-   ball_speed : Float := 0.4;
+   ball_speed : Float := 0.7;
    players_delay : Float := 0.7;
    print_delay : Float := 0.5;
 

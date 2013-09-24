@@ -41,7 +41,7 @@ package body Soccer.BallPkg is
 
       procedure Catch (catch_coord : Coordinate; player_coord : Coordinate; succeded : out Boolean) is
       begin
-         if Compare_Coordinates (catch_coord, current_position) then
+         if not controlled and Compare_Coordinates (catch_coord, current_position) then
             current_position := player_coord;
             controlled := True;
             moving := False;

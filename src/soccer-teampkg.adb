@@ -254,4 +254,143 @@ package body Soccer.TeamPkg is
       end if;
    end Get_Attack_Position;
 
+   -- returns player's goal kick position, given his number and his team
+   function Get_Goal_Kick_Position(number : in Integer;
+                                   team   : in Team_Id) return Coordinate is
+      position : Integer;
+   begin
+      if team = Team_One then
+         for i in team_1.number_id'Range loop
+            if number = team_1.number_id(i).number then
+               position := team_1.number_id(i).formation_id;
+            end if;
+         end loop;
+         if team_1.formation = O_352 then
+            return t1_352_gkick_pos(position);
+         elsif team_1.formation = B_442 then
+            return t1_442_gkick_pos(position);
+         else
+            return t1_532_gkick_pos(position);
+         end if;
+      else
+         for i in team_2.number_id'Range loop
+            if number = team_2.number_id(i).number then
+               position := team_2.number_id(i).formation_id;
+            end if;
+         end loop;
+         if team_2.formation = O_352 then
+            return t2_352_gkick_pos(position);
+         elsif team_2.formation = B_442 then
+            return t2_442_gkick_pos(position);
+         else
+            return t2_532_gkick_pos(position);
+         end if;
+      end if;
+   end Get_Goal_Kick_Position;
+
+   -- returns player's attack statistic
+   function Get_Attack(number : in Integer;
+                       team   : Team_Id) return Integer is
+      player_team : Team_Ptr;
+      attack      : Integer;
+   begin
+      player_team := Get_Team(team);
+      for i in player_team.number_id'Range loop
+         if player_team.number_id(i).number = number then
+            attack := player_team.statistics(player_team.number_id(i).statistics_id,1);
+         end if;
+      end loop;
+      return attack;
+   end Get_Attack;
+
+   -- returns player's defense statistic
+   function Get_Defense(number : in Integer;
+                        team   : Team_Id) return Integer is
+      player_team : Team_Ptr;
+      defense     : Integer;
+   begin
+      player_team := Get_Team(team);
+      for i in player_team.number_id'Range loop
+         if player_team.number_id(i).number = number then
+            defense := player_team.statistics(player_team.number_id(i).statistics_id,2);
+         end if;
+      end loop;
+      return defense;
+   end Get_Defense;
+
+   -- returns player's goal keeping statistic
+   function Get_Goal_Keeping(number : in Integer;
+                             team   : Team_Id) return Integer is
+      player_team  : Team_Ptr;
+      goal_keeping : Integer;
+   begin
+      player_team := Get_Team(team);
+      for i in player_team.number_id'Range loop
+         if player_team.number_id(i).number = number then
+            goal_keeping := player_team.statistics(player_team.number_id(i).statistics_id,3);
+         end if;
+      end loop;
+      return goal_keeping;
+   end Get_Goal_Keeping;
+
+   -- returns player's power statistic
+   function Get_Power(number : in Integer;
+                      team   : Team_Id) return Integer is
+      player_team : Team_Ptr;
+      power       : Integer;
+   begin
+      player_team := Get_Team(team);
+      for i in player_team.number_id'Range loop
+         if player_team.number_id(i).number = number then
+            power := player_team.statistics(player_team.number_id(i).statistics_id,4);
+         end if;
+      end loop;
+      return power;
+   end Get_Power;
+
+   -- returns player's precision statistic
+   function Get_Precision(number : in Integer;
+                          team   : Team_Id) return Integer is
+      player_team : Team_Ptr;
+      precision   : Integer;
+   begin
+      player_team := Get_Team(team);
+      for i in player_team.number_id'Range loop
+         if player_team.number_id(i).number = number then
+            precision := player_team.statistics(player_team.number_id(i).statistics_id,5);
+         end if;
+      end loop;
+      return precision;
+   end Get_Precision;
+
+   -- returns player's speed statistic
+   function Get_Speed(number : in Integer;
+                      team   : Team_Id) return Integer is
+      player_team : Team_Ptr;
+      speed       : Integer;
+   begin
+      player_team := Get_Team(team);
+      for i in player_team.number_id'Range loop
+         if player_team.number_id(i).number = number then
+            speed := player_team.statistics(player_team.number_id(i).statistics_id,6);
+         end if;
+      end loop;
+      return speed;
+   end Get_Speed;
+
+   -- returns player's tackle statistic
+   function Get_Tackle(number : in Integer;
+                       team   : Team_Id) return Integer is
+      player_team : Team_Ptr;
+      tackle      : Integer;
+   begin
+      player_team := Get_Team(team);
+      for i in player_team.number_id'Range loop
+         if player_team.number_id(i).number = number then
+            tackle := player_team.statistics(player_team.number_id(i).statistics_id,7);
+         end if;
+      end loop;
+      return tackle;
+   end Get_Tackle;
+
 end Soccer.TeamPkg;

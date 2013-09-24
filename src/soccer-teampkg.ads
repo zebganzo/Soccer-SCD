@@ -44,9 +44,9 @@ package Soccer.TeamPkg is
 
    function To_String (team : in Team_Id) return String;
 
-   function Get_Coordinate_For_Player (my_team : in Team_Id;
+   function Get_Coordinate_For_Player (my_team     : in Team_Id;
                                        holder_team : in Team_Id;
-                                       number : in Integer) return Coordinate;
+                                       number      : in Integer) return Coordinate;
 
    function Get_Goalkeeper_Number (team : in Team_Id) return Integer;
 
@@ -65,6 +65,38 @@ package Soccer.TeamPkg is
    -- returns player's attack position, given his number and his team
    function Get_Attack_Position(number : in Integer;
                                 team   : in Team_Id) return Coordinate;
+
+   -- returns player's goal kick position, given his number and his team
+   function Get_Goal_Kick_Position(number : in Integer;
+                                   team   : in Team_Id) return Coordinate;
+
+   -- returns player's attack statistic
+   function Get_Attack(number : in Integer;
+                       team   : Team_Id) return Integer;
+
+   -- returns player's defense statistic
+   function Get_Defense(number : in Integer;
+                        team   : Team_Id) return Integer;
+
+   -- returns player's goal_keeping statistic
+   function Get_Goal_Keeping(number : in Integer;
+                             team   : Team_Id) return Integer;
+
+   -- returns player's power statistic
+   function Get_Power(number : in Integer;
+                      team   : Team_Id) return Integer;
+
+   -- returns player's precision statistic
+   function Get_Precision(number : in Integer;
+                          team   : Team_Id) return Integer;
+
+   -- returns player's speed statistic
+   function Get_Speed(number : in Integer;
+                      team   : Team_Id) return Integer;
+
+   -- returns player's tackle statistic
+   function Get_Tackle(number : in Integer;
+                       team   : Team_Id) return Integer;
 
 private
    --+ contengono TUTTI i giocatori di una squadra, non solo quelli in campo
@@ -159,6 +191,36 @@ private
       10 => Coordinate'(5,22),				-- forward 1
       11 => Coordinate'(5,12)); 			-- forward 2
 
+   -- Formation Scheme 3-5-2: team 1 players' reference positions
+   -- during a goal kick event
+   t1_352_gkick_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(10,8),				-- back 1
+      3  => Coordinate'(10,17),				-- back 2
+      4  => Coordinate'(10,26),				-- back 3
+      5  => Coordinate'(18,17),				-- midfielder 1
+      6  => Coordinate'(23,11),				-- midfielder 2
+      7  => Coordinate'(23,23),				-- midfielder 3
+      8  => Coordinate'(28,6),				-- midfielder 4
+      9  => Coordinate'(28,28),				-- midfielder 5
+      10 => Coordinate'(36,11),				-- forward 1
+      11 => Coordinate'(36,23));			-- forward 2
+
+   -- Formation Scheme 3-5-2: team 2 players' reference positions
+   -- during a goal kick event
+   t2_352_gkick_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(42,26),				-- back 1
+      3  => Coordinate'(42,17),				-- back 2
+      4  => Coordinate'(42,8),				-- back 3
+      5  => Coordinate'(34,17),				-- midfielder 1
+      6  => Coordinate'(29,23),				-- midfielder 2
+      7  => Coordinate'(29,11),				-- midfielder 3
+      8  => Coordinate'(24,28),				-- midfielder 4
+      9  => Coordinate'(24,6),				-- midfielder 5
+      10 => Coordinate'(16,23),				-- forward 1
+      11 => Coordinate'(16,11));			-- forward 2
+
    -- Formation Scheme 4-4-2: team 1 players' starting position
    t1_442_start_pos : Positions_Array :=
      (1  => Coordinate'(1,17),				-- goal keeper
@@ -247,6 +309,36 @@ private
       10 => Coordinate'(5,19),				-- forward 1
       11 => Coordinate'(5,15));				-- forward 2
 
+   -- Formation Scheme 4-4-2: team 1 players' reference positions
+   -- during a goal kick event
+   t1_442_gkick_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(9,11),				-- back 1
+      3  => Coordinate'(9,23),				-- back 2
+      4  => Coordinate'(12,4),				-- back 3
+      5  => Coordinate'(12,30),				-- back 4
+      6  => Coordinate'(16,17),				-- midfielder 1
+      7  => Coordinate'(24,8),				-- midfielder 2
+      8  => Coordinate'(24,26),				-- midfielder 3
+      9  => Coordinate'(27,17),				-- midfielder 4
+      10 => Coordinate'(34,13),				-- forward 1
+      11 => Coordinate'(34,21));			-- forward 2
+
+   -- Formation Scheme 4-4-2: team 2 players' reference positions
+   -- during a goal kick event
+   t2_442_gkick_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(43,23),				-- back 1
+      3  => Coordinate'(43,11),				-- back 2
+      4  => Coordinate'(40,30),				-- back 3
+      5  => Coordinate'(40,4),				-- back 4
+      6  => Coordinate'(36,17),				-- midfielder 1
+      7  => Coordinate'(28,26),				-- midfielder 2
+      8  => Coordinate'(28,8),				-- midfielder 3
+      9  => Coordinate'(25,17),				-- midfielder 4
+      10 => Coordinate'(18,21),				-- forward 1
+      11 => Coordinate'(18,13));			-- forward 2
+
    -- Formation Scheme 5-3-2: team 1 players' starting position
    t1_532_start_pos : Positions_Array :=
      (1  => Coordinate'(1,17),				-- goal keeper
@@ -334,5 +426,35 @@ private
       9  => Coordinate'(11,10),				-- midfielder 3
       10 => Coordinate'(5,20),				-- forward 1
       11 => Coordinate'(5,14));				-- forward 2
+
+   -- Formation Scheme 5-3-2: team 1 players' reference positions
+   -- during a goal kick event
+   t1_532_gkick_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(9,11),				-- back 1
+      3  => Coordinate'(9,17),				-- back 2
+      4  => Coordinate'(9,23),				-- back 3
+      5  => Coordinate'(12,4),				-- back 4
+      6  => Coordinate'(12,30),				-- back 5
+      7  => Coordinate'(20,17),				-- midfielder 1
+      8  => Coordinate'(24,8),				-- midfielder 2
+      9  => Coordinate'(24,26),				-- midfielder 3
+      10 => Coordinate'(34,13),				-- forward 1
+      11 => Coordinate'(34,21));			-- forward 2
+
+   -- Formation Scheme 5-3-2: team 2 players' reference positions
+   -- during a goal kick event
+   t2_532_gkick_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(43,23),				-- back 1
+      3  => Coordinate'(43,17),				-- back 2
+      4  => Coordinate'(43,11),				-- back 3
+      5  => Coordinate'(40,30),				-- back 4
+      6  => Coordinate'(40,4),				-- back 5
+      7  => Coordinate'(32,17),				-- midfielder 1
+      8  => Coordinate'(28,26),				-- midfielder 2
+      9  => Coordinate'(28,8),				-- midfielder 3
+      10 => Coordinate'(18,21),				-- forward 1
+      11 => Coordinate'(18,13));			-- forward 2
 
 end Soccer.TeamPkg;
