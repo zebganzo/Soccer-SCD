@@ -288,6 +288,124 @@ package body Soccer.TeamPkg is
       end if;
    end Get_Goal_Kick_Position;
 
+   -- returns player's corner kick position, given his number and his team
+   function Get_Corner_Kick_Position(number 	 : in Integer;
+                                     team   	 : in Team_Id;
+                                     holder_team : in Team_Id) return Coordinate is
+      position : Integer;
+   begin
+      if team = Team_One then
+         for i in team_1.number_id'Range loop
+            if number = team_1.number_id(i).number then
+               position := team_1.number_id(i).formation_id;
+            end if;
+         end loop;
+         if team_1.formation = O_352 then
+            if holder_team = Team_One then
+               return t1_352_att_corner_pos(position);
+            else
+               return t1_352_def_corner_pos(position);
+            end if;
+         elsif team_1.formation = B_442 then
+            if holder_team = Team_One then
+               return t1_442_att_corner_pos(position);
+            else
+               return t1_442_def_corner_pos(position);
+            end if;
+         else
+            if holder_team = Team_One then
+               return t1_532_att_corner_pos(position);
+            else
+               return t1_532_def_corner_pos(position);
+            end if;
+         end if;
+      else
+         for i in team_2.number_id'Range loop
+            if number = team_2.number_id(i).number then
+               position := team_2.number_id(i).formation_id;
+            end if;
+         end loop;
+         if team_2.formation = O_352 then
+            if holder_team = Team_Two then
+               return t2_352_att_corner_pos(position);
+            else
+               return t2_352_def_corner_pos(position);
+            end if;
+         elsif team_2.formation = B_442 then
+            if holder_team = Team_Two then
+               return t2_442_att_corner_pos(position);
+            else
+               return t2_442_def_corner_pos(position);
+            end if;
+         else
+            if holder_team = Team_Two then
+               return t2_532_att_corner_pos(position);
+            else
+               return t2_532_def_corner_pos(position);
+            end if;
+         end if;
+      end if;
+   end Get_Corner_Kick_Position;
+
+   -- returns player's penalty kick position, given his number and his team
+   function Get_Penalty_Kick_Position(number 	  : in Integer;
+                                      team   	  : in Team_Id;
+                                      holder_team : in Team_Id) return Coordinate is
+      position : Integer;
+   begin
+      if team = Team_One then
+         for i in team_1.number_id'Range loop
+            if number = team_1.number_id(i).number then
+               position := team_1.number_id(i).formation_id;
+            end if;
+         end loop;
+         if team_1.formation = O_352 then
+            if holder_team = Team_One then
+               return t1_352_att_penalty_pos(position);
+            else
+               return t1_352_def_penalty_pos(position);
+            end if;
+         elsif team_1.formation = B_442 then
+            if holder_team = Team_One then
+               return t1_442_att_penalty_pos(position);
+            else
+               return t1_442_def_penalty_pos(position);
+            end if;
+         else
+            if holder_team = Team_One then
+               return t1_532_att_penalty_pos(position);
+            else
+               return t1_532_def_penalty_pos(position);
+            end if;
+         end if;
+      else
+         for i in team_2.number_id'Range loop
+            if number = team_2.number_id(i).number then
+               position := team_2.number_id(i).formation_id;
+            end if;
+         end loop;
+         if team_2.formation = O_352 then
+            if holder_team = Team_Two then
+               return t2_352_att_penalty_pos(position);
+            else
+               return t2_352_def_penalty_pos(position);
+            end if;
+         elsif team_2.formation = B_442 then
+            if holder_team = Team_Two then
+               return t2_442_att_penalty_pos(position);
+            else
+               return t2_442_def_penalty_pos(position);
+            end if;
+         else
+            if holder_team = Team_Two then
+               return t2_532_att_penalty_pos(position);
+            else
+               return t2_532_def_penalty_pos(position);
+            end if;
+         end if;
+      end if;
+   end Get_Penalty_Kick_Position;
+
    -- returns player's attack statistic
    function Get_Attack(number : in Integer;
                        team   : Team_Id) return Integer is
