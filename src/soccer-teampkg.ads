@@ -70,6 +70,16 @@ package Soccer.TeamPkg is
    function Get_Goal_Kick_Position(number : in Integer;
                                    team   : in Team_Id) return Coordinate;
 
+    -- returns player's corner kick position, given his number and his team
+   function Get_Corner_Kick_Position(number 	 : in Integer;
+                                     team   	 : in Team_Id;
+                                     holder_team : in Team_Id) return Coordinate;
+
+   -- returns player's penalty kick position, given his number and his team
+   function Get_Penalty_Kick_Position(number 	  : in Integer;
+                                      team   	  : in Team_Id;
+                                      holder_team : in Team_Id) return Coordinate;
+
    -- returns player's attack statistic
    function Get_Attack(number : in Integer;
                        team   : Team_Id) return Integer;
@@ -221,6 +231,126 @@ private
       10 => Coordinate'(16,23),				-- forward 1
       11 => Coordinate'(16,11));			-- forward 2
 
+   -- Formation Scheme 3-5-2: team 1 players' reference positions
+   -- during a corner kick event assigned to team 1
+   t1_352_att_corner_pos : Positions_Array :=
+     (1  => Coordinate'(8,17),				-- goal keeper
+      2  => Coordinate'(31,6),				-- back 1
+      3  => Coordinate'(31,17),				-- back 2
+      4  => Coordinate'(31,28),				-- back 3
+      5  => Coordinate'(43,7),				-- midfielder 1
+      6  => Coordinate'(43,27),				-- midfielder 2
+      7  => Coordinate'(46,21),				-- midfielder 3
+      8  => Coordinate'(47,15),				-- midfielder 4
+      9  => Coordinate'(48,19),				-- midfielder 5
+      10 => Coordinate'(50,13),				-- forward 1
+      11 => Coordinate'(50,20));			-- forward 2
+
+   -- Formation Scheme 3-5-2: team 2 players' reference positions
+   -- during a corner kick event assigned to team 2
+   t2_352_att_corner_pos : Positions_Array :=
+     (1  => Coordinate'(44,17),				-- goal keeper
+      2  => Coordinate'(21,28),				-- back 1
+      3  => Coordinate'(21,17),				-- back 2
+      4  => Coordinate'(21,6),				-- back 3
+      5  => Coordinate'(9,27),				-- midfielder 1
+      6  => Coordinate'(9,7),				-- midfielder 2
+      7  => Coordinate'(6,21),				-- midfielder 3
+      8  => Coordinate'(5,15),				-- midfielder 4
+      9  => Coordinate'(4,19),				-- midfielder 5
+      10 => Coordinate'(2,20),				-- forward 1
+      11 => Coordinate'(2,13));				-- forward 2
+
+   -- Formation Scheme 3-5-2: team 1 players' reference positions
+   -- during a corner kick event assigned to team 2
+   t1_352_def_corner_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(2,15),				-- back 1
+      3  => Coordinate'(2,19),				-- back 2
+      4  => Coordinate'(3,23),				-- back 3
+      5  => Coordinate'(4,11),				-- midfielder 1
+      6  => Coordinate'(4,17),				-- midfielder 2
+      7  => Coordinate'(6,20),				-- midfielder 3
+      8  => Coordinate'(7,13),				-- midfielder 4
+      9  => Coordinate'(9,17),				-- midfielder 5
+      10 => Coordinate'(18,13),				-- forward 1
+      11 => Coordinate'(18,21));			-- forward 2
+
+   -- Formation Scheme 3-5-2: team 2 players' reference positions
+   -- during a corner kick event assigned to team 1
+   t2_352_def_corner_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(50,19),				-- back 1
+      3  => Coordinate'(50,15),				-- back 2
+      4  => Coordinate'(49,23),				-- back 3
+      5  => Coordinate'(48,17),				-- midfielder 1
+      6  => Coordinate'(48,11),				-- midfielder 2
+      7  => Coordinate'(46,20),				-- midfielder 3
+      8  => Coordinate'(45,13),				-- midfielder 4
+      9  => Coordinate'(43,17),				-- midfielder 5
+      10 => Coordinate'(34,21),				-- forward 1
+      11 => Coordinate'(34,13));			-- forward 2
+
+   -- Formation Scheme 3-5-2: team 1 players' reference positions
+   -- during a penalty kick event assigned to team 1
+   t1_352_att_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(8,17),				-- goal keeper
+      2  => Coordinate'(31,17),				-- back 1
+      3  => Coordinate'(33,10),				-- back 2
+      4  => Coordinate'(33,24),				-- back 3
+      5  => Coordinate'(41,16),				-- midfielder 1
+      6  => Coordinate'(43,12),				-- midfielder 2
+      7  => Coordinate'(43,14),				-- midfielder 3
+      8  => Coordinate'(43,20),				-- midfielder 4
+      9  => Coordinate'(43,22),				-- midfielder 5
+      10 => Coordinate'(43,16),				-- forward 1
+      11 => Coordinate'(43,18));			-- forward 2
+
+   -- Formation Scheme 3-5-2: team 2 players' reference positions
+   -- during a penalty kick event assigned to team 2
+   t2_352_att_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(44,17),				-- goal keeper
+      2  => Coordinate'(21,17),				-- back 1
+      3  => Coordinate'(19,24),				-- back 2
+      4  => Coordinate'(19,10),				-- back 3
+      5  => Coordinate'(11,16),				-- midfielder 1
+      6  => Coordinate'(9,20),				-- midfielder 2
+      7  => Coordinate'(9,14),				-- midfielder 3
+      8  => Coordinate'(9,22),				-- midfielder 4
+      9  => Coordinate'(9,12),				-- midfielder 5
+      10 => Coordinate'(9,18),				-- forward 1
+      11 => Coordinate'(9,16));				-- forward 2
+
+   -- Formation Scheme 3-5-2: team 1 players' reference positions
+   -- during a penalty kick event assigned to team 2
+   t1_352_def_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(9,17),				-- back 1
+      3  => Coordinate'(9,15),				-- back 2
+      4  => Coordinate'(9,19),				-- back 3
+      5  => Coordinate'(9,13),				-- midfielder 1
+      6  => Coordinate'(9,21),				-- midfielder 2
+      7  => Coordinate'(9,11),				-- midfielder 3
+      8  => Coordinate'(9,23),				-- midfielder 4
+      9  => Coordinate'(11,17),				-- midfielder 5
+      10 => Coordinate'(14,15),				-- forward 1
+      11 => Coordinate'(14,19));			-- forward 2
+
+   -- Formation Scheme 3-5-2: team 2 players' reference positions
+   -- during a penalty kick event assigned to team 1
+   t2_352_def_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(43,19),				-- back 1
+      3  => Coordinate'(43,17),				-- back 2
+      4  => Coordinate'(43,15),				-- back 3
+      5  => Coordinate'(41,17),				-- midfielder 1
+      6  => Coordinate'(43,21),				-- midfielder 2
+      7  => Coordinate'(43,13),				-- midfielder 3
+      8  => Coordinate'(43,23),				-- midfielder 4
+      9  => Coordinate'(43,11),				-- midfielder 5
+      10 => Coordinate'(38,19),				-- forward 1
+      11 => Coordinate'(38,15));			-- forward 2
+
    -- Formation Scheme 4-4-2: team 1 players' starting position
    t1_442_start_pos : Positions_Array :=
      (1  => Coordinate'(1,17),				-- goal keeper
@@ -339,6 +469,126 @@ private
       10 => Coordinate'(18,21),				-- forward 1
       11 => Coordinate'(18,13));			-- forward 2
 
+   -- Formation Scheme 4-4-2: team 1 players' reference positions
+   -- during a corner kick event assigned to team 1
+   t1_442_att_corner_pos : Positions_Array :=
+     (1  => Coordinate'(8,17),				-- goal keeper
+      2  => Coordinate'(28,14),				-- back 1
+      3  => Coordinate'(28,20),				-- back 2
+      4  => Coordinate'(31,6),				-- back 3
+      5  => Coordinate'(31,28),				-- back 4
+      6  => Coordinate'(44,14),				-- midfielder 1
+      7  => Coordinate'(44,19),				-- midfielder 2
+      8  => Coordinate'(46,11),				-- midfielder 3
+      9  => Coordinate'(46,22),				-- midfielder 4
+      10 => Coordinate'(49,15),				-- forward 1
+      11 => Coordinate'(49,19));			-- forward 2
+
+   -- Formation Scheme 4-4-2: team 2 players' reference positions
+   -- during a corner kick event assigned to team 2
+   t2_442_att_corner_pos : Positions_Array :=
+     (1  => Coordinate'(44,17),				-- goal keeper
+      2  => Coordinate'(24,20),				-- back 1
+      3  => Coordinate'(24,14),				-- back 2
+      4  => Coordinate'(21,28),				-- back 3
+      5  => Coordinate'(21,6),				-- back 4
+      6  => Coordinate'(8,19),				-- midfielder 1
+      7  => Coordinate'(8,14),				-- midfielder 2
+      8  => Coordinate'(6,22),				-- midfielder 3
+      9  => Coordinate'(6,11),				-- midfielder 4
+      10 => Coordinate'(3,19),				-- forward 1
+      11 => Coordinate'(3,15));				-- forward 2
+
+   -- Formation Scheme 4-4-2: team 1 players' reference positions
+   -- during a corner kick event assigned to team 2
+   t1_442_def_corner_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(2,15),				-- back 1
+      3  => Coordinate'(2,19),				-- back 2
+      4  => Coordinate'(3,12),				-- back 3
+      5  => Coordinate'(3,22),				-- back 4
+      6  => Coordinate'(5,18),				-- midfielder 1
+      7  => Coordinate'(6,15),				-- midfielder 2
+      8  => Coordinate'(10,10),				-- midfielder 3
+      9  => Coordinate'(10,24),				-- midfielder 4
+      10 => Coordinate'(18,13),				-- forward 1
+      11 => Coordinate'(18,21));			-- forward 2
+
+   -- Formation Scheme 4-4-2: team 2 players' reference positions
+   -- during a corner kick event assigned to team 1
+   t2_442_def_corner_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(50,19),				-- back 1
+      3  => Coordinate'(50,15),				-- back 2
+      4  => Coordinate'(49,22),				-- back 3
+      5  => Coordinate'(49,12),				-- back 4
+      6  => Coordinate'(47,18),				-- midfielder 1
+      7  => Coordinate'(46,15),				-- midfielder 2
+      8  => Coordinate'(42,24),				-- midfielder 3
+      9  => Coordinate'(42,10),				-- midfielder 4
+      10 => Coordinate'(34,21),				-- forward 1
+      11 => Coordinate'(34,13));			-- forward 2
+
+   -- Formation Scheme 4-4-2: team 1 players' reference positions
+   -- during a penalty kick event assigned to team 1
+   t1_442_att_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(8,17),				-- goal keeper
+      2  => Coordinate'(34,14),				-- back 1
+      3  => Coordinate'(34,20),				-- back 2
+      4  => Coordinate'(35,11),				-- back 3
+      5  => Coordinate'(35,23),				-- back 4
+      6  => Coordinate'(43,14),				-- midfielder 1
+      7  => Coordinate'(43,20),				-- midfielder 2
+      8  => Coordinate'(43,12),				-- midfielder 3
+      9  => Coordinate'(43,22),				-- midfielder 4
+      10 => Coordinate'(43,16),				-- forward 1
+      11 => Coordinate'(43,18));			-- forward 2
+
+   -- Formation Scheme 4-4-2: team 2 players' reference positions
+   -- during a penalty kick event assigned to team 2
+   t2_442_att_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(44,17),				-- goal keeper
+      2  => Coordinate'(18,20),				-- back 1
+      3  => Coordinate'(18,14),				-- back 2
+      4  => Coordinate'(17,23),				-- back 3
+      5  => Coordinate'(17,11),				-- back 4
+      6  => Coordinate'(9,20),				-- midfielder 1
+      7  => Coordinate'(9,14),				-- midfielder 2
+      8  => Coordinate'(9,22),				-- midfielder 3
+      9  => Coordinate'(9,12),				-- midfielder 4
+      10 => Coordinate'(9,18),				-- forward 1
+      11 => Coordinate'(9,16));				-- forward 2
+
+   -- Formation Scheme 4-4-2: team 1 players' reference positions
+   -- during a penalty kick event assigned to team 2
+   t1_442_def_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(9,15),				-- back 1
+      3  => Coordinate'(9,19),				-- back 2
+      4  => Coordinate'(11,17),				-- back 3
+      5  => Coordinate'(9,17),				-- back 4
+      6  => Coordinate'(9,13),				-- midfielder 1
+      7  => Coordinate'(9,21),				-- midfielder 2
+      8  => Coordinate'(9,11),				-- midfielder 3
+      9  => Coordinate'(9,23),				-- midfielder 4
+      10 => Coordinate'(15,13),				-- forward 1
+      11 => Coordinate'(15,21));			-- forward 2
+
+   -- Formation Scheme 4-4-2: team 2 players' reference positions
+   -- during a penalty kick event assigned to team 1
+   t2_442_def_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(43,19),				-- back 1
+      3  => Coordinate'(43,15),				-- back 2
+      4  => Coordinate'(43,17),				-- back 3
+      5  => Coordinate'(41,17),				-- back 4
+      6  => Coordinate'(43,21),				-- midfielder 1
+      7  => Coordinate'(43,13),				-- midfielder 2
+      8  => Coordinate'(43,23),				-- midfielder 3
+      9  => Coordinate'(43,11),				-- midfielder 4
+      10 => Coordinate'(37,21),				-- forward 1
+      11 => Coordinate'(37,13));			-- forward 2
+
    -- Formation Scheme 5-3-2: team 1 players' starting position
    t1_532_start_pos : Positions_Array :=
      (1  => Coordinate'(1,17),				-- goal keeper
@@ -359,8 +609,8 @@ private
       2  => Coordinate'(39,24),				-- back 1
       3  => Coordinate'(39,17),				-- back 2
       4  => Coordinate'(39,10),				-- back 3
-      5  => Coordinate'(37,28),				-- back 3
-      6  => Coordinate'(37,7),				-- back 4
+      5  => Coordinate'(37,28),				-- back 4
+      6  => Coordinate'(37,7),				-- back 5
       7  => Coordinate'(33,17),			        -- midfielder 1
       8  => Coordinate'(31,25),				-- midfielder 2
       9  => Coordinate'(31,9),				-- midfielder 3
@@ -457,4 +707,123 @@ private
       10 => Coordinate'(18,21),				-- forward 1
       11 => Coordinate'(18,13));			-- forward 2
 
+   -- Formation Scheme 5-3-2: team 1 players' reference positions
+   -- during a corner kick event assigned to team 1
+   t1_532_att_corner_pos : Positions_Array :=
+     (1  => Coordinate'(8,17),				-- goal keeper
+      2  => Coordinate'(30,17),				-- back 1
+      3  => Coordinate'(33,10),				-- back 2
+      4  => Coordinate'(33,24),				-- back 3
+      5  => Coordinate'(35,4),				-- back 4
+      6  => Coordinate'(35,30),				-- back 5
+      7  => Coordinate'(44,16),				-- midfielder 1
+      8  => Coordinate'(47,12),				-- midfielder 2
+      9  => Coordinate'(47,22),				-- midfielder 3
+      10 => Coordinate'(49,15),				-- forward 1
+      11 => Coordinate'(49,19));			-- forward 2
+
+   -- Formation Scheme 5-3-2: team 2 players' reference positions
+   -- during a corner kick event assigned to team 2
+   t2_532_att_corner_pos : Positions_Array :=
+     (1  => Coordinate'(44,17),				-- goal keeper
+      2  => Coordinate'(22,17),				-- back 1
+      3  => Coordinate'(19,24),				-- back 2
+      4  => Coordinate'(19,10),				-- back 3
+      5  => Coordinate'(17,30),				-- back 4
+      6  => Coordinate'(17,4),				-- back 5
+      7  => Coordinate'(8,16),				-- midfielder 1
+      8  => Coordinate'(5,22),				-- midfielder 2
+      9  => Coordinate'(5,12),				-- midfielder 3
+      10 => Coordinate'(3,19),				-- forward 1
+      11 => Coordinate'(3,15));				-- forward 2
+
+   -- Formation Scheme 5-3-2: team 1 players' reference positions
+   -- during a corner kick event assigned to team 2
+   t1_532_def_corner_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(3,17),				-- back 1
+      3  => Coordinate'(5,14),				-- back 2
+      4  => Coordinate'(5,19),				-- back 3
+      5  => Coordinate'(7,22),				-- back 4
+      6  => Coordinate'(8,10),				-- back 5
+      7  => Coordinate'(8,17),				-- midfielder 1
+      8  => Coordinate'(12,13),				-- midfielder 2
+      9  => Coordinate'(12,21),				-- midfielder 3
+      10 => Coordinate'(18,14),				-- forward 1
+      11 => Coordinate'(18,20));			-- forward 2
+
+   -- Formation Scheme 5-3-2: team 2 players' reference positions
+   -- during a corner kick event assigned to team 1
+   t2_532_def_corner_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(49,17),				-- back 1
+      3  => Coordinate'(47,19),				-- back 2
+      4  => Coordinate'(47,14),				-- back 3
+      5  => Coordinate'(45,22),				-- back 4
+      6  => Coordinate'(44,17),				-- back 5
+      7  => Coordinate'(44,10),				-- midfielder 1
+      8  => Coordinate'(40,21),				-- midfielder 2
+      9  => Coordinate'(40,13),				-- midfielder 3
+      10 => Coordinate'(34,20),				-- forward 1
+      11 => Coordinate'(34,14));			-- forward 2
+
+   -- Formation Scheme 5-3-2: team 1 players' reference positions
+   -- during a penalty kick event assigned to team 1
+   t1_532_att_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(8,17),				-- goal keeper
+      2  => Coordinate'(31,17),				-- back 1
+      3  => Coordinate'(33,12),				-- back 2
+      4  => Coordinate'(33,22),				-- back 3
+      5  => Coordinate'(36,9),				-- back 4
+      6  => Coordinate'(36,25),				-- back 5
+      7  => Coordinate'(41,17),				-- midfielder 1
+      8  => Coordinate'(43,14),				-- midfielder 2
+      9  => Coordinate'(43,20),				-- midfielder 3
+      10 => Coordinate'(43,16),				-- forward 1
+      11 => Coordinate'(43,18));			-- forward 2
+
+   -- Formation Scheme 5-3-2: team 2 players' reference positions
+   -- during a penalty kick event assigned to team 2
+   t2_532_att_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(44,17),				-- goal keeper
+      2  => Coordinate'(21,17),				-- back 1
+      3  => Coordinate'(19,22),				-- back 2
+      4  => Coordinate'(19,12),				-- back 3
+      5  => Coordinate'(16,25),				-- back 4
+      6  => Coordinate'(16,9),				-- back 5
+      7  => Coordinate'(11,17),				-- midfielder 1
+      8  => Coordinate'(9,20),				-- midfielder 2
+      9  => Coordinate'(9,14),				-- midfielder 3
+      10 => Coordinate'(9,18),				-- forward 1
+      11 => Coordinate'(9,16));				-- forward 2
+
+   -- Formation Scheme 5-3-2: team 1 players' reference positions
+   -- during a penalty kick event assigned to team 2
+   t1_532_def_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(1,17),				-- goal keeper
+      2  => Coordinate'(9,13),				-- back 1
+      3  => Coordinate'(9,15),				-- back 2
+      4  => Coordinate'(9,17),				-- back 3
+      5  => Coordinate'(9,19),				-- back 4
+      6  => Coordinate'(9,21),				-- back 5
+      7  => Coordinate'(9,12),				-- midfielder 1
+      8  => Coordinate'(9,22),				-- midfielder 2
+      9  => Coordinate'(11,16),				-- midfielder 3
+      10 => Coordinate'(16,16),				-- forward 1
+      11 => Coordinate'(16,19));			-- forward 2
+
+   -- Formation Scheme 5-3-2: team 2 players' reference positions
+   -- during a penalty kick event assigned to team 1
+   t2_532_def_penalty_pos : Positions_Array :=
+     (1  => Coordinate'(51,17),				-- goal keeper
+      2  => Coordinate'(43,21),				-- back 1
+      3  => Coordinate'(43,19),				-- back 2
+      4  => Coordinate'(43,17),				-- back 3
+      5  => Coordinate'(43,15),				-- back 4
+      6  => Coordinate'(43,13),				-- back 5
+      7  => Coordinate'(43,22),				-- midfielder 1
+      8  => Coordinate'(43,12),				-- midfielder 2
+      9  => Coordinate'(41,16),				-- midfielder 3
+      10 => Coordinate'(36,19),				-- forward 1
+      11 => Coordinate'(36,16));			-- forward 2
 end Soccer.TeamPkg;

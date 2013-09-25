@@ -335,6 +335,7 @@ package body Soccer.PlayersPkg is
                      when Goal_Kick =>
                         json_obj.Set_Field(Field_Name => "event",
                                            Field      => "goal_kick");
+
                         -- get player's goal kick position
                         formation_pos := Get_Goal_Kick_Position(player_number, player_team);
                         Append(coords_array, Create(formation_pos.coord_x));
@@ -342,9 +343,38 @@ package body Soccer.PlayersPkg is
                         json_obj.Set_Field(Field_Name => "goal_kick_position",
                                            Field      => coords_array);
                         coords_array := Empty_Array;
-                     when Throw_In .. Penalty_Kick =>
+                     when Corner_Kick =>
                         json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "inactive_ball");
+                                           Field      => "corner_kick");
+
+                        -- get player's corner kick position
+                        formation_pos := Get_Corner_Kick_Position(player_number,
+                                                                  player_team,
+                                                                  current_generic_status.holder_team);
+                        Append(coords_array, Create(formation_pos.coord_x));
+                        Append(coords_array, Create(formation_pos.coord_y));
+                        json_obj.Set_Field(Field_Name => "corner_kick_position",
+                                           Field      => coords_array);
+                        coords_array := Empty_Array;
+                     when Penalty_Kick =>
+                        json_obj.Set_Field(Field_Name => "event",
+                                           Field      => "penalty_kick");
+
+                        -- get player's penalty kick position
+                        formation_pos := Get_Penalty_Kick_Position(player_number,
+                                                                   player_team,
+                                                                   current_generic_status.holder_team);
+                        Append(coords_array, Create(formation_pos.coord_x));
+                        Append(coords_array, Create(formation_pos.coord_y));
+                        json_obj.Set_Field(Field_Name => "penalty_kick_position",
+                                           Field      => coords_array);
+                        coords_array := Empty_Array;
+                     when Throw_In =>
+                        json_obj.Set_Field(Field_Name => "event",
+                                           Field      => "throw_in");
+                     when Free_Kick =>
+                        json_obj.Set_Field(Field_Name => "event",
+                                           Field      => "free_kick");
                   end case;
                end if;
 

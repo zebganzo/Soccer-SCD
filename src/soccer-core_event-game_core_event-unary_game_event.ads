@@ -10,11 +10,11 @@ package Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 --  			   Send_Off,
 --  			   Caution,
                            Goal_Kick,
+                           Corner_Kick,
+                           Penalty_Kick,
 			   Throw_In,
-			   Corner_Kick,
-			   Free_Kick,
---  			   Kick_Off,
-			   Penalty_Kick);
+			   Free_Kick);
+--  			   Kick_Off);
 
    procedure Serialize (E : Unary_Event; Serialized_Obj : out JSON_Value);
 
