@@ -510,12 +510,17 @@ package body Soccer.PlayersPkg is
             begin
                new_shot_event := new Shot_Event;
 
+	       if decision = "shot" then
+		  decision_y := decision_y + 7;
+	       end if;
+
                new_shot_event.Initialize(id,
                                          current_coord,
                                          Coordinate'(decision_x,decision_y));
                new_shot_event.Set_Shot_Power(15);
                current_action.event := Motion_Event_Ptr(new_shot_event);
-               current_action.utility := 10;
+	       current_action.utility := 10;
+
             end;
          elsif decision = "catch" then
             declare

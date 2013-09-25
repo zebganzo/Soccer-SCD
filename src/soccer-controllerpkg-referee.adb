@@ -344,10 +344,10 @@ package body Soccer.ControllerPkg.Referee is
                      -- controllo che non ci siano giocatori attorno alla posizione
                      -- di chi deve battere (della squadra avversaria)
                      for i in current_status'Range loop
---                          Print("CHECKING PLAYER: " & I2S(current_status(i).id) & " (" & I2S(current_status(i).number) & ") " &
---                                  "DISTANCE: " & Boolean'Image(Distance (From => assigned_player_position,
---                                                                         To => current_status (i).coord) > free_kick_area) &
---                              " ON THE FIELD: " & Boolean'Image(current_status(i).on_the_field));
+                        Print("CHECKING PLAYER: " & I2S(current_status(i).id) & " (" & I2S(current_status(i).number) & ") " &
+                                "DISTANCE: " & Boolean'Image(Distance (From => assigned_player_position,
+                                                                       To => current_status (i).coord) > free_kick_area) &
+                            " ON THE FIELD: " & Boolean'Image(current_status(i).on_the_field));
 
                         if current_status(i).id /= current_player_status.id
                           and current_player_status.team /= current_status(i).team
@@ -361,7 +361,7 @@ package body Soccer.ControllerPkg.Referee is
                         exit when not second_condition;
                      end loop;
                   end if;
---                    Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
+                  Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
                   if first_condition and second_condition then
                      Set_Game_Status (Game_Ready);
                   end if;
@@ -615,105 +615,110 @@ package body Soccer.ControllerPkg.Referee is
 
                -- controllo se e' stato fatto un goal
 
-               declare
-                  goal_event : Unary_Event_Ptr := new Unary_Event;
-                  scoring_team : Team_Id;
-                  opposing_team : Team_Id;
-               begin
-                  if last_team_possession = Team_One then
-                     if ball_coord.coord_x = team_two_goal_lower_coord.coord_x
-                       and ball_coord.coord_y >= team_two_goal_lower_coord.coord_y
-                       and ball_coord.coord_y <= team_two_goal_upper_coord.coord_y then
-                        scoring_team := Team_One;
-                        Print ("[POST_CHECK] Team_One ha segnato!");
-                     end if;
-                  else
-                     if ball_coord.coord_x = team_one_goal_lower_coord.coord_x
-                       and ball_coord.coord_y >= team_one_goal_lower_coord.coord_y
-                       and ball_coord.coord_y <= team_one_goal_upper_coord.coord_y then
-                        scoring_team := Team_Two;
-                        Print ("[POST_CHECK] Team_Two ha segnato!");
-                     end if;
-                  end if;
+	       if ball_coord.coord_y >= team_one_goal_lower_coord.coord_y and
+		 ball_coord.coord_y <= team_one_goal_upper_coord.coord_y then
+		  declare
+		     goal_event : Unary_Event_Ptr := new Unary_Event;
+		     scoring_team : Team_Id;
+		     opposing_team : Team_Id;
+		  begin
+		     if last_team_possession = Team_One then
+			scoring_team := Team_One;
+			Print ("[POST_CHECK] Team_One ha segnato!");
+		     else
+			scoring_team := Team_Two;
+			Print ("[POST_CHECK] Team_Two ha segnato!");
+		     end if;
 
-                  if scoring_team = Team_One then
-                     opposing_team := Team_Two;
-                  else
-                     opposing_team := Team_One;
-                  end if;
+		     if scoring_team = Team_One then
+			opposing_team := Team_Two;
+		     else
+			opposing_team := Team_One;
+		     end if;
 
-                  goal_event.Initialize (new_event_id    => Goal,
-                                         new_player_id   =>
-                                           Get_Id_From_Number (Get_Number_From_formation (10, opposing_team)),
-                                         new_team_id     => scoring_team,
-                                         new_event_coord => middle_field_coord);
-                  new_game_status := goal_event;
-               end;
-               -- controllo se va assegnata una rimessa laterale
-            elsif (ball_coord.coord_y <= 0 or ball_coord.coord_y >= field_max_y + 1)
-              and ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
-               Print ("[POST_CHECK] rimessa laterale");
-               new_game_status := new Unary_Event;
-               new_game_status.Initialize (new_event_id    => Throw_In,
-                                           new_player_id   => Get_Nearest_Player (ball_coord, last_team_possession),
-                                           new_team_id     => last_team_possession,
-                                           new_event_coord => ball_coord);
-            elsif ball_coord.coord_x = 0 or ball_coord.coord_x = field_max_x + 1 then
-               -- controllo se va assegnato un calcio d'angolo o un rinvio dal
-               -- fondo (non controllo la y perche' ho gia' controllato il gol)
-               Print ("[POST_CHECK] Controllo se va assegnato un calcio d'angolo o un rinvio dal fondo");
-               declare
-                  new_event : Unary_Event_Ptr := new Unary_Event;
-                  new_evt_coord : Coordinate := Coordinate'(0,0);
-               begin
-                  if ball_coord.coord_y < field_max_y / 2 then
-                     Set_Coord_Y (coord => new_evt_coord, value => 0);
-                  else
-                     Set_Coord_Y (coord => new_evt_coord, value => field_max_y + 1);
-                  end if;
+		     goal_event.Initialize (new_event_id    => Goal,
+			      new_player_id   => Get_Id_From_Number (Get_Number_From_formation (10, opposing_team)),
+			      new_team_id     => scoring_team,
+			      new_event_coord => middle_field_coord);
+		     new_game_status := goal_event;
+		  end;
 
-                  if last_team_possession = Team_One then
-                     if ball_coord.coord_x = 0 then
-                        -- assegna un calcio d'angolo a Team_Two
-                        Print ("[POST_CHECK] calcio d'angolo per Team_Two");
-                        Set_Coord_X (coord => new_evt_coord, value => 0);
-                        new_event.Initialize (new_event_id    => Corner_Kick,
-                                              new_player_id   => Get_Nearest_Player (new_evt_coord, Team_Two),
-                                              new_team_id     => Team_Two,
-                                              new_event_coord => new_evt_coord);
-                     elsif ball_coord.coord_x = field_max_x + 1 then
-                        -- assegna una rimessa dal fondo a Team_Two
-                        Print ("[POST_CHECK] rimessa dal fondo per Team_Two");
-                        Set_Coord_X (coord => new_evt_coord, value => field_max_x + 1);
-                        new_event.Initialize (new_event_id    => Goal_Kick,
-                                              new_player_id   => Get_Id_From_Number(Get_Goalkeeper_Number(Team_Two)),
-                                              new_team_id     => Team_Two,
-                                              new_event_coord => new_evt_coord);
-                     end if;
-                  else
-                     if ball_coord.coord_x = 0 then
-                        -- assegna una rimessa dal fondo a Team_One
-                        Print ("[POST_CHECK] rimessa dal fondo per Team_One");
-                        Set_Coord_X (coord => new_evt_coord, value => 0);
-                        new_event.Initialize (new_event_id    => Goal_Kick,
-                                              new_player_id   => Get_Id_From_Number(Get_Goalkeeper_Number(Team_One)), -- portiere
-                                              new_team_id     => Team_One,
-                                              new_event_coord => new_evt_coord);
-                     elsif ball_coord.coord_x = field_max_x + 1 then
-                        -- assegna un calcio d'angolo a Team_One
-                        Print ("[POST_CHECK] calcio d'angolo per Team_One");
-                        Set_Coord_X (coord => new_evt_coord, value => field_max_x + 1);
-                        new_event.Initialize (new_event_id    => Corner_Kick,
-                                              new_player_id   => Get_Nearest_Player (new_evt_coord, Team_One),
-                                              new_team_id     => Team_One,
-                                              new_event_coord => new_evt_coord);
-                     end if;
-                  end if;
+		-- controllo se va assegnata una rimessa laterale
+	       elsif ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
+		  Print ("[POST_CHECK] Rimessa laterale");
+		  new_game_status := new Unary_Event;
+		  new_game_status.Initialize (new_event_id    => Throw_In,
+				new_player_id   => Get_Nearest_Player (ball_coord, Get_Opposing_Team (last_team_possession)),
+				new_team_id     => last_team_possession,
+				new_event_coord => ball_coord);
+	       elsif ball_coord.coord_x = 0 or ball_coord.coord_x = field_max_x + 1 then
+		  -- controllo se va assegnato un calcio d'angolo o un rinvio dal
+		  -- fondo (non controllo la y perche' ho gia' controllato il gol)
+		  Print ("[POST_CHECK] Controllo se va assegnato un calcio d'angolo o un rinvio dal fondo");
+		  declare
+		     new_event : Unary_Event_Ptr := new Unary_Event;
+		     new_evt_coord : Coordinate := Coordinate'(0,0);
+		  begin
+		     if ball_coord.coord_y < field_max_y / 2 then
+			Set_Coord_Y (coord => new_evt_coord, value => 1);
+		     else
+			Set_Coord_Y (coord => new_evt_coord, value => field_max_y);
+		     end if;
 
-                  -- imposto l'evento appena calcolato
-                  new_game_status := new_event;
-               end;
-            end if;
+		     if last_team_possession = Team_One then
+			if ball_coord.coord_x = 0 then
+			   -- assegna un calcio d'angolo a Team_Two
+			   Print ("[POST_CHECK] Calcio d'angolo per Team_Two");
+
+			   Set_Coord_X (coord => new_evt_coord, value => 1);
+
+			   new_event.Initialize (new_event_id    => Corner_Kick,
+			    new_player_id   => Get_Nearest_Player (new_evt_coord, Team_Two),
+			    new_team_id     => Team_Two,
+			    new_event_coord => new_evt_coord);
+			elsif ball_coord.coord_x = field_max_x + 1 then
+			   -- assegna una rimessa dal fondo a Team_Two
+			   Print ("[POST_CHECK] Rimessa dal fondo per Team_Two");
+
+			   Set_Coord_X (coord => new_evt_coord, value => field_max_x - 3);
+			   Set_Coord_Y (new_evt_coord, field_max_y / 2);
+
+			   new_event.Initialize (new_event_id    => Goal_Kick,
+			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_Two)),
+			    new_team_id     => Team_Two,
+			    new_event_coord => new_evt_coord);
+			end if;
+		     else
+			if ball_coord.coord_x = 0 then
+			   -- assegna una rimessa dal fondo a Team_One
+			   Print ("[POST_CHECK] Rimessa dal fondo per Team_One");
+
+			   Set_Coord_X (coord => new_evt_coord, value => 3);
+			   Set_Coord_Y (new_evt_coord, field_max_y / 2);
+
+			   new_event.Initialize (new_event_id    => Goal_Kick,
+			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_One)), -- portiere
+			    new_team_id     => Team_One,
+			    new_event_coord => new_evt_coord);
+			elsif ball_coord.coord_x = field_max_x + 1 then
+			   -- assegna un calcio d'angolo a Team_One
+
+			   Print ("[POST_CHECK] Calcio d'angolo per Team_One");
+
+			   Set_Coord_X (coord => new_evt_coord, value => field_max_x);
+
+			   new_event.Initialize (new_event_id    => Corner_Kick,
+			    new_player_id   => Get_Nearest_Player (new_evt_coord, Team_One),
+			    new_team_id     => Team_One,
+			    new_event_coord => new_evt_coord);
+			end if;
+		     end if;
+
+		     -- imposto l'evento appena calcolato
+		     new_game_status := new_event;
+		  end;
+	       end if;
+	    end if;
          end;
       end if;
 
@@ -774,5 +779,14 @@ package body Soccer.ControllerPkg.Referee is
    begin
       return last_ball_holder;
    end Get_Last_Ball_Holder;
+
+   function Get_Opposing_Team (current_team : Team_Id) return Team_Id is
+   begin
+      if current_team = Team_One then
+	 return Team_Two;
+      end if;
+
+      return Team_One;
+   end Get_Opposing_Team;
 
 end Soccer.ControllerPkg.Referee;

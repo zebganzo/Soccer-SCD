@@ -26,6 +26,96 @@ package body Soccer.Utils is
       return Integer(Sqrt( dx*dx + dy*dy ));
    end Distance;
 
+   function NEW_Get_Next_Coordinate (start_coord : Coordinate; target_coord : Coordinate) return Coordinate is
+      delta_x : Integer;
+      delta_y : Integer;
+      reminder : Integer;
+      result : Coordinate;
+   begin
+      delta_x := target_coord.coord_x - start_coord.coord_x;
+      delta_y := target_coord.coord_y - start_coord.coord_y;
+
+      if abs (delta_x) > abs (delta_y) then
+	 if delta_y = 0 then
+	    reminder := 42;
+	 else
+	    reminder := delta_x rem delta_y;
+	 end if;
+
+	 if reminder = 0 then
+	    if delta_x > 0 and delta_y > 0 then
+	       result.coord_x := start_coord.coord_x + 1;
+	       result.coord_y := start_coord.coord_y + 1;
+	    elsif delta_x > 0 and delta_y < 0 then
+	       result.coord_x := start_coord.coord_x + 1;
+	       result.coord_y := start_coord.coord_y - 1;
+	    elsif delta_x < 0 and delta_y > 0 then
+	       result.coord_x := start_coord.coord_x - 1;
+	       result.coord_y := start_coord.coord_y + 1;
+	    else
+	       result.coord_x := start_coord.coord_x - 1;
+	       result.coord_y := start_coord.coord_y - 1;
+	    end if;
+	 else
+	    if delta_x > 0 then
+	       result.coord_x := start_coord.coord_x + 1;
+	    else
+	       result.coord_x := start_coord.coord_x - 1;
+	    end if;
+
+	    result.coord_y := start_coord.coord_y;
+
+	 end if;
+      elsif abs (delta_x) < abs (delta_y) then
+	 if delta_x = 0 then
+	    reminder := 42;
+	 else
+	    reminder := delta_y rem delta_x;
+	 end if;
+
+	 if reminder = 0 then
+	    if delta_x > 0 and delta_y > 0 then
+	       result.coord_x := start_coord.coord_x + 1;
+	       result.coord_y := start_coord.coord_y + 1;
+	    elsif delta_x > 0 and delta_y < 0 then
+	       result.coord_x := start_coord.coord_x + 1;
+	       result.coord_y := start_coord.coord_y - 1;
+	    elsif delta_x < 0 and delta_y > 0 then
+	       result.coord_x := start_coord.coord_x - 1;
+	       result.coord_y := start_coord.coord_y + 1;
+	    else
+	       result.coord_x := start_coord.coord_x - 1;
+	       result.coord_y := start_coord.coord_y - 1;
+	    end if;
+	 else
+	    if delta_y > 0 then
+	       result.coord_y := start_coord.coord_y + 1;
+	    else
+	       result.coord_y := start_coord.coord_y - 1;
+	    end if;
+
+	    result.coord_x := start_coord.coord_x;
+
+	 end if;
+      else
+	 if delta_x > 0 and delta_y > 0 then
+	    result.coord_x := start_coord.coord_x + 1;
+	    result.coord_y := start_coord.coord_y + 1;
+	 elsif delta_x > 0 and delta_y < 0 then
+	    result.coord_x := start_coord.coord_x + 1;
+	    result.coord_y := start_coord.coord_y - 1;
+	 elsif delta_x < 0 and delta_y > 0 then
+	    result.coord_x := start_coord.coord_x - 1;
+	    result.coord_y := start_coord.coord_y + 1;
+	 else
+	    result.coord_x := start_coord.coord_x - 1;
+	    result.coord_y := start_coord.coord_y - 1;
+	 end if;
+      end if;
+
+      return result;
+   end NEW_Get_Next_Coordinate;
+
    function Get_Next_Coordinate (myCoord : Coordinate; targetCoord : Coordinate) return Coordinate is
       myX : Integer := myCoord.coord_x;
       myY : Integer := myCoord.coord_y;

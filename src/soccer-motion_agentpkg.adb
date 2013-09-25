@@ -53,8 +53,8 @@ package body Soccer.Motion_AgentPkg is
          while start and actual_power > 0 and Ball.Get_Controlled = False loop
             Print("[MOTION_AGENT] Nuova coordinata " & Print_Coord (actual_coord));
             Ball.Set_Moving(new_status => True);
-            actual_target := Utils.Get_Next_Coordinate(myCoord => actual_coord,
-                                                       targetCoord => real_target);
+            actual_target := Get_Next_Coordinate(actual_coord,
+						     real_target);
             select
                Ball.Move_Agent(new_coord => actual_target);
                Print("[MOTION_AGENT] Palla mossa alla coordinata prestabilita");
@@ -76,9 +76,11 @@ package body Soccer.Motion_AgentPkg is
          if actual_power = 0 then
             Print("[MOTION_AGENT] Potenza esaurita");
             null;
-         end if;
+	 end if;
+
          Ball.Set_Moving(new_status => False);
-         Print("[MOTION_AGENT] Agente terminato");
+	 Print("[MOTION_AGENT] Agente terminato");
+
       end loop;
    end Motion_Agent;
 

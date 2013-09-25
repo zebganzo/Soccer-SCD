@@ -30,7 +30,7 @@ with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.G
 package body Soccer.ControllerPkg is
 
    --+ Ritorna la posizione in base all'id
-   function Get_Generic_Status(id : in Integer) return Generic_Status_Ptr is
+   function Get_Generic_Status (id : in Integer) return Generic_Status_Ptr is
       coord_result  : Coordinate;
       holder_result : Boolean := False;
       nearby_result : Boolean := False;
@@ -169,7 +169,7 @@ package body Soccer.ControllerPkg is
                           x2 => current_status (i).coord.coord_x,
                           y1 => y,
                           y2 => current_status (i).coord.coord_y);
-         if dist <= r and dist /= 0 then
+         if dist <= r and dist /= 0 and current_status (i).on_the_field then
             result.players_in_my_zone.Append (New_Item => current_status (i));
          end if;
       end loop;
@@ -615,7 +615,7 @@ package body Soccer.ControllerPkg is
 
    procedure Compute (action : in Shot_Event_Ptr; success : out Boolean) is
    begin
-      Print ("[CONTROLLER] Shot_Event");
+      Print ("[CONTROLLER] Shot_Event per Giocatore " & I2S (Get_Player_Id (action.all)));
       if Utils.Compare_Coordinates(coord1 => Ball.Get_Position,
                                    coord2 => action.Get_From) then
          Ball.Set_Controlled(new_status => False);
@@ -637,7 +637,7 @@ package body Soccer.ControllerPkg is
       with_foul : Boolean := False;
       tackle_success : Boolean;
    begin
-      Print ("[CONTROLLER] Tackle_Event");
+      Print ("[CONTROLLER] Tackle_Event per Giocatore " & I2S (Get_Player_Id (action.all)));
       if Utils.Compare_Coordinates(coord1 => action.Get_To,
 				   coord2 => current_status(action.Get_Other_Player_Id).coord) then
 	    -- Tento di rubargli la palla!
@@ -689,7 +689,7 @@ package body Soccer.ControllerPkg is
 
    procedure Compute (action : in Catch_Event_Ptr; success : out Boolean) is
    begin
-      Print ("[CONTROLLER] Catch_Event");
+      Print ("[CONTROLLER] Catch_Event per Giocatore " & I2S (Get_Player_Id (action.all)));
       Ball.Catch (catch_coord => action.Get_To,
                   player_coord => action.Get_From,
                   succeded     => success);

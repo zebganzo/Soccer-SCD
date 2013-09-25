@@ -11,6 +11,8 @@ package Soccer.Utils is
    --+ Coordinate della prossima cella date le mie coordinate attuali e quelle della cella target
    function Get_Next_Coordinate (myCoord : Coordinate; targetCoord : Coordinate) return Coordinate;
 
+   function NEW_Get_Next_Coordinate (start_coord : Coordinate; target_coord : Coordinate) return Coordinate;
+
    --+ Mi tolgo di mezzo nel caso di gioco fermo
    function Back_Off (current_coord : Coordinate; reference_coord : Coordinate; event_coord : Coordinate) return Coordinate;
 
