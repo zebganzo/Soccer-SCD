@@ -368,9 +368,12 @@ package body Soccer.PlayersPkg is
                         json_obj.Set_Field(Field_Name => "penalty_kick_position",
                                            Field      => coords_array);
                         coords_array := Empty_Array;
-                     when Throw_In .. Free_Kick =>
+                     when Throw_In =>
                         json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "inactive_ball");
+                                           Field      => "throw_in");
+                     when Free_Kick =>
+                        json_obj.Set_Field(Field_Name => "event",
+                                           Field      => "free_kick");
                   end case;
                end if;
 

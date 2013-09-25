@@ -53,17 +53,89 @@ action(CellX, CellY, move) :-
 		move_to_pos(StartX, StartY, CellX, CellY)								% move to the closest cell to the starting position
 	).
 
-% Move action if the game is in status 'blocked', caused by an 'inactive_ball' event (free kick, penalty, corner ...)
+% Move action if the game is in status 'blocked', caused by a 'goal_kick' event. The player moves one cell at a time
+% A normal player is never assigned to resume the game in this event type, therefore we just retrieve his goal kick position and 
+% move him there
+% action(
+%	CellX,																		X coordinate of the cell in which the player will move
+%	CellY,																		Y coordinate of the cell in which the player will move
+%	Move) 																		'move'
+action(CellX, CellY, move) :-
+	game(blocked),																% game status: 'blocked'
+	event(goal_kick), !,														% event: 'goal_kick'
+	goal_kick_position(GKickX, GKickY),											% retrieve goal_kick_position
+	move_to_pos(GKickX, GKickY, CellX, CellY).									% move to the goal_kick_position
+
+% Move action if the game is in status 'blocked', caused by a 'corner_kick' event.
+% If the player is the one assigned to resume the game he moves towards his reference position.
+% Otherwise the player must move to his corner kick position. The player moves one cell at a time
+% action(
+%	CellX,																		X coordinate of the cell in which the player will move
+%	CellY,																		Y coordinate of the cell in which the player will move
+%	Move) 																		'move'
+% current_predicate(:PredicateIndicator) is a predefined procedure that is True if PredicateIndicator is a currently defined predicate
+action(CellX, CellY, move) :-
+	game(blocked),																% game status: 'blocked'
+	event(corner_kick), !,														% game event: 'corner_kick'
+	(
+		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
+		reference_position(RefX, RefY),											% get the player assigned position
+		move_to_pos(RefX, RefY, CellX, CellY)									% move to the closest cell to the  fixed assigned position
+		;																		% or if the player has not a fixed position
+		corner_kick_position(CornerX, CornerY),									% retrieve corner_kick_position
+		move_to_pos(CornerX, CornerY, CellX, CellY)								% move to the corner_kick_position
+	).
+
+% Move action if the game is in status 'blocked', caused by a 'penalty_kick' event.
+% If the player is the one assigned to resume the game he moves towards his reference position.
+% Otherwise the player must move to his corner kick position. The player moves one cell at a time
+% action(
+%	CellX,																		X coordinate of the cell in which the player will move
+%	CellY,																		Y coordinate of the cell in which the player will move
+%	Move) 																		'move'
+% current_predicate(:PredicateIndicator) is a predefined procedure that is True if PredicateIndicator is a currently defined predicate
+action(CellX, CellY, move) :-
+	game(blocked),																% game status: 'blocked'
+	event(penalty_kick), !, 													% game event: 'penalty_kick'
+	(
+		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
+		reference_position(RefX, RefY),											% get the player assigned position
+		move_to_pos(RefX, RefY, CellX, CellY)									% move to the closest cell to the  fixed assigned position
+		;																		% or if the player has not a fixed position
+		penalty_kick_position(PenaltyX, PenaltyY),								% retrieve penalty_kick_position
+		move_to_pos(PenaltyX, PenaltyY, CellX, CellY)							% move to the penalty_kick_position
+	).
+
+% Move action if the game is in status 'blocked', caused by an 'free_kick' event.
 % If the player is the one assigned to resume the game he moves towards his reference position.
 % Otherwise the player must move out of the "safe zone" the ball is in. The player moves one cell at a time
 % action(
 %	CellX,																		X coordinate of the cell in which the player will move
-%	CellY																		Y coordinate of the cell in which the player will move
+%	CellY,																		Y coordinate of the cell in which the player will move
 %	Move) 																		'move'
 % current_predicate(:PredicateIndicator) is a predefined procedure that is True if PredicateIndicator is a currently defined predicate
 action(CellX, CellY, move) :-
 	game(blocked), 																% game status: 'blocked'
-	event(inactive_ball), !,													% event: 'inactive_ball'
+	event(throw_in), !,															% event: 'free_kick'	
+	(
+		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
+		reference_position(RefX, RefY),											% get the player assigned position
+		move_to_pos(RefX, RefY, CellX, CellY)									% move to the closest cell to the  fixed assigned position
+		;																		% or if the player has not a fixed assigned position																										
+		player(position(CellX, CellY), _, _, _)									% he doesn't need to move
+	).
+
+% Move action if the game is in status 'blocked', caused by an 'free_kick' event.
+% If the player is the one assigned to resume the game he moves towards his reference position.
+% Otherwise the player must move out of the "safe zone" the ball is in. The player moves one cell at a time
+% action(
+%	CellX,																		X coordinate of the cell in which the player will move
+%	CellY,																		Y coordinate of the cell in which the player will move
+%	Move) 																		'move'
+% current_predicate(:PredicateIndicator) is a predefined procedure that is True if PredicateIndicator is a currently defined predicate
+action(CellX, CellY, move) :-
+	game(blocked), 																% game status: 'blocked'
+	event(free_kick), !,														% event: 'free_kick'	
 	(
 		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
 		reference_position(RefX, RefY),											% get the player assigned position
@@ -162,7 +234,7 @@ action(TargetX, TargetY, shot) :-
 	GoalY is (Y1+Y2)/2,
 	see_goal(position(PlayerX, PlayerY), position(GoalX, GoalY)), !,			% does the player see the goal? if not the Shot action must fail
 	(
-		Team = team1,
+		Team = team1, !,
 		ShotX is GoalX + 1
 		;
 		Team = team2,
@@ -181,7 +253,7 @@ action(TargetX, TargetY, shot) :-
 %	Move)																		'pass'
 action(TargetX, TargetY, pass) :-
 	game(ready),																% game status: 'ready'
-	player(_, has, Team, _),														% if the player has the ball
+	player(_, has, Team, _),													% if the player has the ball
 	(
 		event(free_kick), !														% event: 'free_kick'
 		;
@@ -204,7 +276,6 @@ action(TargetX, TargetY, pass) :-
 action(CellX, CellY, move) :-
 	game(ready),!,
 	player(position(CellX, CellY), _, _, _).
-
 
 /***************************************************************************************************************
  *										GAME RUNNING	PLAYER WITH BALL RULES								   *
