@@ -265,18 +265,19 @@ package body Soccer.Utils is
 
    function Is_In_Penalty_Area (team : Team_Id; coord : Coordinate) return Boolean is
    begin
+
       if team = Team_One then
-	 if coord.coord_x > team_one_goal_starting_coord.coord_x
-	   and coord.coord_x < team_one_goal_starting_coord.coord_x + penalty_area_width
-	   and coord.coord_y > team_one_goal_starting_coord.coord_y - penalty_area_height
-	   and coord.coord_y < team_one_goal_starting_coord.coord_y then
+	 if coord.coord_x >= team_one_penalty_lower_left_coord.coord_x
+	   and coord.coord_x <= team_one_penalty_lower_right_coord.coord_x
+	   and coord.coord_y >= team_one_penalty_lower_left_coord.coord_y
+	   and coord.coord_y <= team_one_penalty_upper_left_coord.coord_y then
 	    return true;
 	 end if;
       else
-	 if coord.coord_x > team_two_goal_starting_coord.coord_x
-	   and coord.coord_x < team_two_goal_starting_coord.coord_x + penalty_area_width
-	   and coord.coord_y > team_two_goal_starting_coord.coord_y
-	   and coord.coord_y < team_two_goal_starting_coord.coord_y + penalty_area_height then
+	 if coord.coord_x >= team_two_penalty_lower_left_coord.coord_x
+	   and coord.coord_x <= team_two_penalty_lower_right_coord.coord_x
+	   and coord.coord_y >= team_two_penalty_lower_left_coord.coord_y
+	   and coord.coord_y <= team_two_penalty_upper_left_coord.coord_y then
 	    return true;
 	 end if;
       end if;

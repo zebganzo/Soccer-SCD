@@ -638,8 +638,9 @@ package body Soccer.ControllerPkg is
       tackle_success : Boolean;
    begin
       Print ("[CONTROLLER] Tackle_Event per Giocatore " & I2S (Get_Player_Id (action.all)));
-      if Utils.Compare_Coordinates(coord1 => action.Get_To,
-				   coord2 => current_status(action.Get_Other_Player_Id).coord) then
+      if Compare_Coordinates (coord1 => action.Get_To,
+			      coord2 => current_status(action.Get_Other_Player_Id).coord) and
+	ball_holder_id = action.Get_Other_Player_Id then
 	    -- Tento di rubargli la palla!
 	    Calculate_Tackle(attacker_id   => action.Get_Player_Id,
 		      ball_owner_id => action.Get_Other_Player_Id,
@@ -657,9 +658,11 @@ package body Soccer.ControllerPkg is
                   foul_event.Initialize(new_event_id    => Foul,
                                         new_player_1_id => action.Get_Player_Id,
                                         new_player_2_id => action.Get_Other_Player_Id,
-                                        new_event_coord => action.Get_To);
+					new_event_coord => action.Get_To);
+
 		  ball_holder_id := 0;
-                  Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
+
+		  Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
                else
                   -- hell yeah! Mi prendo la palla
                   Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla");
@@ -683,7 +686,19 @@ package body Soccer.ControllerPkg is
             success := False;
          end if;
       else
-         success := False;
+	 declare
+	    foul_event : Binary_Event_Ptr := new Binary_Event;
+	 begin
+	    Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
+	    foul_event.Initialize(new_event_id    => Foul,
+			   new_player_1_id => action.Get_Player_Id,
+			   new_player_2_id => action.Get_Other_Player_Id,
+			   new_event_coord => action.Get_To);
+
+	    ball_holder_id := 0;
+
+	    Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
+	 end;
       end if;
    end Compute;
 
@@ -754,6 +769,8 @@ package body Soccer.ControllerPkg is
       team_two_players_count : Integer;
       initialized : Boolean;
 
+      first_time : Boolean := True;
+
    begin
 --        Initialize;
 --        Timer_Control.Start;
@@ -781,6 +798,64 @@ package body Soccer.ControllerPkg is
 	 -- aggiungere controllo su flag del gioco (per pausa, fine_gioco, ecc)
 	 select
 	    accept Write (current_action : in out Action) do
+
+	       if first_time then
+		  if current_action.event.Get_Player_Id = 1 then
+		     if Is_In_Penalty_Area (Team_Two, current_action.event.Get_From) then
+			declare
+			   foul_event : Binary_Event_Ptr := new Binary_Event;
+			begin
+			   first_time := False;
+
+			   Print ("[CONTROLLER] Falsifico fallo di 9 su 1");
+
+			   foul_event.Initialize(new_event_id    => Foul,
+			    new_player_1_id => 9,
+			    new_player_2_id => 1,
+			    new_event_coord => team_two_penalty_coord);
+
+			   ball_holder_id := 0;
+
+			   Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
+
+			   Referee.Pre_Check (last_player_event);
+			   Referee.Post_Check;
+
+			   goto BRAIN_FUCK;
+			end;
+		     else
+			Print ("[CONTROLLER] Non nell'area di rigore di Team_Two");
+		     end if;
+
+		  elsif current_action.event.Get_Player_Id = 9 then
+		     if Is_In_Penalty_Area (Team_One, current_action.event.Get_From) then
+			declare
+			   foul_event : Binary_Event_Ptr := new Binary_Event;
+			begin
+			   first_time := False;
+
+			   Print ("[CONTROLLER] Falsifico fallo di 1 su 9");
+
+			   foul_event.Initialize(new_event_id    => Foul,
+			    new_player_1_id => 1,
+			    new_player_2_id => 9,
+			    new_event_coord => team_one_penalty_coord);
+
+			   ball_holder_id := 0;
+
+			   Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
+
+			   Referee.Pre_Check (last_player_event);
+			   Referee.Post_Check;
+
+			   goto BRAIN_FUCK;
+			end;
+		     else
+			Print ("[CONTROLLER] Non nell'area di rigore di Team_One");
+		     end if;
+		  end if;
+	       end if;
+
 
 	       -- provo a soddisfare la richiesta del giocatore
 	       Compute (current_action.event, compute_result, revaluate);
@@ -830,6 +905,10 @@ package body Soccer.ControllerPkg is
 		  Referee.Pre_Check (last_player_event);
 		  Referee.Post_Check;
 	       end if;
+
+	       <<BRAIN_FUCK>>
+	       null;
+
 	    end Write;
 --  	 or
 --  	    when released (Integer (Zone)) = True =>

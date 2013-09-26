@@ -401,7 +401,7 @@ package body Soccer.PlayersPkg is
             current_read_result :=
               ControllerPkg.Read_Status(x => current_generic_status.coord.coord_x,
                                         y => current_generic_status.coord.coord_y,
-                                        r => player_radius + 12);
+                                        r => player_radius + 100);
             -- reset resume_player variable
             resume_player := False;
          else
@@ -510,9 +510,9 @@ package body Soccer.PlayersPkg is
             begin
                new_shot_event := new Shot_Event;
 
-	       if decision = "shot" then
-		  decision_y := decision_y + 7;
-	       end if;
+--  	       if decision = "shot" then
+--  		  decision_y := decision_y + 7;
+--  	       end if;
 
                new_shot_event.Initialize(id,
                                          current_coord,

@@ -43,7 +43,7 @@ procedure Soccer.Main is
    -- players statistics for team 1
    -- (attack, defense, goal_keeping, power, precision, speed, tackle)
    players_stats_team_1 : Team_Players_Statistics :=
-     (1   => (30, 80, 0, 75, 60, 60, 80),
+     (1   => (30, 10, 0, 20, 60, 60, 80),
       2   => (30, 80, 0, 75, 60, 60, 80),
       3   => (30, 80, 0, 75, 60, 60, 80),
       4   => (30, 80, 0, 75, 60, 60, 80),
@@ -55,7 +55,7 @@ procedure Soccer.Main is
      (1   => (40, 70, 0, 85, 50, 70, 70),
       2   => (40, 70, 0, 85, 50, 70, 70),
       3   => (40, 70, 0, 85, 50, 70, 70),
-      4   => (40, 70, 0, 85, 50, 70, 70),
+      4   => (40, 10, 0, 20, 50, 70, 70),
       5   => (40, 70, 0, 85, 50, 70, 70));
 
    t1 : Team_Ptr;

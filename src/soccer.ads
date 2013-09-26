@@ -26,11 +26,6 @@ package Soccer is
 
    half_game_duration : Positive := 120;
 
-   team_one_goal_starting_coord : Coordinate := Coordinate'(0,9);
-   team_two_goal_starting_coord : Coordinate := Coordinate'(31,9);
-
-   goal_length : Positive := 5;
-
    -- team one [LEFT]
    team_one_goal_lower_coord : Coordinate := Coordinate'(0,15);
    team_one_goal_upper_coord : Coordinate := Coordinate'(0,19);
@@ -38,8 +33,8 @@ package Soccer is
    team_one_goalkeeper_coord : Coordinate := Coordinate'(1,17);
 
    team_one_penalty_lower_left_coord : Coordinate := Coordinate'(1,9);
-   team_one_penalty_upper_left_coord : Coordinate := Coordinate'(8,9);
-   team_one_penalty_lower_right_coord : Coordinate := Coordinate'(1,25);
+   team_one_penalty_upper_left_coord : Coordinate := Coordinate'(1,25);
+   team_one_penalty_lower_right_coord : Coordinate := Coordinate'(8,9);
    team_one_penalty_upper_right_coord : Coordinate := Coordinate'(8,25);
 
    team_one_penalty_coord : Coordinate := Coordinate'(6,17);
@@ -51,17 +46,13 @@ package Soccer is
    team_two_goalkeeper_coord : Coordinate := Coordinate'(51,17);
 
    team_two_penalty_lower_left_coord : Coordinate := Coordinate'(44,9);
-   team_two_penalty_upper_left_coord : Coordinate := Coordinate'(51,9);
-   team_two_penalty_lower_right_coord : Coordinate := Coordinate'(44,25);
+   team_two_penalty_upper_left_coord : Coordinate := Coordinate'(44,25);
+   team_two_penalty_lower_right_coord : Coordinate := Coordinate'(51,9);
    team_two_penalty_upper_right_coord : Coordinate := Coordinate'(51,25);
 
    team_two_penalty_coord : Coordinate := Coordinate'(46,17);
 
    middle_field_coord : Coordinate := Coordinate'(26,17);
-
-   -- penalty variables
-   penalty_area_width : Positive := 6;
-   penalty_area_height : Positive := 3;
 
    free_kick_area : Positive := 4;
 

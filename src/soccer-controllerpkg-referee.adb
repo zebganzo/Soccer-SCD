@@ -294,9 +294,7 @@ package body Soccer.ControllerPkg.Referee is
                      -- ha lanciato, quindi il gioco puo' riprendere
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
-                  end if;
-
-                  if Get_Game_Status /= Game_Ready then
+                  else
                      -- controllo che chi deve fare la rimessa dal fondo sia in
                      -- posizione, se non lo e' esco
                      if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
@@ -308,10 +306,6 @@ package body Soccer.ControllerPkg.Referee is
                      -- di chi deve fare la rimessa dal fondo
 		     for i in current_status'Range loop
 
-			Print("CHECKING PLAYER: " & I2S(current_status(i).id) & " (" & I2S(current_status(i).number) & ") " &
-			    "DISTANCE: " & Boolean'Image(Distance (From => assigned_player_position,
-					      To => current_status (i).coord) > free_kick_area) &
-			    " ON THE FIELD: " & Boolean'Image(current_status(i).on_the_field));
 
                         if current_status(i).id /= current_player_status.id
 			  and current_status(i).on_the_field
@@ -322,13 +316,12 @@ package body Soccer.ControllerPkg.Referee is
 			end if;
 
                         exit when not second_condition;
-                     end loop;
-                  end if;
+		     end loop;
 
-		  Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
+		     if first_condition and second_condition then
+			Set_Game_Status (Game_Ready);
+		     end if;
 
-                  if first_condition and second_condition then
-                     Set_Game_Status (Game_Ready);
                   end if;
                end;
 
@@ -385,46 +378,45 @@ package body Soccer.ControllerPkg.Referee is
                declare
                   current_player_status : Player_Status := current_status (assigned_player);
                   assigned_player_position : Coordinate := current_player_status.coord;
-                  opponent_team : Team_Id;
+                  assigned_team : Team_Id := current_player_status.team;
                   first_condition : Boolean := False;
                   second_condition : Boolean := False;
                begin
                   -- controllo se il gioco puo' riprendere
-                  if Get_Game_Status /= Game_Ready and e.all in Shot_Event'Class then
-                     -- ha battuto, quindi il gioco puo' riprendere
+                  if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
+                     -- ha lanciato, quindi il gioco puo' riprendere
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
-                  end if;
-
-                  if Get_Game_Status /= Game_Ready then
-                     -- controllo che chi deve battere il calcio di rigore sia in
+                  else
+                     -- controllo che chi deve fare la rimessa dal fondo sia in
                      -- posizione, se non lo e' esco
                      if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
                                              coord2 => current_event_coord) then
                         first_condition := True;
                      end if;
 
-                     if current_player_status.team = Team_One then
-                        opponent_team := Team_Two;
-                     else
-                        opponent_team := Team_One;
-                     end if;
-
                      -- controllo che non ci siano giocatori attorno alla posizione
-                     -- di chi deve battere il calcio di rigore
-                     for i in current_status'Range loop
-                        if i /= current_player_status.id
-                          and i /= Get_Id_From_Number(Get_Goalkeeper_Number(team => opponent_team))
-                          and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
-                           second_condition := True;
-                        end if;
+                     -- di chi deve fare la rimessa dal fondo
+		     for i in current_status'Range loop
+
+                        if current_status(i).id /= current_player_status.id
+			  and current_status(i).on_the_field
+			  and not Compare_Coordinates (current_status (i).coord,
+			    Get_Penalty_Kick_Position (current_status (i).number,
+			      current_status (i).team,
+			      assigned_team)) then
+				  second_condition := False;
+			end if;
+
                         exit when not second_condition;
-                     end loop;
+		     end loop;
+
+		     if first_condition and second_condition then
+			Set_Game_Status (Game_Ready);
+		     end if;
+
                   end if;
 
-                  if first_condition and second_condition then
-                     Set_Game_Status (Game_Ready);
-                  end if;
                end;
 
             when Throw_In =>
@@ -548,7 +540,7 @@ package body Soccer.ControllerPkg.Referee is
 		     assigned_team : Team_Id := Get_Player_Team_From_Id (evt.Get_Id_Player_2);
 		     foul_event : Unary_Event_Ptr := new Unary_Event;
 		     is_penalty : Boolean := Is_In_Penalty_Area (team  => assigned_team,
-						   coord => evt_coord);
+						   coord => current_status (evt.Get_Id_Player_2).coord);
 		     foul_type : Unary_Event_Id;
 		  begin
 		     -- controllo se il fallo e' stato fatto nell'area di rigore
