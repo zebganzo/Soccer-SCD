@@ -1,12 +1,7 @@
+with Ada.Real_Time; use Ada.Real_Time;
+with Soccer.Generic_Timers;
+
 package Soccer.Bridge.Output is
-
-   protected Timer_Control is
-      procedure Start;
-      procedure Stop;
-      entry Is_On;
-   end Timer_Control;
-
-   task Timer;
 
    type Event_Buffer_Element is
       record
@@ -29,5 +24,10 @@ package Soccer.Bridge.Output is
 
    end Buffer_Wrapper;
 
+private
+   -- Timer
+   buffer_time_span : constant Time_Span := Seconds (send_buffer_delay);
+   id : constant String := "[TIMER] Buffer timer";
+   package Buffer_Timer is new Generic_Timers (True, id, buffer_time_span, Buffer_Wrapper.Send);
 
 end Soccer.Bridge.Output;

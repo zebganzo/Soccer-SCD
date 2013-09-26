@@ -12,37 +12,6 @@ use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 
 package body Soccer.Bridge.Output is
 
-   On : Boolean := False;
-
-   protected body Timer_Control is
-
-      procedure Start is
-      begin
-         On := True;
-      end Start;
-
-      procedure Stop is
-      begin
-         On := False;
-      end Stop;
-
-      entry Is_On when On is
-      begin
-         null;
-      end Is_On;
-   end Timer_Control;
-
-   task body Timer is
-   begin
-      loop
-         Timer_Control.Is_On;
-         delay duration (send_buffer_delay);
-         if On then
-            Buffer_Wrapper.Send;
-         end if;
-      end loop;
-   end Timer;
-
    -- Ogni mossa che viene inserita tramite Put e' formata da:
    -- id
    -- coord From
@@ -64,9 +33,10 @@ package body Soccer.Bridge.Output is
    -- avendo cura di evitare che i giocatori si incaprettino fra di loro!
 
    protected body Buffer_Wrapper is
+
       procedure Put (new_event : Soccer.Core_Event.Event_Ptr) is
          new_element : Event_Buffer_Element;
-         now : Time := Clock;
+         now : Ada.Calendar.Time := Clock;
       begin
 
          if new_event.all in Game_Event'Class then
