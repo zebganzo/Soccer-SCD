@@ -822,6 +822,8 @@ package body Soccer.ControllerPkg is
 			  & " rivalutata alla cella " & Print_Coord (alternative));
 			Compute (new_move, compute_result, revaluate);
 			Guard.Update (Field_Zones (Get_Zone (from)), False);
+			Referee.Pre_Check (last_player_event);
+			Referee.Post_Check;
 		     end;
 		  end if;
 	       else

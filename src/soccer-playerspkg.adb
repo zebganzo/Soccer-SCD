@@ -113,8 +113,8 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
+--        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
@@ -401,7 +401,7 @@ package body Soccer.PlayersPkg is
             current_read_result :=
               ControllerPkg.Read_Status(x => current_generic_status.coord.coord_x,
                                         y => current_generic_status.coord.coord_y,
-                                        r => player_radius + 100);
+                                        r => player_radius + 12);
             -- reset resume_player variable
             resume_player := False;
          else

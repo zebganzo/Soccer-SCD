@@ -287,7 +287,7 @@ package body Soccer.ControllerPkg.Referee is
                   current_player_status : Player_Status := current_status (assigned_player);
                   assigned_player_position : Coordinate := current_player_status.coord;
                   first_condition : Boolean := False;
-                  second_condition : Boolean := False;
+                  second_condition : Boolean := True;
                begin
                   -- controllo se il gioco puo' riprendere
                   if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
@@ -306,15 +306,26 @@ package body Soccer.ControllerPkg.Referee is
 
                      -- controllo che non ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa dal fondo
-                     for i in current_status'Range loop
-                        if i /= current_player_status.id
-                          and current_player_status.team /= current_status(i).team
-                          and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
-                           second_condition := True;
-                        end if;
+		     for i in current_status'Range loop
+
+			Print("CHECKING PLAYER: " & I2S(current_status(i).id) & " (" & I2S(current_status(i).number) & ") " &
+			    "DISTANCE: " & Boolean'Image(Distance (From => assigned_player_position,
+					      To => current_status (i).coord) > free_kick_area) &
+			    " ON THE FIELD: " & Boolean'Image(current_status(i).on_the_field));
+
+                        if current_status(i).id /= current_player_status.id
+			  and current_status(i).on_the_field
+			  and not Compare_Coordinates (current_status (i).coord,
+			    Get_Goal_Kick_Position (current_status (i).number,
+			      current_status (i).team)) then
+				  second_condition := False;
+			end if;
+
                         exit when not second_condition;
                      end loop;
                   end if;
+
+		  Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
 
                   if first_condition and second_condition then
                      Set_Game_Status (Game_Ready);
