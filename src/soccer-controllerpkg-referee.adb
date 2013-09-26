@@ -380,7 +380,7 @@ package body Soccer.ControllerPkg.Referee is
                   assigned_player_position : Coordinate := current_player_status.coord;
                   assigned_team : Team_Id := current_player_status.team;
                   first_condition : Boolean := False;
-                  second_condition : Boolean := False;
+                  second_condition : Boolean := True;
                begin
                   -- controllo se il gioco puo' riprendere
                   if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
@@ -388,7 +388,7 @@ package body Soccer.ControllerPkg.Referee is
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
                   else
-                     -- controllo che chi deve fare la rimessa dal fondo sia in
+                     -- controllo che chi deve battere il calcio di rigore sia in
                      -- posizione, se non lo e' esco
                      if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
                                              coord2 => current_event_coord) then
@@ -537,16 +537,17 @@ package body Soccer.ControllerPkg.Referee is
 	       if evt.Get_Event_Id = Foul then
 		  declare
 		     evt_coord : Coordinate := evt.Get_Coordinate;
-		     assigned_team : Team_Id := Get_Player_Team_From_Id (evt.Get_Id_Player_2);
+		     offender_team : Team_Id := Get_Player_Team_From_Id (evt.Get_Id_Player_1);
+		     victim_team : Team_Id := Get_Player_Team_From_Id (evt.Get_Id_Player_2);
 		     foul_event : Unary_Event_Ptr := new Unary_Event;
-		     is_penalty : Boolean := Is_In_Penalty_Area (team  => assigned_team,
-						   coord => current_status (evt.Get_Id_Player_2).coord);
+		     is_penalty : Boolean := Is_In_Penalty_Area (offender_team,
+						   		 current_status (evt.Get_Id_Player_2).coord);
 		     foul_type : Unary_Event_Id;
 		  begin
 		     -- controllo se il fallo e' stato fatto nell'area di rigore
 		     if is_penalty then
 			foul_type := Penalty_Kick;
-			if assigned_team = Team_One then
+			if offender_team = Team_One then
 			   evt_coord := team_one_penalty_coord;
 			else
 			   evt_coord := team_two_penalty_coord;
@@ -557,8 +558,8 @@ package body Soccer.ControllerPkg.Referee is
 
 		     -- inizializzo l'evento di fallo
 		     foul_event.Initialize (foul_type,
-			      Get_Nearest_Player (evt_coord, assigned_team),
-			      assigned_team,
+			      Get_Nearest_Player (evt_coord, victim_team),
+			      victim_team,
 			      evt_coord);
 
 		     -- setto il risultato (stato di gioco)

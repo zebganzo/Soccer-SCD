@@ -799,64 +799,6 @@ package body Soccer.ControllerPkg is
 	 select
 	    accept Write (current_action : in out Action) do
 
-	       if first_time then
-		  if current_action.event.Get_Player_Id = 1 then
-		     if Is_In_Penalty_Area (Team_Two, current_action.event.Get_From) then
-			declare
-			   foul_event : Binary_Event_Ptr := new Binary_Event;
-			begin
-			   first_time := False;
-
-			   Print ("[CONTROLLER] Falsifico fallo di 9 su 1");
-
-			   foul_event.Initialize(new_event_id    => Foul,
-			    new_player_1_id => 9,
-			    new_player_2_id => 1,
-			    new_event_coord => team_two_penalty_coord);
-
-			   ball_holder_id := 0;
-
-			   Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
-
-			   Referee.Pre_Check (last_player_event);
-			   Referee.Post_Check;
-
-			   goto BRAIN_FUCK;
-			end;
-		     else
-			Print ("[CONTROLLER] Non nell'area di rigore di Team_Two");
-		     end if;
-
-		  elsif current_action.event.Get_Player_Id = 9 then
-		     if Is_In_Penalty_Area (Team_One, current_action.event.Get_From) then
-			declare
-			   foul_event : Binary_Event_Ptr := new Binary_Event;
-			begin
-			   first_time := False;
-
-			   Print ("[CONTROLLER] Falsifico fallo di 1 su 9");
-
-			   foul_event.Initialize(new_event_id    => Foul,
-			    new_player_1_id => 1,
-			    new_player_2_id => 9,
-			    new_event_coord => team_one_penalty_coord);
-
-			   ball_holder_id := 0;
-
-			   Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
-
-			   Referee.Pre_Check (last_player_event);
-			   Referee.Post_Check;
-
-			   goto BRAIN_FUCK;
-			end;
-		     else
-			Print ("[CONTROLLER] Non nell'area di rigore di Team_One");
-		     end if;
-		  end if;
-	       end if;
-
-
 	       -- provo a soddisfare la richiesta del giocatore
 	       Compute (current_action.event, compute_result, revaluate);
 
@@ -905,9 +847,6 @@ package body Soccer.ControllerPkg is
 		  Referee.Pre_Check (last_player_event);
 		  Referee.Post_Check;
 	       end if;
-
-	       <<BRAIN_FUCK>>
-	       null;
 
 	    end Write;
 --  	 or
