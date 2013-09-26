@@ -66,7 +66,7 @@ package body Soccer.Motion_AgentPkg is
 
             delay duration (ball_speed);-- TODO:: Utils.Get_Ball_Delay(power => actual_power);
 --              Print("[MOTION_AGENT] Delay scaduto, diminuisco la potenza");
-                actual_power := actual_power - 1;
+--                  actual_power := actual_power - 1;
 --              Print("[MOTION_AGENT] Fine del ciclo" & " con actual_power = " & I2S(Integer(actual_power)) & " e Ball.Get_Controlled = "
 --                       & Boolean'Image(Ball.Get_Controlled) & " " & Boolean'Image(actual_power > 0 and Ball.Get_Controlled = False));
          end loop;

@@ -799,6 +799,26 @@ package body Soccer.ControllerPkg is
 	 select
 	    accept Write (current_action : in out Action) do
 
+	       if first_time then
+		  if current_action.event.Get_Player_Id = 2
+		    and current_action.event.all in Shot_Event'Class then
+		     declare
+			new_shot_event : Shot_Event_Ptr := new Shot_Event;
+		     begin
+			first_time := False;
+
+			new_shot_event.Initialize(2,
+			 current_status (2).coord,
+			 Coordinate' (0,13));
+
+			new_shot_event.Set_Shot_Power(15);
+
+			current_action.event := Motion_Event_Ptr (new_shot_event);
+			current_action.utility := 10;
+		     end;
+		  end if;
+	       end if;
+
 	       -- provo a soddisfare la richiesta del giocatore
 	       Compute (current_action.event, compute_result, revaluate);
 
@@ -847,6 +867,9 @@ package body Soccer.ControllerPkg is
 		  Referee.Pre_Check (last_player_event);
 		  Referee.Post_Check;
 	       end if;
+
+	       <<BRAIN_FUCK>>
+	       Print ("[CONTROLLER] BRAINFUCK!");
 
 	    end Write;
 --  	 or
