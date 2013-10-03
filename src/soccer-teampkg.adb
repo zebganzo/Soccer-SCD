@@ -1,7 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 package body Soccer.TeamPkg is
 
-   function Get_Number_From_formation (formation_id : Integer;
+   function Get_Number_From_Formation (formation_id : Integer;
                                        team	    : Team_Id) return Integer is
       number : Integer;
    begin

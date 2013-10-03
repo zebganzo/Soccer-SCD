@@ -123,9 +123,9 @@ package body Soccer.ControllerPkg.Referee is
                      declare
                         kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
                         current_coord : Coordinate := current_status (i).coord;
-                        -- ref_coord : Coordinate := TEMP_Get_Coordinate_For_Player (current_status (i).id);
                         ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
                      begin
+--                            Print("[REFEREE]: KICKOFF ID: " & I2S(kickoff_player));
                         if i /= kickoff_player then
                            first_condition := False;
                            if Compare_Coordinates (current_coord, ref_coord) then
@@ -390,8 +390,7 @@ package body Soccer.ControllerPkg.Referee is
                   else
                      -- controllo che chi deve battere il calcio di rigore sia in
                      -- posizione, se non lo e' esco
-                     if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
-                                             coord2 => current_event_coord) then
+                     if ball_holder_id = assigned_player then
                         first_condition := True;
                      end if;
 
@@ -437,8 +436,7 @@ package body Soccer.ControllerPkg.Referee is
                   if Get_Game_Status /= Game_Ready then
                      -- controllo che chi deve fare la rimessa sia in posizione,
                      -- se non lo e' esco
-                     if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
-                                             coord2 => current_event_coord) then
+                     if ball_holder_id = assigned_player then
                         first_condition := True;
                      end if;
 
@@ -476,21 +474,21 @@ package body Soccer.ControllerPkg.Referee is
                   else
                      -- controllo che chi deve battere il calcio d'angolo sia in
                      -- posizione, se non lo e' esco
-                     if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
-                                             coord2 => current_event_coord) then
+--                       if Compare_Coordinates (coord1 => current_status (assigned_player).coord,
+--                                               coord2 => current_event_coord) then
+                     if ball_holder_id = assigned_player then
                         first_condition := True;
                      end if;
 
-                     -- controllo che non ci siano giocatori attorno alla posizione
-                     -- di chi deve battere il calcio d'angolo
+                     -- controllo che tutti i giocatori siano nelle loro posizioni
 		     for i in current_status'Range loop
                         if current_status(i).id /= current_player_status.id
 			  and current_status(i).on_the_field
 			  and not Compare_Coordinates (current_status (i).coord,
-			    Get_Corner_Kick_Position (current_status (i).number,
-			      current_status (i).team,
-			      assigned_team)) then
-				  second_condition := False;
+			    			       Get_Corner_Kick_Position (current_status (i).number,
+                              							 current_status (i).team,
+			      							 assigned_team)) then
+                           second_condition := False;
 			end if;
 
                         exit when not second_condition;
@@ -642,7 +640,7 @@ package body Soccer.ControllerPkg.Referee is
 		     end if;
 
 		     goal_event.Initialize (new_event_id    => Goal,
-			      new_player_id   => Get_Id_From_Number (Get_Number_From_formation (10, opposing_team)),
+			      new_player_id   => Get_Id_From_Number (Get_Number_From_Formation (10, opposing_team), opposing_team),
 			      new_team_id     => scoring_team,
 			      new_event_coord => middle_field_coord);
 		     new_game_status := goal_event;
@@ -678,9 +676,11 @@ package body Soccer.ControllerPkg.Referee is
 			   Set_Coord_X (coord => new_evt_coord, value => 1);
 
 			   new_event.Initialize (new_event_id    => Corner_Kick,
-			    new_player_id   => Get_Nearest_Player (new_evt_coord, Team_Two),
-			    new_team_id     => Team_Two,
-			    new_event_coord => new_evt_coord);
+			    			 new_player_id   => Get_Id_From_Number(Get_Number_From_Formation(6, Team_Two),Team_Two),
+                            			 new_team_id     => Team_Two,
+                            new_event_coord => new_evt_coord);
+                           Print("[REFEREE DIO SCHIFOSO]: NUMBER: " & I2S(Get_Number_From_Formation(6, Team_Two)) & " ID: " &
+                                 I2S(Get_Id_From_Number(Get_Number_From_Formation(6, Team_Two),Team_Two)));
 			elsif ball_coord.coord_x = field_max_x + 1 then
 			   -- assegna una rimessa dal fondo a Team_Two
 			   Print ("[POST_CHECK] Rimessa dal fondo per Team_Two");
@@ -689,7 +689,7 @@ package body Soccer.ControllerPkg.Referee is
 			   Set_Coord_Y (new_evt_coord, field_max_y / 2);
 
 			   new_event.Initialize (new_event_id    => Goal_Kick,
-			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_Two)),
+			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_Two),Team_Two),
 			    new_team_id     => Team_Two,
 			    new_event_coord => new_evt_coord);
 			end if;
@@ -702,7 +702,7 @@ package body Soccer.ControllerPkg.Referee is
 			   Set_Coord_Y (new_evt_coord, field_max_y / 2);
 
 			   new_event.Initialize (new_event_id    => Goal_Kick,
-			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_One)), -- portiere
+			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_One),Team_One), -- portiere
 			    new_team_id     => Team_One,
 			    new_event_coord => new_evt_coord);
 			elsif ball_coord.coord_x = field_max_x + 1 then
@@ -713,9 +713,10 @@ package body Soccer.ControllerPkg.Referee is
 			   Set_Coord_X (coord => new_evt_coord, value => field_max_x);
 
 			   new_event.Initialize (new_event_id    => Corner_Kick,
-			    new_player_id   => Get_Nearest_Player (new_evt_coord, Team_One),
+			    new_player_id   => Get_Id_From_Number(Get_Number_From_Formation(6, Team_One),Team_One),
 			    new_team_id     => Team_One,
-			    new_event_coord => new_evt_coord);
+                            new_event_coord => new_evt_coord);
+                           Print("[REFEREE DIO SCHIFOSO]: " & I2S(Get_Id_From_Number(Get_Number_From_Formation(6, Team_One),Team_One)));
 			end if;
 		     end if;
 
