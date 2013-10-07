@@ -45,18 +45,18 @@ package body Soccer.Server.Callbacks is
       end if;
 
 --        Put_Line (AWS.Parameters.Get (PARAMS, "a"));
-      Put_Line ("received payload is " & AWS.Parameters.Get (PARAMS, "a"));
-      Put_Line ("decoded payload is " & AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "a")));
-
-      b := GNATCOLL.JSON.Read (AWS.Parameters.Get (PARAMS, "a"), "");
-      Put_Line ("foo is " & GNATCOLL.JSON.Get (Val   => b,
-					       Field => "foo"));
+--        Put_Line ("received payload is " & AWS.Parameters.Get (PARAMS, "a"));
+--        Put_Line ("decoded payload is " & AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "a")));
+--
+--        b := GNATCOLL.JSON.Read (AWS.Parameters.Get (PARAMS, "a"), "");
+--        Put_Line ("foo is " & GNATCOLL.JSON.Get (Val   => b,
+--  					       Field => "foo"));
 
       return AWS.Response.Build (MIME.Text_HTML, "Hello WebServer!");
 
    end Services;
 
-      ----------------
+   ----------------
    --  Iterator  --
    ----------------
 

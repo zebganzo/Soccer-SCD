@@ -151,7 +151,7 @@ see_goal(PlayerPosition, GoalPosition) :-											% I see the goal if
 	radius(Radius),																	
 	Distance =< Radius.																% is smaller than my radius 
 
-% selects the closest cell (at distance 1 from the current player position) to the given target position
+% Selects the closest cell (at distance 1 from the current player position) to the given target position
 % next_cell(
 %	CurrentX,																	% player current X coordinate
 %	CurrentY,																	% player current Y coordinate
@@ -162,7 +162,12 @@ next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :-
 	PosX < CurrentX,															% 1 = = 
 	PosY > CurrentY, !,															% = P = 	(Player)
 	NewX is CurrentX - 1,														% = = = 	(Cell: X-1,Y+1)
-	NewY is CurrentY + 1,														
+	(
+		player(position(_,51),_,_,_), !,
+		NewY is CurrentY
+		;
+		NewY is CurrentY + 1
+	),
  	Cell = position(NewX, NewY).
 
 next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :- 
@@ -175,7 +180,12 @@ next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :-
 	PosX > CurrentX,															% = = 3
 	PosY > CurrentY, !,															% = P = 	(Player)
 	NewX is CurrentX + 1,														% = = =		(Cell: X+1,Y+1)
-	NewY is CurrentY + 1,
+	(
+		player(position(_,51),_,_,_), !,
+		NewY is CurrentY
+		;
+		NewY is CurrentY + 1
+	),
  	Cell = position(NewX, NewY).					
 
 next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :- 
