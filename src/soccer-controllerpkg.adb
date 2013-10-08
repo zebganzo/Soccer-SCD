@@ -815,7 +815,7 @@ package body Soccer.ControllerPkg is
 
 			new_shot_event.Initialize(2,
                              			  current_status (2).coord,
-                             			  Coordinate' (15,0));
+                             			  Coordinate' (20,0));
 
 			new_shot_event.Set_Shot_Power(15);
 

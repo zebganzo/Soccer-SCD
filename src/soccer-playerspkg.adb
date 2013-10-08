@@ -363,7 +363,7 @@ package body Soccer.PlayersPkg is
                                      Field      => coords_array);
                	  coords_array := Empty_Array;
                   resume_player := True;
-                  radius_offset := 25;
+                  radius_offset := 50;
                end if;
             end if;
          end if;
@@ -507,8 +507,6 @@ package body Soccer.PlayersPkg is
                                           Coordinate'(decision_x,decision_y));
                current_action.event := Motion_Event_Ptr(new_catch_event);
                current_action.utility := 10;
-
-               Print("[PLAYER CATCH DIO SERPENTE]: NUMBER: " & I2S(player_number));
             end;
          elsif decision = "tackle" then
             declare

@@ -348,10 +348,10 @@ package body Soccer.ControllerPkg.Referee is
                      -- controllo che non ci siano giocatori attorno alla posizione
                      -- di chi deve battere (della squadra avversaria)
                      for i in current_status'Range loop
-                        Print("CHECKING PLAYER: " & I2S(current_status(i).id) & " (" & I2S(current_status(i).number) & ") " &
-                                "DISTANCE: " & Boolean'Image(Distance (From => assigned_player_position,
-                                                                       To => current_status (i).coord) > free_kick_area) &
-                            " ON THE FIELD: " & Boolean'Image(current_status(i).on_the_field));
+--                          Print("CHECKING PLAYER: " & I2S(current_status(i).id) & " (" & I2S(current_status(i).number) & ") " &
+--                                  "DISTANCE: " & Boolean'Image(Distance (From => assigned_player_position,
+--                                                                         To => current_status (i).coord) > free_kick_area) &
+--                              " ON THE FIELD: " & Boolean'Image(current_status(i).on_the_field));
 
                         if current_status(i).id /= current_player_status.id
                           and current_player_status.team /= current_status(i).team
@@ -442,16 +442,17 @@ package body Soccer.ControllerPkg.Referee is
 
                      -- controllo che ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa
---                       for i in current_status'Range loop
---                          if current_status(i).id /= current_player_status.id
---                              and current_player_status.team /= current_status(i).team
---                            and current_status(i).on_the_field then
---                              and not Distance (From => assigned_player_position,
---                                                To   => current_status (i).coord) > free_kick_area then
---                             second_condition := False;
---                          end if;
---                          exit when not second_condition;
---                       end loop;
+                     for i in current_status'Range loop
+                         if current_status(i).id /= current_player_status.id
+                          and current_player_status.team /= current_status(i).team
+                          and current_status(i).on_the_field then
+                           if Distance (From => assigned_player_position,
+                                        To => current_status (i).coord) <= free_kick_area then
+                           second_condition := False;
+                           end if;
+                        end if;
+                        exit when not second_condition;
+                     end loop;
                   end if;
 
                   if first_condition and second_condition then
@@ -652,10 +653,12 @@ package body Soccer.ControllerPkg.Referee is
 	       elsif ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
 		  Print ("[POST_CHECK] Rimessa laterale");
 		  new_game_status := new Unary_Event;
-		  new_game_status.Initialize (new_event_id    => Throw_In,
-				new_player_id   => Get_Nearest_Player (ball_coord, Get_Opposing_Team (last_team_possession)),
-				new_team_id     => last_team_possession,
-				new_event_coord => ball_coord);
+		  new_game_status.Initialize (
+                                new_event_id    => Throw_In,
+                                new_player_id   => Get_Nearest_Player (ball_coord, Get_Opposing_Team (last_team_possession)),
+				new_team_id     => Get_Opposing_Team (last_team_possession),
+                                new_event_coord => ball_coord);
+--                    Print("[RIMESSA LATERALE]: NEAREST PLAYER: " & I2S(Get_Nearest_Player (ball_coord, Get_Opposing_Team (last_team_possession))));
 	       elsif ball_coord.coord_x = 0 or ball_coord.coord_x = field_max_x + 1 then
 		  -- controllo se va assegnato un calcio d'angolo o un rinvio dal
 		  -- fondo (non controllo la y perche' ho gia' controllato il gol)
@@ -718,7 +721,6 @@ package body Soccer.ControllerPkg.Referee is
 			    new_player_id   => Get_Id_From_Number(Get_Number_From_Formation(6, Team_One),Team_One),
 			    new_team_id     => Team_One,
                             new_event_coord => new_evt_coord);
-                           Print("[REFEREE DIO SCHIFOSO]: " & I2S(Get_Id_From_Number(Get_Number_From_Formation(6, Team_One),Team_One)));
 			end if;
 		     end if;
 
