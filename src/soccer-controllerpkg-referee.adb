@@ -424,10 +424,10 @@ package body Soccer.ControllerPkg.Referee is
                   current_player_status : Player_Status := current_status (assigned_player);
                   assigned_player_position : Coordinate := current_player_status.coord;
                   first_condition : Boolean := False;
-                  second_condition : Boolean := False;
+                  second_condition : Boolean := True;
                begin
                   -- controllo se il gioco puo' riprendere
-                  if Get_Game_Status /= Game_Ready and e.all in Shot_Event'Class then
+                  if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
                      -- ha lanciato, quindi il gioco puo' riprendere
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
@@ -440,16 +440,18 @@ package body Soccer.ControllerPkg.Referee is
                         first_condition := True;
                      end if;
 
-                     -- controllo che non ci siano giocatori attorno alla posizione
+                     -- controllo che ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa
-                     for i in current_status'Range loop
-                        if i /= current_player_status.id
-                          and current_player_status.team /= current_status(i).team
-                          and Distance (From => assigned_player_position, To => current_status (i).coord) > free_kick_area then
-                           second_condition := True;
-                        end if;
-                        exit when not second_condition;
-                     end loop;
+--                       for i in current_status'Range loop
+--                          if current_status(i).id /= current_player_status.id
+--                              and current_player_status.team /= current_status(i).team
+--                            and current_status(i).on_the_field then
+--                              and not Distance (From => assigned_player_position,
+--                                                To   => current_status (i).coord) > free_kick_area then
+--                             second_condition := False;
+--                          end if;
+--                          exit when not second_condition;
+--                       end loop;
                   end if;
 
                   if first_condition and second_condition then
