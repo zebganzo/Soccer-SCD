@@ -51,4 +51,9 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
       return e.event_coord;
    end Get_Coordinate;
 
+   procedure Set_Coordinate (e : in Unary_Event_Ptr; coord : in Coordinate) is
+   begin
+      e.event_coord := coord;
+   end;
+
 end Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;

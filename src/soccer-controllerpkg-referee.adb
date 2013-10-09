@@ -122,8 +122,8 @@ package body Soccer.ControllerPkg.Referee is
                   if current_status(i).on_the_field then
                      declare
                         kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
-                        current_coord : Coordinate := current_status (i).coord;
-                        ref_coord : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
+                        current_coord  : Coordinate := current_status (i).coord;
+                        ref_coord      : Coordinate := Get_Starting_Position (current_status(i).number, current_status(i).team);
                      begin
 --                            Print("[REFEREE]: KICKOFF ID: " & I2S(kickoff_player));
                         if i /= kickoff_player then
@@ -224,7 +224,6 @@ package body Soccer.ControllerPkg.Referee is
 
             when Goal =>
                -- goal
-
                declare
                   opposite_team : Team_Id;
                   first_condition : Boolean := False;
@@ -235,7 +234,6 @@ package body Soccer.ControllerPkg.Referee is
                   else
                      opposite_team := Team_One;
                   end if;
-
                   -- controllo se il gioco puo' riprendere
                   if Get_Game_Status = Game_Ready
                     and e.all in Shot_Event'Class
@@ -305,8 +303,6 @@ package body Soccer.ControllerPkg.Referee is
                      -- controllo che non ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa dal fondo
 		     for i in current_status'Range loop
-
-
                         if current_status(i).id /= current_player_status.id
 			  and current_status(i).on_the_field
 			  and not Compare_Coordinates (current_status (i).coord,
@@ -314,7 +310,6 @@ package body Soccer.ControllerPkg.Referee is
 			      current_status (i).team)) then
 				  second_condition := False;
 			end if;
-
                         exit when not second_condition;
 		     end loop;
 
@@ -327,7 +322,6 @@ package body Soccer.ControllerPkg.Referee is
 
             when Free_Kick =>
                -- calcio di punizione
-
                declare
                   current_player_status : Player_Status := current_status (assigned_player);
                   assigned_player_position : Coordinate := current_player_status.coord;
@@ -365,16 +359,14 @@ package body Soccer.ControllerPkg.Referee is
                         exit when not second_condition;
                      end loop;
                   end if;
-                  Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
+--                    Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
                   if first_condition and second_condition then
                      Set_Game_Status (Game_Ready);
                   end if;
-
                end;
 
             when Penalty_Kick =>
                -- calcio di rigore
-
                declare
                   current_player_status : Player_Status := current_status (assigned_player);
                   assigned_player_position : Coordinate := current_player_status.coord;
@@ -393,11 +385,9 @@ package body Soccer.ControllerPkg.Referee is
                      if ball_holder_id = assigned_player then
                         first_condition := True;
                      end if;
-
                      -- controllo che non ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa dal fondo
 		     for i in current_status'Range loop
-
                         if current_status(i).id /= current_player_status.id
 			  and current_status(i).on_the_field
 			  and not Compare_Coordinates (current_status (i).coord,
@@ -406,34 +396,39 @@ package body Soccer.ControllerPkg.Referee is
 			      assigned_team)) then
 				  second_condition := False;
 			end if;
-
                         exit when not second_condition;
 		     end loop;
 
 		     if first_condition and second_condition then
 			Set_Game_Status (Game_Ready);
 		     end if;
-
                   end if;
                end;
 
             when Throw_In =>
                -- rimessa
-
                declare
                   current_player_status : Player_Status := current_status (assigned_player);
                   assigned_player_position : Coordinate := current_player_status.coord;
                   first_condition : Boolean := False;
                   second_condition : Boolean := True;
                begin
+                  Print("[RIMESSA LATERALE DIOSSSSS]");
                   -- controllo se il gioco puo' riprendere
                   if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
                      -- ha lanciato, quindi il gioco puo' riprendere
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
-                  end if;
-
-                  if Get_Game_Status /= Game_Ready then
+                  else
+                     if current_event_coord.coord_y = 0 then
+                        current_event_coord.coord_y := 1;
+                        Set_Coordinate (current_game_status,current_event_coord);
+                        Ball.Set_Position(current_event_coord);
+                     elsif current_event_coord.coord_y = field_max_y + 1 then
+                        current_event_coord.coord_y := field_max_y;
+                        Set_Coordinate (current_game_status,current_event_coord);
+                        Ball.Set_Position(current_event_coord);
+                     end if;
                      -- controllo che chi deve fare la rimessa sia in posizione,
                      -- se non lo e' esco
                      if ball_holder_id = assigned_player then
@@ -443,18 +438,18 @@ package body Soccer.ControllerPkg.Referee is
                      -- controllo che ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa
                      for i in current_status'Range loop
-                         if current_status(i).id /= current_player_status.id
+                        if current_status(i).id /= current_player_status.id
                           and current_player_status.team /= current_status(i).team
                           and current_status(i).on_the_field then
                            if Distance (From => assigned_player_position,
                                         To => current_status (i).coord) <= free_kick_area then
-                           second_condition := False;
+                              second_condition := False;
                            end if;
                         end if;
                         exit when not second_condition;
                      end loop;
                   end if;
-
+                  Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
                   if first_condition and second_condition then
                      Set_Game_Status (Game_Ready);
                   end if;
@@ -650,15 +645,18 @@ package body Soccer.ControllerPkg.Referee is
 		  end;
 
 		-- controllo se va assegnata una rimessa laterale
-	       elsif ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
-		  Print ("[POST_CHECK] Rimessa laterale");
-		  new_game_status := new Unary_Event;
-		  new_game_status.Initialize (
-                                new_event_id    => Throw_In,
-                                new_player_id   => Get_Nearest_Player (ball_coord, Get_Opposing_Team (last_team_possession)),
-				new_team_id     => Get_Opposing_Team (last_team_possession),
-                                new_event_coord => ball_coord);
---                    Print("[RIMESSA LATERALE]: NEAREST PLAYER: " & I2S(Get_Nearest_Player (ball_coord, Get_Opposing_Team (last_team_possession))));
+               elsif ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
+                  Print ("[POST_CHECK] Rimessa laterale");
+
+                  new_game_status := new Unary_Event;
+                  new_game_status.Initialize (
+                                              new_event_id    => Throw_In,
+                                              new_player_id   => Get_Nearest_Field_Player (ball_coord, Get_Opposing_Team (last_team_possession)),
+                                              new_team_id     => Get_Opposing_Team (last_team_possession),
+                                              new_event_coord => ball_coord);
+                  Print("[RIMESSA LATERALE]: BALL COORDINATE: " & Print_Coord(ball_coord));
+                  Print("[RIMESSA LATERALE]: OPPOSING TEAM: " & Team_Id'Image(Get_Opposing_Team (last_team_possession)));
+                  Print("[RIMESSA LATERALE]: NEAREST PLAYER: " & I2S(Get_Nearest_Field_Player (ball_coord, Get_Opposing_Team (last_team_possession))));
 	       elsif ball_coord.coord_x = 0 or ball_coord.coord_x = field_max_x + 1 then
 		  -- controllo se va assegnato un calcio d'angolo o un rinvio dal
 		  -- fondo (non controllo la y perche' ho gia' controllato il gol)
@@ -684,8 +682,6 @@ package body Soccer.ControllerPkg.Referee is
 			    			 new_player_id   => Get_Id_From_Number(Get_Number_From_Formation(6, Team_Two),Team_Two),
                             			 new_team_id     => Team_Two,
                             new_event_coord => new_evt_coord);
-                           Print("[REFEREE DIO SCHIFOSO]: NUMBER: " & I2S(Get_Number_From_Formation(6, Team_Two)) & " ID: " &
-                                 I2S(Get_Id_From_Number(Get_Number_From_Formation(6, Team_Two),Team_Two)));
 			elsif ball_coord.coord_x = field_max_x + 1 then
 			   -- assegna una rimessa dal fondo a Team_Two
 			   Print ("[POST_CHECK] Rimessa dal fondo per Team_Two");
@@ -758,19 +754,40 @@ package body Soccer.ControllerPkg.Referee is
       player : Integer;
    begin
       for i in current_status'Range loop
-	 declare
-	    current_distance : Integer := Distance (From => event_coord,
-					     To => current_status (i).coord);
-	 begin
-	    if current_status(i).team = team and current_distance < smallest_distance then
-	       smallest_distance := current_distance;
-	       player := i;
-	    end if;
-	 end;
+         declare
+            current_distance : Integer := Distance (From => event_coord,
+                                                    To => current_status (i).coord);
+         begin
+            if current_status(i).team = team and current_distance < smallest_distance then
+               smallest_distance := current_distance;
+               player := i;
+            end if;
+         end;
       end loop;
 
       return player;
    end Get_Nearest_Player;
+
+   function Get_Nearest_Field_Player (event_coord : in Coordinate; team : in Team_Id) return Integer is
+      smallest_distance : Integer := Integer'Last;
+      player : Integer;
+   begin
+      for i in current_status'Range loop
+         if current_status(i).on_the_field then
+            declare
+               current_distance : Integer := Distance (From => event_coord,
+                                                       To => current_status (i).coord);
+            begin
+               if current_status(i).team = team and current_distance < smallest_distance then
+                  smallest_distance := current_distance;
+                  player := i;
+               end if;
+            end;
+         end if;
+      end loop;
+
+      return player;
+   end Get_Nearest_Field_Player;
 
    procedure Notify_Manager_Event (event : Manager_Event.Event_Ptr) is begin
       manager_events.Append(New_Item => event);

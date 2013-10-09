@@ -121,8 +121,10 @@ action(CellX, CellY, move) :-
 		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
 		reference_position(RefX, RefY),											% get the player assigned position
 		move_to_pos(RefX, RefY, CellX, CellY)									% move to the closest cell to the  fixed assigned position
-		;																		% or if the player has not a fixed assigned position																										
-		player(position(CellX, CellY), _, _, _)									% he doesn't need to move
+		;																		% or if the player has not a fixed position
+		move_out(CellX, CellY), !												% check if he is inside the ball "safe zone" and move him out of it
+		;																		% or if the player has not a fixed assigned position and he is not in																										
+		player(position(CellX, CellY), _, _, _)									% the safe zone, he doesn't need to move
 	).
 
 % Move action if the game is in status 'blocked', caused by an 'free_kick' event.

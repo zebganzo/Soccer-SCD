@@ -34,6 +34,8 @@ package Soccer.ControllerPkg.Referee is
 
    function Get_Nearest_Player (event_coord : in Coordinate; team : in Team_Id) return Integer;
 
+   function Get_Nearest_Field_Player (event_coord : in Coordinate; team : in Team_Id) return Integer;
+
    function Get_Opposing_Team (current_team : Team_Id) return Team_Id;
 
    procedure Simulate_End_Of_1T;
