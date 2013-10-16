@@ -413,7 +413,6 @@ package body Soccer.ControllerPkg.Referee is
                   first_condition : Boolean := False;
                   second_condition : Boolean := True;
                begin
-                  Print("[RIMESSA LATERALE DIOSSSSS]");
                   -- controllo se il gioco puo' riprendere
                   if Get_Game_Status = Game_Ready and e.all in Shot_Event'Class then
                      -- ha lanciato, quindi il gioco puo' riprendere
