@@ -24,6 +24,9 @@ package Soccer.Bridge.Output is
 
    end Buffer_Wrapper;
 
+   procedure Start_Timer;
+   procedure Reset_Timer;
+
 private
    -- Timer
    buffer_time_span : constant Time_Span := Seconds (send_buffer_delay);

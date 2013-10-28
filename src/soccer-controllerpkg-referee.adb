@@ -1,5 +1,6 @@
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 with Soccer.Motion_AgentPkg; use Soccer.Motion_AgentPkg;
+with Soccer.Bridge.Output; use Soccer.Bridge.Output;
 
 package body Soccer.ControllerPkg.Referee is
 
@@ -102,8 +103,12 @@ package body Soccer.ControllerPkg.Referee is
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
                      Print ("[PRE_CHECK] Inizio primo tempo!");
-                     -- faccio partire il timer del primo tempo
-                     Game_Timer_First_Half.Start;
+		     -- faccio partire i timer del primo tempo
+		     -- (tempo partita e buffer eventi)
+		     Game_Timer_First_Half.Start;
+		     Soccer.Bridge.Output.Start_Timer;
+		     -- mando l'evento alla distribuzione
+		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
                      return; -- TODO:: controlla se serve!
                   end if;
                end if;
@@ -163,8 +168,12 @@ package body Soccer.ControllerPkg.Referee is
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
                      Print ("[PRE_CHECK] Inizio secondo tempo!");
-                     -- faccio partire il timer del secondo tempo
-                     Game_Timer_Second_Half.Start;
+		     -- faccio partire i timer del secondo tempo
+		     -- (tempo partita e buffer eventi)
+		     Game_Timer_Second_Half.Start;
+		     Soccer.Bridge.Output.Start_Timer;
+		     -- mando l'evento alla distribuzione
+		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
                      return; -- TODO:: controlla se serve!
                   end if;
                end if;
@@ -180,7 +189,7 @@ package body Soccer.ControllerPkg.Referee is
                -- deve sbloccare il gioco
                Print ("[PRE_CHECK] Controllo che tutti siano in posizione, tranne chi batte");
                for i in current_status'Range loop
-                  if current_status(i).on_the_field then
+                  if current_status (i).on_the_field then
                      declare
                         kickoff_player : Integer := Get_Kick_Off_Player (current_match_status);
                         current_coord : Coordinate := current_status (i).coord;
@@ -448,7 +457,7 @@ package body Soccer.ControllerPkg.Referee is
                         exit when not second_condition;
                      end loop;
                   end if;
-                  Print("FIRST CONDITION: " & Boolean'Image(first_condition) & " SECOND CONDITION: " & Boolean'Image(second_condition));
+
                   if first_condition and second_condition then
                      Set_Game_Status (Game_Ready);
                   end if;
@@ -499,6 +508,9 @@ package body Soccer.ControllerPkg.Referee is
          end case;
       end if;
 
+      -- mando l'evento alla distribuzione
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+
    end Pre_Check;
 
 
@@ -509,9 +521,6 @@ package body Soccer.ControllerPkg.Referee is
       last_team_possession : Team_Id := Get_Player_Team_From_Id (id => last_ball_holder);
       new_game_status : Unary_Event_Ptr;
    begin
-      -- controlla se e' finito il tempo, in quel caso setta l'evento di tipo
-      -- Match_Event ed esci
-      -- TODO:: implementa!
 
       -- controllare se c'e' un evento "core" in pending
       -- controllare se il gioco e' fermo
@@ -733,6 +742,9 @@ package body Soccer.ControllerPkg.Referee is
 	 Print ("[POST_CHECK] Imposto il nuovo stato di gioco");
 	 Set_Last_Game_Event (event => Game_Event_Ptr (new_game_status));
          Set_Game_Status (Game_Blocked);
+
+	 -- mando l'evento alla distribuzione
+	 Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_game_status));
 
          -- setto la nuova posizione della palla E STOPPO IL MOTION AGENT, SE ATTIVO
          if Ball.Get_Moving then

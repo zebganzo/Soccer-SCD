@@ -114,8 +114,8 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
+--        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
@@ -561,7 +561,7 @@ package body Soccer.PlayersPkg is
 
                            -- aspetto l'inizio del secondo tempo
                            Game_Entity.Rest;
-                           delay duration (id / 5);
+                           delay duration (id / 5); -- TODO:: change delay!
                            Game_Entity.Start_2T;
                         end if;
                      elsif Get_Match_Event_Id(m_event) = End_Of_Match then
