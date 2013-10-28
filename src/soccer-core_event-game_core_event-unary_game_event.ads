@@ -28,6 +28,7 @@ package Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
    function Get_Player_Id (e : in Unary_Event_Ptr) return Integer;
    function Get_Type (e : in Unary_Event_Ptr) return Unary_Event_Id;
    function Get_Coordinate (e : in Unary_Event_Ptr) return Coordinate;
+   procedure Set_Coordinate (e : in Unary_Event_Ptr; coord : in Coordinate);
 
 private
 

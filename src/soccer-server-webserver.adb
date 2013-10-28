@@ -17,9 +17,9 @@ package body Soccer.Server.WebServer is
 
       Net.WebSocket.Registry.Control.Start;
 
-      AWS.Server.Start(Web_Server,
-		   Config => Web_Config,
-		   Callback => Soccer.Server.Callbacks.Services'Unrestricted_Access);
+      AWS.Server.Start(Web_Server => Web_Server,
+                       Config     => Web_Config,
+                       Callback   => Soccer.Server.Callbacks.Services'Unrestricted_Access);
 
    end Start;
 

@@ -97,6 +97,7 @@ package body Soccer.PlayersPkg is
       -- width of the "influence bubble" of the player. It is computed by
       -- dividing the sum of the player's statistics by a factor
       player_radius : Integer;
+      radius_offset : Integer := 0;
 
       -- factor by which divide the sum of the statistics
       -- (Max_Stat_Value * Num_Stats) / (Field_Height/2)
@@ -113,8 +114,8 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+--        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
@@ -130,18 +131,6 @@ package body Soccer.PlayersPkg is
 
       -- chiedo il mio ID al controllore
       Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
-
---        current_action.event := new Move_Event;
---        current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
---        current_coord := current_generic_status.coord;
---        target_coord := oblivium;
---
---        current_action.event.Initialize(nPlayer_Id => id,
---  				      nFrom      => current_coord,
---  				      nTo        => target_coord);
---        current_action.utility := 10;
---
---        Controller.Write(current_action => current_action);
 
       loop
 	 Print ("[PLAYER_" & I2S (id) & "] Leggo Generic Status");
@@ -254,20 +243,6 @@ package body Soccer.PlayersPkg is
 
          -- Get player's statistics
          player_stats := Get_Statistics(player_number,player_team);
---	 json_obj.Set_Field(Field_Name => "attack",
---                     	    Field      => Create(player_stats(1)));
---         json_obj.Set_Field(Field_Name => "defense",
---                            Field      => Create(player_stats(2)));
---         json_obj.Set_Field(Field_Name => "goal_keeping",
---                            Field      => Create(player_stats(3)));
---         json_obj.Set_Field(Field_Name => "power",
---                            Field      => Create(player_stats(4)));
---         json_obj.Set_Field(Field_Name => "precision",
---                            Field      => Create(player_stats(5)));
---         json_obj.Set_Field(Field_Name => "speed",
---                            Field      => Create(player_stats(6)));
---         json_obj.Set_Field(Field_Name => "tackle",
---                            Field      => Create(player_stats(7)));
 
         -- Compute player's radius
          player_radius := (player_stats(1) +
@@ -303,6 +278,7 @@ package body Soccer.PlayersPkg is
                                         Field      => coords_array);
                      coords_array := Empty_Array;
                      resume_player := True;
+                     radius_offset := 10;
                   end if;
                else
 		  -- Match Event: End_Of_First_Half or End_Of_Match
@@ -387,6 +363,7 @@ package body Soccer.PlayersPkg is
                                      Field      => coords_array);
                	  coords_array := Empty_Array;
                   resume_player := True;
+                  radius_offset := 50;
                end if;
             end if;
          end if;
@@ -401,9 +378,10 @@ package body Soccer.PlayersPkg is
             current_read_result :=
               ControllerPkg.Read_Status(x => current_generic_status.coord.coord_x,
                                         y => current_generic_status.coord.coord_y,
-                                        r => player_radius + 100);
+                                        r => player_radius + radius_offset);
             -- reset resume_player variable
             resume_player := False;
+            radius_offset := 0;
          else
             current_read_result :=
               ControllerPkg.Read_Status(x => current_generic_status.coord.coord_x,
@@ -509,10 +487,6 @@ package body Soccer.PlayersPkg is
                new_shot_event : Shot_Event_Ptr;
             begin
                new_shot_event := new Shot_Event;
-
---  	       if decision = "shot" then
---  		  decision_y := decision_y + 7;
---  	       end if;
 
                new_shot_event.Initialize(id,
                                          current_coord,

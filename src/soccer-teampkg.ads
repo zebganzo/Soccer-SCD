@@ -33,7 +33,7 @@ package Soccer.TeamPkg is
       end record;
    type Team_Ptr is access Team;
 
-   function Get_Number_From_formation (formation_id : Integer;
+   function Get_Number_From_Formation (formation_id : Integer;
                                        team         : Team_Id) return Integer;
 
    procedure Set_Teams (first_team : Team_Ptr; second_team : Team_Ptr);

@@ -97,11 +97,28 @@ min_distance_from_me([Head|Tail], Target, Min) :-									% general case: non-em
 	min_from_location(																% finds the minimum distance between Distance and Min
 		Distance, 																	% Distance from me of player 'Head'
 		CurrentMin, 																% Distance from me goal of the current team mate closer to the goal 
-		Min, 													
+		Min, 																		% Instantiated to the min between Distance and CurrentMin
 		Head, 																		% Head of the list of team mates
 		Tar, 																		% Current team mate closer to me
 		Target).	
 
+% Returns the position of the closest player to the specified position ('From' parameter).
+% min_distance_from(
+%	Players List,																	  list of players
+% 	NextCell,																		  this cell contains the player who is closest to the specified position ('From')
+%	Min,																			  distance of 'NextCell' from the specified position
+% 	From)																			  target position for which we want to compute the distance
+min_distance_from([],_,1000,_).														% boundary case: empty list 
+min_distance_from([Head|Tail], NextCell, Min, From) :-								% general case: non-empty list of players 
+	min_distance_from(Tail, Next, CurrentMin, From),								% recursive call to reach the end of the players' list
+	distance(Head, From, Distance),													% compute the distance between 'From' and the 'Head' of the list
+	min_from_location(																% compare it to the current minimum distance
+		Distance,																	% the distance computed at the previous step
+		CurrentMin,																	% current minimum distance to the 'From' position
+		Min,																		% instantiated to the minimum value between Distance and CurrentMin
+		Head,																		% position of the 'Head' player 
+		Next,																		% position of the player with distance 'CurrentMin'
+		NextCell).																	% instantiated to the position associated to the 'Min' value
 
 % Used at the beginning of each half. The player assigned to start the game looks for the farthest team mate to pass him the ball
 % max_distance_from_me(
@@ -151,7 +168,7 @@ see_goal(PlayerPosition, GoalPosition) :-											% I see the goal if
 	radius(Radius),																	
 	Distance =< Radius.																% is smaller than my radius 
 
-% selects the closest cell (at distance 1 from the current player position) to the given target position
+% Selects the closest cell (at distance 1 from the current player position) to the given target position
 % next_cell(
 %	CurrentX,																	% player current X coordinate
 %	CurrentY,																	% player current Y coordinate
@@ -162,7 +179,12 @@ next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :-
 	PosX < CurrentX,															% 1 = = 
 	PosY > CurrentY, !,															% = P = 	(Player)
 	NewX is CurrentX - 1,														% = = = 	(Cell: X-1,Y+1)
-	NewY is CurrentY + 1,														
+	(
+		player(position(_,51),_,_,_), !,
+		NewY is CurrentY
+		;
+		NewY is CurrentY + 1
+	),
  	Cell = position(NewX, NewY).
 
 next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :- 
@@ -175,7 +197,12 @@ next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :-
 	PosX > CurrentX,															% = = 3
 	PosY > CurrentY, !,															% = P = 	(Player)
 	NewX is CurrentX + 1,														% = = =		(Cell: X+1,Y+1)
-	NewY is CurrentY + 1,
+	(
+		player(position(_,51),_,_,_), !,
+		NewY is CurrentY
+		;
+		NewY is CurrentY + 1
+	),
  	Cell = position(NewX, NewY).					
 
 next_cell(CurrentX, CurrentY, PosX, PosY, Cell) :- 

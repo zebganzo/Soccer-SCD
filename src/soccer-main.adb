@@ -31,8 +31,8 @@ procedure Soccer.Main is
    players_team_two : Team_Players_List := (6, 56, 1, 4, 10);
 
    type Pos_Id is array (Positive range <>) of Integer;
-   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,3,1,10,5);
-   t2_pos_id : Pos_Id(1 .. total_players/2) := (4,5,1,10,6);
+   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1,10,5);
+   t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1,10,3);
 
    t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
    t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
@@ -107,7 +107,7 @@ begin
 	 arr_1 : JSON_Array := Empty_Array;
 	 arr_2 : JSON_Array := Empty_Array;
       begin
-	 Append (arr_1, Create(arr_2));
+         Append (arr_1, Create(arr_2));
       end;
 
       loop

@@ -15,7 +15,7 @@ with Soccer.Generic_Timers;
 package Soccer.ControllerPkg.Referee is
 
    --+-------------
-   debug : Boolean := True;
+   debug : Boolean := False;
    --+-------------
 
    pragma Suppress (Elaboration_Check);
@@ -33,6 +33,8 @@ package Soccer.ControllerPkg.Referee is
    function Get_Last_Ball_Holder return Integer;
 
    function Get_Nearest_Player (event_coord : in Coordinate; team : in Team_Id) return Integer;
+
+   function Get_Nearest_Field_Player (event_coord : in Coordinate; team : in Team_Id) return Integer;
 
    function Get_Opposing_Team (current_team : Team_Id) return Team_Id;
 

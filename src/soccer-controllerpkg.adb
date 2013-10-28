@@ -26,6 +26,7 @@ use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
 with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
 with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
 
 package body Soccer.ControllerPkg is
 
@@ -107,6 +108,7 @@ package body Soccer.ControllerPkg is
    function Get_Player_Team_From_Id(id : in Integer) return Team_Id is
       player_team : Team_Id;
       m_event     : Match_Event_Ptr;
+      u_event	  : Unary_Event_Ptr;
    begin
       if id = 0 then
          if last_game_event /= null then
@@ -119,6 +121,10 @@ package body Soccer.ControllerPkg is
                elsif Get_Match_Event_Id(m_event) = Begin_Of_Second_Half then
                   return Team_Two;
                end if;
+            else
+               -- Unary Event
+               u_event := Unary_Event_Ptr(last_game_event);
+	       return Get_Team(u_event);
             end if;
          else
             return Get_Player_Team_From_Id(Get_Last_Ball_Holder);
@@ -135,11 +141,11 @@ package body Soccer.ControllerPkg is
    end Get_Player_Team_From_Id;
 
    -- Returns the player's id, given his number
-   function Get_Id_From_Number(number : in Integer) return Integer is
+   function Get_Id_From_Number(number : in Integer; team : in Team_Id) return Integer is
       player_id : Integer;
    begin
       for i in current_status'Range loop
-         if number = current_status(i).number then
+         if number = current_status(i).number and team = current_status(i).team then
             player_id := current_status(i).id;
          end if;
       end loop;
@@ -773,7 +779,7 @@ package body Soccer.ControllerPkg is
       -- imposto l'evento d'inizio gioco
       initial_match_event := new Match_Event;
       initial_match_event.Initialize (Begin_Of_Match,
-				      Get_Nearest_Player (Ball.Get_Position, Team_One));
+                                      Get_Nearest_Player(Ball.Get_Position, Team_One));
 
       last_game_event := Game_Event_Ptr (initial_match_event);
       game_status := Game_Paused;
@@ -799,8 +805,8 @@ package body Soccer.ControllerPkg is
 			first_time := False;
 
 			new_shot_event.Initialize(2,
-			 current_status (2).coord,
-			 Coordinate' (0,13));
+                             			  current_status (2).coord,
+                             			  Coordinate' (20,0));
 
 			new_shot_event.Set_Shot_Power(15);
 

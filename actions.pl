@@ -106,7 +106,7 @@ action(CellX, CellY, move) :-
 		move_to_pos(PenaltyX, PenaltyY, CellX, CellY)							% move to the penalty_kick_position
 	).
 
-% Move action if the game is in status 'blocked', caused by an 'free_kick' event.
+% Move action if the game is in status 'blocked', caused by a 'free_kick' or a throw_in event.
 % If the player is the one assigned to resume the game he moves towards his reference position.
 % Otherwise the player must move out of the "safe zone" the ball is in. The player moves one cell at a time
 % action(
@@ -116,26 +116,11 @@ action(CellX, CellY, move) :-
 % current_predicate(:PredicateIndicator) is a predefined procedure that is True if PredicateIndicator is a currently defined predicate
 action(CellX, CellY, move) :-
 	game(blocked), 																% game status: 'blocked'
-	event(throw_in), !,															% event: 'free_kick'	
-	(
-		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
-		reference_position(RefX, RefY),											% get the player assigned position
-		move_to_pos(RefX, RefY, CellX, CellY)									% move to the closest cell to the  fixed assigned position
-		;																		% or if the player has not a fixed assigned position																										
-		player(position(CellX, CellY), _, _, _)									% he doesn't need to move
-	).
-
-% Move action if the game is in status 'blocked', caused by an 'free_kick' event.
-% If the player is the one assigned to resume the game he moves towards his reference position.
-% Otherwise the player must move out of the "safe zone" the ball is in. The player moves one cell at a time
-% action(
-%	CellX,																		X coordinate of the cell in which the player will move
-%	CellY,																		Y coordinate of the cell in which the player will move
-%	Move) 																		'move'
-% current_predicate(:PredicateIndicator) is a predefined procedure that is True if PredicateIndicator is a currently defined predicate
-action(CellX, CellY, move) :-
-	game(blocked), 																% game status: 'blocked'
-	event(free_kick), !,														% event: 'free_kick'	
+		(
+		event(throw_in), !															% event: 'throw_in'
+		;
+		event(free_kick), !															% event: 'free_kick'
+	),	
 	(
 		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
 		reference_position(RefX, RefY),											% get the player assigned position
@@ -253,7 +238,7 @@ action(TargetX, TargetY, shot) :-
 %	Move)																		'pass'
 action(TargetX, TargetY, pass) :-
 	game(ready),																% game status: 'ready'
-	player(_, has, Team, _),													% if the player has the ball
+	player(position(PlayerX, PlayerY), has, Team, _),													% if the player has the ball
 	(
 		event(free_kick), !														% event: 'free_kick'
 		;
@@ -264,7 +249,8 @@ action(TargetX, TargetY, pass) :-
 	% finds the target of the pass action
 	current_predicate(nearby_player/3),
 	bagof(Position, nearby_player(Position, _,Team), TargetList),				% find all nearby team mates 
- 	min_distance_from_me(TargetList, TargetCell, _),							% return the closest to the goal
+ %	min_distance_from_me(TargetList, TargetCell, _),							% return the closest to the goal
+ 	min_distance_from(TargetList, TargetCell, _, position(PlayerX, PlayerY)),
 	TargetCell =.. [_, TargetX, TargetY], !.
 
 % Move action for game status 'Ready' if the player is not the one assigned to resume the game.
@@ -294,7 +280,10 @@ action(TargetX, TargetY, pass) :-
 	bagof(Position, nearby_player(Position, _,Team), TargetList),				% find all nearby team mates 
 	add(position(PlayerX, PlayerY), TargetList, List),							% add the player itself to the list to check if he is the most advanced 
 																				% in the field
- 	min_distance_from_goal(List, TargetCell, _),								% return the closest to the goal
+% 	min_distance_from_goal(List, TargetCell, _),								% return the closest to the goal
+	goal_position(position(GoalX, Y1), position(_,Y2)),								% get goal position
+	GoalY is (Y1+Y2)/2,
+	min_distance_from(List, TargetCell, _, position(GoalX, GoalY)),
 	TargetCell =.. [_, TargetX, TargetY],
 	\+(player(position(TargetX, TargetY), _, _, _)), !.
 
@@ -427,14 +416,20 @@ action(CellX, CellY, move) :-
 	ball(position(BallX,BallY),_),
 	see_ball(position(PlayerX, PlayerY), position(BallX, BallY)), 					% Do I see the ball?
 	(
+%		current_predicate(nearby_player/3),
+%		\+(bagof(_, nearby_player(_, has, _), _)), !,								% the ball is currently free (nobody near me has it) 
+%		move_to_pos(BallX, BallY, CellX, CellY)
 		current_predicate(nearby_player/3),
-		\+(bagof(_, nearby_player(_, has, _), _)), !,								% the ball is currently free (nobody near me has it) 
+		bagof(Position, Team^nearby_player(Position, _, Team), TargetPosition),
+		add(position(PlayerX, PlayerY), TargetPosition, List),
+		min_distance_from(List, TargetCell, _, position(BallX,BallY)),
+		TargetCell =.. [_, TargetX, TargetY],
+		player(position(TargetX, TargetY), _, _, _),
 		move_to_pos(BallX, BallY, CellX, CellY)
 		;
 		\+(current_predicate(nearby_player/3)),
 		move_to_pos(BallX, BallY, CellX, CellY)
 	).
-
 
 /***************************************************************************************************************
  *										GAME RUNNING	GENERIC MOVEMENTS									   *
