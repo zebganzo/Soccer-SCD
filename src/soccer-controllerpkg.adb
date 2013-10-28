@@ -669,16 +669,6 @@ package body Soccer.ControllerPkg is
                   ball.Move_Player(new_coord => action.Get_From);
                   ball_holder_id := action.Get_Player_Id;
                   Set_Last_Ball_Holder (holder => ball_holder_id);
-
---                    declare
---                       new_action : Motion_Event_Ptr := new Motion_Event;
---                    begin
---                       new_action.Initialize(nPlayer_Id => 0,
---                                             nFrom      => action.Get_To,
---                                             nTo        => action.Get_From);
---                       Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (new_action));
---                       Buffer_Wrapper.Send;
---                    end;
                end if;
             end;
          else
@@ -799,6 +789,7 @@ package body Soccer.ControllerPkg is
 	 select
 	    accept Write (current_action : in out Action) do
 
+	       -- simulating corner kick
 	       if first_time then
 		  if current_action.event.Get_Player_Id = 2
 		    and current_action.event.all in Shot_Event'Class then
@@ -857,8 +848,11 @@ package body Soccer.ControllerPkg is
 			new_move.Initialize (id, from, alternative);
 			Print ("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
 			  & " rivalutata alla cella " & Print_Coord (alternative));
+
 			Compute (new_move, compute_result, revaluate);
+
 			Guard.Update (Field_Zones (Get_Zone (from)), False);
+
 			Referee.Pre_Check (last_player_event);
 			Referee.Post_Check;
 		     end;
@@ -867,9 +861,6 @@ package body Soccer.ControllerPkg is
 		  Referee.Pre_Check (last_player_event);
 		  Referee.Post_Check;
 	       end if;
-
-	       <<BRAIN_FUCK>>
-	       Print ("[CONTROLLER] BRAINFUCK!");
 
 	    end Write;
 --  	 or
