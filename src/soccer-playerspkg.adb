@@ -54,6 +54,56 @@ package body Soccer.PlayersPkg is
       end if;
    end Get_Move_Utility;
 
+   function Action_Outcome(target : in Coordinate; stat_1 : in Integer; stat_2 : in Integer) return Coordinate is
+      type Probability is Range 1 .. 100;
+      type Offset is Range 1 .. 24;
+      package Random_Index is new Ada.Numerics.Discrete_Random (Probability);
+      package Random_Offset is new Ada.Numerics.Discrete_Random (Offset);
+      seed 	  : Random_Index.Generator;
+      off         : Random_Offset.Generator;
+      action_prob : Integer;
+      outcome     : Integer;
+      error	  : Offset;
+   begin
+      action_prob := ((stat_1 + stat_2)/2);
+
+      Random_Index.Reset(seed);
+      outcome := Integer(Random_Index.Random(seed));
+
+      if outcome <= action_prob then
+         return target;
+      else
+         Random_Offset.Reset(off);
+         error := Random_Offset.Random(off);
+         case error is
+            when 1  => return Coordinate'(target.coord_x-1,target.coord_y+1);
+            when 2  => return Coordinate'(target.coord_x  ,target.coord_y+1);
+            when 3  => return Coordinate'(target.coord_x+1,target.coord_y+1);
+            when 4  => return Coordinate'(target.coord_x+1,target.coord_y);
+            when 5  => return Coordinate'(target.coord_x+1,target.coord_y-1);
+            when 6  => return Coordinate'(target.coord_x  ,target.coord_y-1);
+            when 7  => return Coordinate'(target.coord_x-1,target.coord_y-1);
+            when 8  => return Coordinate'(target.coord_x-1,target.coord_y);
+            when 9  => return Coordinate'(target.coord_x-1,target.coord_y+2);
+            when 10 => return Coordinate'(target.coord_x  ,target.coord_y+2);
+            when 11 => return Coordinate'(target.coord_x+1,target.coord_y+2);
+            when 12 => return Coordinate'(target.coord_x+2,target.coord_y+2);
+            when 13 => return Coordinate'(target.coord_x+2,target.coord_y+1);
+            when 14 => return Coordinate'(target.coord_x+2,target.coord_y);
+            when 15 => return Coordinate'(target.coord_x+2,target.coord_y-1);
+            when 16 => return Coordinate'(target.coord_x+2,target.coord_y-2);
+            when 17 => return Coordinate'(target.coord_x+1,target.coord_y-2);
+            when 18 => return Coordinate'(target.coord_x  ,target.coord_y-2);
+            when 19 => return Coordinate'(target.coord_x-1,target.coord_y-2);
+            when 20 => return Coordinate'(target.coord_x-2,target.coord_y-2);
+            when 21 => return Coordinate'(target.coord_x-2,target.coord_y-1);
+            when 22 => return Coordinate'(target.coord_x-2,target.coord_y);
+            when 23 => return Coordinate'(target.coord_x-2,target.coord_y+1);
+            when 24 => return Coordinate'(target.coord_x-2,target.coord_y+2);
+         end case;
+      end if;
+   end Action_Outcome;
+
    procedure Print (input : String) is
    begin
       if debug then
@@ -482,7 +532,7 @@ package body Soccer.PlayersPkg is
          decision := Get(Val   => json,
                          Field => "Decision");
 
-         if decision = "shot" or decision = "pass" then
+         if decision = "pass" then
             declare
                new_shot_event : Shot_Event_Ptr;
             begin
@@ -490,36 +540,69 @@ package body Soccer.PlayersPkg is
 
                new_shot_event.Initialize(id,
                                          current_coord,
-                                         Coordinate'(decision_x,decision_y));
+                                         Action_Outcome(Coordinate'(decision_x,decision_y),
+                   					player_stats(4),
+                   					player_stats(5)));
                new_shot_event.Set_Shot_Power(15);
                current_action.event := Motion_Event_Ptr(new_shot_event);
 	       current_action.utility := 10;
 
             end;
+         elsif decision = "shot" then
+               declare
+                  new_shot_event : Shot_Event_Ptr;
+               begin
+                  new_shot_event := new Shot_Event;
+
+                  new_shot_event.Initialize(id,
+                    			    current_coord,
+                                            Action_Outcome(Coordinate'(decision_x,decision_y),
+                      					   player_stats(1),
+				                           player_stats(4)));
+                  new_shot_event.Set_Shot_Power(15);
+                  current_action.event := Motion_Event_Ptr(new_shot_event);
+                  current_action.utility := 10;
+
+               end;
          elsif decision = "catch" then
             declare
                new_catch_event : Catch_Event_Ptr;
+               target 	       : Coordinate;
             begin
+               if Get_Formation_Id(player_number, player_team) = 1 then
+                  target := Action_Outcome(Coordinate'(decision_x,decision_y),
+                                           player_stats(3),
+                                           player_stats(6));
+               else
+                  target := Action_Outcome(Coordinate'(decision_x,decision_y),
+                                           player_stats(5),
+                                           player_stats(6));
+               end if;
+
                new_catch_event := new Catch_Event;
 
                new_catch_event.Initialize(id,
                                           current_coord,
-                                          Coordinate'(decision_x,decision_y));
+                                          target);
                current_action.event := Motion_Event_Ptr(new_catch_event);
                current_action.utility := 10;
             end;
          elsif decision = "tackle" then
             declare
                new_tackle_event : Tackle_Event_Ptr;
+               target           : Coordinate;
             begin
                new_tackle_event := new Tackle_Event;
 
+               target := Action_Outcome(Coordinate'(decision_x,decision_y),
+                                        player_stats(2),
+                                        player_stats(7));
                new_tackle_event.Initialize(id,
                                            current_coord,
-                                           Coordinate'(decision_x,decision_y));
+                                           target);
                for i in current_read_result.players_in_my_zone.First_Index ..
                  current_read_result.players_in_my_zone.Last_Index loop
-                  if Compare_Coordinates(Coordinate'(decision_x,decision_y),
+                  if Compare_Coordinates(target,
                                          current_read_result.players_in_my_zone.Element(i).coord) then
                      new_tackle_event.Set_Other_Player_Id(id => current_read_result.players_in_my_zone.Element(i).id);
                      exit;
