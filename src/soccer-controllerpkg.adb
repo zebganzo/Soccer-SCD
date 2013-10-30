@@ -3,13 +3,14 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Soccer.Utils;
 use Soccer.Utils;
 
---  with Soccer.ControllerPkg.Referee;
---  use Soccer.ControllerPkg.Referee;
-
 with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Numerics.Discrete_Random;
+
 with Soccer.Bridge.Output; use Soccer.Bridge.Output;
 with Soccer.Manager_Event; use Soccer.Manager_Event;
+
 with Soccer.BallPkg; use Soccer.BallPkg;
+
 with Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
 use Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
 with Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event;
@@ -18,14 +19,20 @@ with Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event;
 use Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event;
 with Soccer.Core_Event.Motion_Core_Event.Catch_Motion_Event;
 use Soccer.Core_Event.Motion_Core_Event.Catch_Motion_Event;
+
 with Soccer.Motion_AgentPkg; use Soccer.Motion_AgentPkg;
-with Ada.Numerics.Discrete_Random;
+
 with Soccer.ControllerPkg; use Soccer.ControllerPkg;
+
+with Soccer.Core_Event.Game_Core_Event;
+use Soccer.Core_Event.Game_Core_Event;
 with Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
 use Soccer.Core_Event.Game_Core_Event.Binary_Game_Event;
+with Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+
 with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
-with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
-with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+
 with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
 
 package body Soccer.ControllerPkg is
@@ -494,12 +501,28 @@ package body Soccer.ControllerPkg is
 
    end Get_Alternative_Coord;
 
+   procedure Print_Status is
+   begin
+      for i in current_status'Range loop
+	 Print (I2S(current_status (i).id) & ": [" & Print_Coord (current_status (i).coord) & "]");
+	 null;
+      end loop;
+   end Print_Status;
+
+   procedure Print_Zones is
+   begin
+--        for i in released'Range loop
+--  	 Print ("Zone " & I2S (i) & " has value: " & Boolean'Image (released (i)));
+--  	 null;
+--        end loop;
+      null;
+   end Print_Zones;
+
    type Rand_Range is range -5 .. 5;
    package Rand_Int is new Ada.Numerics.Discrete_Random(Rand_Range);
 
    type Binary_Range is range 0 .. 1;
    package Rand_Bin is new Ada.Numerics.Discrete_Random(Binary_Range);
-
 
    procedure Calculate_Tackle (attacker_id : in Integer; ball_owner_id : in Integer; with_foul : out Boolean; success : out Boolean) is
       tackle_seed       : Rand_Int.Generator;
@@ -581,7 +604,7 @@ package body Soccer.ControllerPkg is
          if ball_holder_id = action.Get_Player_Id then
             Ball.Move_Player(new_coord => action.Get_To);
          end if;
-         Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (action));
+--           Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (action));
 
 --  	 Print ("[COMPUTE] Il giocatore " & I2S (action.Get_Player_Id) & " sta per rilasciare la zona con coordinata " & Print_Coord (action.Get_From));
 --  	 Print ("Zona di rilascio: " & I2S (Get_Zone (action.Get_From)));
@@ -601,23 +624,6 @@ package body Soccer.ControllerPkg is
 --        Print_Status;
 
    end Compute;
-
-   procedure Print_Status is
-   begin
-      for i in current_status'Range loop
-	 Print (I2S(current_status (i).id) & ": [" & Print_Coord (current_status (i).coord) & "]");
-	 null;
-      end loop;
-   end Print_Status;
-
-   procedure Print_Zones is
-   begin
---        for i in released'Range loop
---  	 Print ("Zone " & I2S (i) & " has value: " & Boolean'Image (released (i)));
---  	 null;
---        end loop;
-      null;
-   end Print_Zones;
 
    procedure Compute (action : in Shot_Event_Ptr; success : out Boolean) is
    begin
@@ -675,16 +681,6 @@ package body Soccer.ControllerPkg is
                   ball.Move_Player(new_coord => action.Get_From);
                   ball_holder_id := action.Get_Player_Id;
                   Set_Last_Ball_Holder (holder => ball_holder_id);
-
---                    declare
---                       new_action : Motion_Event_Ptr := new Motion_Event;
---                    begin
---                       new_action.Initialize(nPlayer_Id => 0,
---                                             nFrom      => action.Get_To,
---                                             nTo        => action.Get_From);
---                       Buffer_Wrapper.Put(new_event => Core_Event.Event_Ptr (new_action));
---                       Buffer_Wrapper.Send;
---                    end;
                end if;
             end;
          else
@@ -805,6 +801,7 @@ package body Soccer.ControllerPkg is
 	 select
 	    accept Write (current_action : in out Action) do
 
+	       -- simulating corner kick
 	       if first_time then
 		  if current_action.event.Get_Player_Id = 2
 		    and current_action.event.all in Shot_Event'Class then
@@ -863,8 +860,11 @@ package body Soccer.ControllerPkg is
 			new_move.Initialize (id, from, alternative);
 			Print ("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
 			  & " rivalutata alla cella " & Print_Coord (alternative));
+
 			Compute (new_move, compute_result, revaluate);
+
 			Guard.Update (Field_Zones (Get_Zone (from)), False);
+
 			Referee.Pre_Check (last_player_event);
 			Referee.Post_Check;
 		     end;
@@ -873,9 +873,6 @@ package body Soccer.ControllerPkg is
 		  Referee.Pre_Check (last_player_event);
 		  Referee.Post_Check;
 	       end if;
-
-	       <<BRAIN_FUCK>>
-	       Print ("[CONTROLLER] BRAINFUCK!");
 
 	    end Write;
 --  	 or

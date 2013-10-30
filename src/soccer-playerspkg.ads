@@ -52,9 +52,8 @@ package Soccer.PlayersPkg is
    debug : Boolean := False;
    --+-------------
 
-   -- Il package Players contiene il task Player...non credo vi sia bisogno di descriverlo
+   -- Il package Players contiene il task Player
 
-   -- Entità attiva    : Player
    task type Player;
 
 end Soccer.PlayersPkg;

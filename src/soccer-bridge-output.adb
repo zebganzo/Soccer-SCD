@@ -51,6 +51,7 @@ package body Soccer.Bridge.Output is
             if new_event.all in Match_Event'Class then
                Send;
             end if;
+
          else
             -- motion event, devo gestire i vari casi!
             if new_event.all in Move_Event'Class then
@@ -91,24 +92,35 @@ package body Soccer.Bridge.Output is
          field_events : JSON_Array;
          manager_events : JSON_Array;
       begin
+	if size > 0 then
+	    for event in 1 .. size loop
+	       event_buffer(event).event.Serialize(j_value);
+	       GNATCOLL.JSON.Append(Arr => field_events,
+			     Val => j_value);
+	       if event_buffer(event).event.all in Game_Event'Class then
+		  GNATCOLL.JSON.Append(Arr => manager_events,
+			 Val => j_value);
+	       end if;
+	    end loop;
 
-         for event in 1 .. size loop
-            event_buffer(event).event.Serialize(j_value);
-            GNATCOLL.JSON.Append(Arr => field_events,
-                                 Val => j_value);
-            if event_buffer(event).event.all in Game_Event'Class then
-               GNATCOLL.JSON.Append(Arr => manager_events,
-                                    Val => j_value);
-            end if;
-	 end loop;
+	    size := 0;
 
-         size := 0;
-
-         -- Server
-         Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
-         Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
-
+	    -- Server
+	    Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
+	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
+	 end if;
       end Send;
+
    end Buffer_Wrapper;
+
+   procedure Start_Timer is
+   begin
+      Buffer_Timer.Start;
+   end Start_Timer;
+
+   procedure Reset_Timer is
+   begin
+      Buffer_Timer.Cancel;
+   end Reset_Timer;
 
 end Soccer.Bridge.Output;
