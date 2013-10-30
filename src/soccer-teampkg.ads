@@ -33,6 +33,8 @@ package Soccer.TeamPkg is
       end record;
    type Team_Ptr is access Team;
 
+   procedure Update_Map (subbed_player : Integer; new_player : Integer; team : Team_Id);
+
    function Get_Formation_Id (number : Integer; team : Team_Id) return Integer;
 
    function Get_Number_From_Formation (formation_id : Integer;

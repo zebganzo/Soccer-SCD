@@ -1,6 +1,23 @@
 with Ada.Text_IO; use Ada.Text_IO;
 package body Soccer.TeamPkg is
 
+   procedure Update_Map (subbed_player : Integer; new_player : Integer; team : Team_Id) is
+   begin
+      if team = Team_One then
+         for i in team_1.number_id'Range loop
+            if team_1.number_id(i).number = subbed_player then
+               team_1.number_id(i).number := new_player;
+            end if;
+         end loop;
+      else
+         for i in team_2.number_id'Range loop
+            if team_2.number_id(i).number = subbed_player then
+               team_2.number_id(i).number := new_player;
+            end if;
+         end loop;
+      end if;
+   end Update_Map;
+
    function Get_Formation_Id (number : Integer; team : Team_Id) return Integer is
       formation_id : Integer;
    begin
