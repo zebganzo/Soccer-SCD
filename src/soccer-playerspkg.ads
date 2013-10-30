@@ -40,6 +40,7 @@ use Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event;
 with Soccer.Core_Event.Game_Core_Event; use Soccer.Core_Event.Game_Core_Event;
 with Soccer.Core_Event.Game_Core_Event.Unary_Game_Event; use Soccer.Core_Event.Game_Core_Event.Unary_Game_Event;
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+with Ada.Numerics.Discrete_Random;
 
 with Soccer.BallPkg; use Soccer.BallPkg;
 
