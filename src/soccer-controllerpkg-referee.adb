@@ -1,4 +1,5 @@
-with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+with Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 with Soccer.Motion_AgentPkg; use Soccer.Motion_AgentPkg;
 with Soccer.Bridge.Output; use Soccer.Bridge.Output;
 
@@ -45,8 +46,11 @@ package body Soccer.ControllerPkg.Referee is
    end Simulate_End_Of_Match;
 
    procedure Simulate_Substitution is
+      new_event : Substitution_Event_Ptr;
    begin
-      null;
+      new_event := new Substitution_Event;
+      Initialize (new_event, Team_One, 12, 60);
+      manager_events.Append (Manager_Event.Event_Ptr (new_event));
    end Simulate_Substitution;
 
    procedure End_Of_First_Half is
