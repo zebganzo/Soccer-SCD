@@ -78,6 +78,8 @@ package Soccer.ControllerPkg is
 
    function Get_Players_Status return Status;
 
+   function Get_Player_Position (id : Integer) return Coordinate;
+
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result;
 
    -- Returns the player's team, given the player's id

@@ -38,6 +38,8 @@ package Soccer.ControllerPkg.Referee is
 
    function Get_Opposing_Team (current_team : Team_Id) return Team_Id;
 
+   function TEMP_Get_Substitutions return Substitutions_Container.Vector;
+
    procedure Simulate_End_Of_1T;
    procedure Simulate_Begin_Of_2T;
    procedure Simulate_End_Of_Match;

@@ -67,6 +67,7 @@ package body Soccer.ControllerPkg is
       gen_stat.holder := holder_result;
       gen_stat.nearby := nearby_result;
       gen_stat.last_game_event := last_game_event;
+      gen_stat.substitutions := TEMP_Get_Substitutions;
       gen_stat.game_status := game_status;
       gen_stat.holder_team := Get_Player_Team_From_Id(ball_holder_id);
       gen_stat.last_ball_holder_id := Referee.Get_Last_Ball_Holder;
@@ -370,6 +371,11 @@ package body Soccer.ControllerPkg is
          delay duration (print_delay);
       end loop;
    end Field_Printer;
+
+   function Get_Player_Position (id : Integer) return Coordinate is
+   begin
+      return current_status (id).coord;
+   end Get_Player_Position;
 
    function Get_Ball_Holder return Integer is
    begin

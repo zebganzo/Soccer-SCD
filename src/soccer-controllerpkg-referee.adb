@@ -13,6 +13,11 @@ package body Soccer.ControllerPkg.Referee is
       end if;
    end Print;
 
+   function TEMP_Get_Substitutions return Substitutions_Container.Vector is
+   begin
+      return pending_substitutions;
+   end TEMP_Get_Substitutions;
+
    procedure Notify_Game_Event (event : Game_Event_Ptr) is begin
       game_event := event;
    end Notify_Game_Event;
@@ -92,6 +97,40 @@ package body Soccer.ControllerPkg.Referee is
 	    current_match_status := null;
 	    current_game_status := Unary_Event_Ptr (Get_Last_Game_Event);
 	 end if;
+      end if;
+
+      -- controllo se ci sono sostituzioni in atto
+      if Get_Game_Status = Game_Blocked then
+	 declare
+	    current_substitution : Substitution_Event_Ptr;
+	    to_remove : array (0 .. pending_substitutions.Length) of Integer := (others => 0);
+	    id_1 : Integer;
+	    id_2 : Integer;
+	 begin
+	    -- controllo se i giocatori che devono entrare.. sono entrati
+	    for i in pending_substitutions.First_Index .. pending_substitutions.Last_Index loop
+	       current_substitution := pending_substitutions.Element (i);
+	       Get_Numbers (current_substitution, id_1, id_2);
+	       if Get_Player_Position (id_2).coord_y >= 1 then
+		  to_remove (Count_Type(i)) := 1;
+	       end if;
+	    end loop;
+
+	    -- rimuovo ogni indice salvato dal vector
+	    for i in to_remove'Last .. to_remove'First loop
+	       if to_remove (i) = 1 then
+		  pending_substitutions.Delete (Integer(i), 1);
+	       end if;
+	    end loop;
+
+	    -- controllo se posso procedere con gli altri controlli (solo se
+	    -- non ci sono piu' sosituzioni in pending)
+	    if pending_substitutions.Length /= 0 then
+	       -- non posso fare gli altri controlli
+	       return;
+	    end if;
+
+	 end;
       end if;
 
       -- controllo lo stato della partita
@@ -605,8 +644,23 @@ package body Soccer.ControllerPkg.Referee is
 		  declare
 		     base_event : Manager_Event.Event_Ptr := manager_events(i);
 		     new_substitution_event : Substitution_Event_Ptr;
+		     number_to_id_1 : Integer;
+		     number_to_id_2 : Integer;
+		     substitution_team : Team_Id;
 		  begin
 		     new_substitution_event := Substitution_Event_Ptr (base_event);
+		     Get_Numbers (new_substitution_event, number_to_id_1, number_to_id_2);
+		     substitution_team := new_substitution_event.Get_Team;
+
+		     -- notifico alla squadra il cambiamento
+		     Update_Map (number_to_id_1, number_to_id_2, substitution_team);
+
+		     -- sostituisco i numeri di maglia con i rispettivi ID
+		     number_to_id_1 := ControllerPkg.Get_Id_From_Number (number_to_id_1, substitution_team);
+		     number_to_id_2 := ControllerPkg.Get_Id_From_Number (number_to_id_2, substitution_team);
+		     Set_Correct_Ids (new_substitution_event, number_to_id_1, number_to_id_2);
+
+		     -- aggiungo in coda la sostituzione
 		     pending_substitutions.Append (new_substitution_event);
 		  end;
 	       end if;
