@@ -119,6 +119,10 @@ package body Soccer.ControllerPkg.Referee is
 	    -- rimuovo ogni indice salvato dal vector
 	    for i in to_remove'Last .. to_remove'First loop
 	       if to_remove (i) = 1 then
+		  current_substitution := pending_substitutions.Element (Integer(i));
+		  Get_Numbers (current_substitution, id_1, id_2);
+		  current_status (id_1).on_the_field := False;
+		  current_status (id_2).on_the_field := True;
 		  pending_substitutions.Delete (Integer(i), 1);
 	       end if;
 	    end loop;
