@@ -2,6 +2,30 @@
  *											GAME BLOCKED MOVEMENTS											   *
  **************************************************************************************************************/
 
+action(CellX, CellY, move) :-
+	game(blocked),
+	current_predicate(substitution/1), 
+	substitution(out), !,
+	(
+		player(position(26,0), _, _, _), !,
+		CellX = 1000,
+		CellY = 0
+		; 
+		move_to_pos(26, 0, CellX, CellY)
+	).
+
+
+action(CellX, CellY, move) :-
+	game(blocked),
+	current_predicate(substitution/1), 
+	substitution(in), !,
+	(
+		\+(player(position(26,0),_,_,_)),										% if the player is not in the field entrance 
+		(player(position(_,0),_,_,_)), !,										% but he is in his bench position
+		CellX = 26,																% move to the field entrance
+		CellY = 0
+	).
+
 % Catch action if the game is in status 'blocked', caused by an 'inactive_ball' event (free kick, penalty, corner ...)
 % If the player is the one assigned to resume the game and he is in his reference position, he catches the ball.
 % action(
@@ -117,17 +141,21 @@ action(CellX, CellY, move) :-
 action(CellX, CellY, move) :-
 	game(blocked), 																% game status: 'blocked'
 		(
-		event(throw_in), !															% event: 'throw_in'
+		event(throw_in), !														% event: 'throw_in'
 		;
-		event(free_kick), !															% event: 'free_kick'
+		event(free_kick), !														% event: 'free_kick'
 	),	
 	(
 		current_predicate(reference_position/2), !,								% checks if the player has a fixed assigned position
 		reference_position(RefX, RefY),											% get the player assigned position
 		move_to_pos(RefX, RefY, CellX, CellY)									% move to the closest cell to the  fixed assigned position
 		;																		% or if the player has not a fixed position
+		player(position(26,0),_,_,_), !,
+		CellX = 26,
+		CellY = 1
+		;	
 		move_out(CellX, CellY), !												% check if he is inside the ball "safe zone" and move him out of it
-		;																		% or if the player has not a fixed assigned position and he is not in																										
+		;																		% or if the player has not a fixed assigned position and he is not in																								
 		player(position(CellX, CellY), _, _, _)									% the safe zone, he doesn't need to move
 	).
 

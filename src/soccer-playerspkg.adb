@@ -1,4 +1,5 @@
 with Ada.Directories; use Ada.Directories;
+with Soccer.Manager_Event.Substitution; use Soccer.Manager_Event.Substitution;
 
 package body Soccer.PlayersPkg is
 
@@ -123,22 +124,25 @@ package body Soccer.PlayersPkg is
       seed_y : Rand_Int.Generator;
 
       -- Artificial Intelligence Related Variables
-      json_obj      : JSON_Value;			-- JSON object
-      coords_array  : JSON_Array;			-- Array of coordinates
-      event         : Game_Event_Ptr;			-- generic Game Event ptr
-      ball_team     : Team_Id;				-- team holding the ball
-      ball_x        : Integer;
-      ball_y        : Integer;
-      player_team   : Team_Id;				-- player's team
-      player_stats  : Player_Statistics(1..7);		-- player's statistics
-      nearby_folks  : JSON_Array;			-- nearby players list
-      nearby_player : JSON_Array;			-- naerby player info
-      player_number : Integer;				-- player's number
-      decision      : Unbounded_String;
-      decision_x    : Integer;
-      decision_y    : Integer;
-      do_nothing    : Boolean := False;
-      formation_pos : Coordinate;
+      json_obj        : JSON_Value;			-- JSON object
+      coords_array    : JSON_Array;			-- Array of coordinates
+      event           : Game_Event_Ptr;			-- generic Game Event ptr
+      ball_team       : Team_Id;			-- team holding the ball
+      ball_x          : Integer;
+      ball_y          : Integer;
+      player_team     : Team_Id;			-- player's team
+      player_number   : Integer;			-- player's number
+      player_position : Coordinate;			-- player's current position
+      player_stats    : Player_Statistics(1..7);	-- player's statistics
+      nearby_folks    : JSON_Array;			-- nearby players list
+      nearby_player   : JSON_Array;			-- naerby player info
+      decision        : Unbounded_String;
+      decision_x      : Integer;
+      decision_y      : Integer;
+      do_nothing      : Boolean := False;
+      formation_pos   : Coordinate;
+      subbed          : Boolean := False;
+      new_player_id   : Integer;			-- id of the player that will substitute the current player
 
       -- True if the player is the one assigned to resume the game after a
       -- game event
@@ -164,8 +168,8 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+--        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
@@ -193,9 +197,10 @@ package body Soccer.PlayersPkg is
          -- Creates an empty JSON object
          json_obj := Create_Object;
 
-	 -- Get player current position
-   	 Append(coords_array, Create(current_generic_status.coord.coord_x));
-  	 Append(coords_array, Create(current_generic_status.coord.coord_y));
+         -- Get player current position
+         player_position := current_generic_status.coord;
+   	 Append(coords_array, Create(player_position.coord_x));
+  	 Append(coords_array, Create(player_position.coord_y));
    	 json_obj.Set_Field(Field_Name => "position",
                     	    Field      => coords_array);
 	 coords_array := Empty_Array;
@@ -354,6 +359,30 @@ package body Soccer.PlayersPkg is
                                                              Field      => "penalty_kick");
                   end case;
                elsif current_generic_status.game_status = Game_Blocked then
+                  if current_generic_status.substitutions.Length > 0 then
+                     declare
+                        id_1 : Integer;
+                        id_2 : Integer;
+                     begin
+                        if subbed and (player_position.coord_y = 0)  then
+                           subbed := False;
+                           json_obj.Set_Field(Field_Name => "substitution",
+                                              Field      => "in");
+			elsif not subbed then
+                           for i in current_generic_status.substitutions.First_Index ..
+                             current_generic_status.substitutions.Last_Index loop
+                              Get_Numbers(current_generic_status.substitutions.Element(i), id_1, id_2);
+                              if id = id_1 then
+                                 json_obj.Set_Field(Field_Name => "substitution",
+                                                    Field      => "out");
+                                 subbed := True;
+                                 new_player_id := id_2;
+                              end if;
+                           end loop;
+                        end if;
+                     end;
+                  end if;
+
                   case Get_Type(u_event) is
                      when Goal =>
                         json_obj.Set_Field(Field_Name => "event",
@@ -526,6 +555,9 @@ package body Soccer.PlayersPkg is
                                          Field  => "X"));
          if decision_x = 1000 then
             decision_x := id;
+            if subbed then
+               id := new_player_id;
+            end if;
          end if;
          decision_y := Integer'Value(Get(Val   => json,
                            	        Field  => "Y"));
