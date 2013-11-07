@@ -100,7 +100,7 @@ begin
       char : Character;
    begin
 
-      Soccer.Server.WebServer.Start;
+--        Soccer.Server.WebServer.Start;
 
       declare
 	 obj : JSON_Value := Create_Object;

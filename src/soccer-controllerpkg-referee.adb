@@ -52,9 +52,13 @@ package body Soccer.ControllerPkg.Referee is
 
    procedure Simulate_Substitution is
       new_event : Substitution_Event_Ptr;
+--        id1 : Integer;
+--        id2 : Integer;
    begin
       new_event := new Substitution_Event;
       Initialize (new_event, Team_One, 12, 60);
+--        Get_Numbers (new_event, id1, id2);
+--        Print("[MAGIMAGIADIOBOIA]:" & I2S(id1) & " " & I2S(id2));
       manager_events.Append (Manager_Event.Event_Ptr (new_event));
    end Simulate_Substitution;
 
@@ -155,7 +159,7 @@ package body Soccer.ControllerPkg.Referee is
 		     Game_Timer_First_Half.Start;
 		     Soccer.Bridge.Output.Start_Timer;
 		     -- mando l'evento alla distribuzione
-		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+--  		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
                      return; -- TODO:: controlla se serve!
                   end if;
                end if;
@@ -220,7 +224,7 @@ package body Soccer.ControllerPkg.Referee is
 		     Game_Timer_Second_Half.Start;
 		     Soccer.Bridge.Output.Start_Timer;
 		     -- mando l'evento alla distribuzione
-		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+--  		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
                      return; -- TODO:: controlla se serve!
                   end if;
                end if;
@@ -556,7 +560,7 @@ package body Soccer.ControllerPkg.Referee is
       end if;
 
       -- mando l'evento alla distribuzione
-      Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+--        Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
 
    end Pre_Check;
 
@@ -650,25 +654,29 @@ package body Soccer.ControllerPkg.Referee is
 		     new_substitution_event : Substitution_Event_Ptr;
 		     number_to_id_1 : Integer;
 		     number_to_id_2 : Integer;
-		     substitution_team : Team_Id;
+                     substitution_team : Team_Id;
+                     id1 : Integer;
+                     id2 : Integer;
 		  begin
 		     new_substitution_event := Substitution_Event_Ptr (base_event);
 		     Get_Numbers (new_substitution_event, number_to_id_1, number_to_id_2);
-		     substitution_team := new_substitution_event.Get_Team;
-
+		     substitution_team := Get_Team(new_substitution_event);
+--                       Print("[MAGIMAGIADIOBOIA]:" & I2S(number_to_id_1) & " " & I2S(number_to_id_2));
 		     -- notifico alla squadra il cambiamento
-		     Update_Map (number_to_id_1, number_to_id_2, substitution_team);
+  		     Update_Map (number_to_id_1, number_to_id_2, substitution_team);
 
 		     -- sostituisco i numeri di maglia con i rispettivi ID
-		     number_to_id_1 := ControllerPkg.Get_Id_From_Number (number_to_id_1, substitution_team);
-		     number_to_id_2 := ControllerPkg.Get_Id_From_Number (number_to_id_2, substitution_team);
-		     Set_Correct_Ids (new_substitution_event, number_to_id_1, number_to_id_2);
+                     id1 := ControllerPkg.Get_Id_From_Number (number_to_id_1, substitution_team);
+                     id2 := ControllerPkg.Get_Id_From_Number (number_to_id_2, substitution_team);
+--                       Print("[MAGIMAGIADIOBOIA]:" & I2S(id1) & " " & I2S(id2));
+		     Set_Correct_Ids (new_substitution_event, id1, id2);
 
 		     -- aggiungo in coda la sostituzione
 		     pending_substitutions.Append (new_substitution_event);
 		  end;
 	       end if;
-	    end loop;
+            end loop;
+            manager_events.Clear;
 	 end if;
       end if;
 
@@ -806,7 +814,7 @@ package body Soccer.ControllerPkg.Referee is
          Set_Game_Status (Game_Blocked);
 
 	 -- mando l'evento alla distribuzione
-	 Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_game_status));
+--  	 Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_game_status));
 
          -- setto la nuova posizione della palla E STOPPO IL MOTION AGENT, SE ATTIVO
          if Ball.Get_Moving then

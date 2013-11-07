@@ -152,11 +152,15 @@ package body Soccer.ControllerPkg is
    function Get_Id_From_Number(number : in Integer; team : in Team_Id) return Integer is
       player_id : Integer;
    begin
+      Print("[PADREPIOPORCODIO]:" & I2S(number) & " TEAM: " & Team_Id'Image(team));
       for i in current_status'Range loop
+--           Print("i: " & I2S(i) & " number: " & I2S(current_status(i).number) & " team: " & Team_Id'Image(current_status(i).team) &
+--                " id: " & I2S(current_status(i).id));
          if number = current_status(i).number and team = current_status(i).team then
             player_id := current_status(i).id;
          end if;
       end loop;
+      Print("[PADREPIOPORCODIO]:" & I2S(player_id));
       return player_id;
    end Get_Id_From_Number;
 
@@ -242,12 +246,12 @@ package body Soccer.ControllerPkg is
             current_player := team_one_ptr.players (i);
 
             current_status (counter).id := counter;
---              Print ("ID: " & I2S(counter));
+            Print ("ID: " & I2S(counter));
 	    current_status (counter).number := current_player;
---              Print ("MAGLIA: " & I2S(current_player));
+            Print ("MAGLIA: " & I2S(current_player));
 	    current_status (counter).coord := Coordinate'(counter,0);
 	    current_status (counter).team := Team_One;
---              Print ("TEAM: " & "TEAM_ONE));
+            Print ("TEAM: " & "TEAM_ONE");
 
 	    counter := counter + 1;
 	 end;
@@ -260,12 +264,12 @@ package body Soccer.ControllerPkg is
 	    current_player := team_two_ptr.players (i);
 
 	    current_status (counter).id := counter;
---              Print ("ID: " & I2S(counter));
+            Print ("ID: " & I2S(counter));
 	    current_status (counter).number := current_player;
---              Print ("MAGLIA: " & I2S(current_player));
+            Print ("MAGLIA: " & I2S(current_player));
 	    current_status (counter).coord := Coordinate'(counter,0);
 	    current_status (counter).team := Team_Two;
---              Print ("TEAM: " & "TEAM_TWO");
+            Print ("TEAM: " & "TEAM_TWO");
 
 	    counter := counter + 1;
 	 end;

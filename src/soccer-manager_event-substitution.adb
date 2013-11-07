@@ -38,4 +38,9 @@ package body Soccer.Manager_Event.Substitution is
       E.type_id := Substitution_Id;
    end Deserialize;
 
+   function Get_Team (e : in Substitution_Event_Ptr) return Team_Id is
+   begin
+      return e.team;
+   end Get_Team;
+
 end Soccer.Manager_Event.Substitution;

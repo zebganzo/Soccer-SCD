@@ -15,7 +15,7 @@ with Soccer.Generic_Timers;
 package Soccer.ControllerPkg.Referee is
 
    --+-------------
-   debug : Boolean := False;
+   debug : Boolean := True;
    --+-------------
 
    pragma Suppress (Elaboration_Check);

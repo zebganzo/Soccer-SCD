@@ -16,6 +16,8 @@ package Soccer.Manager_Event.Substitution is
 
    procedure Get_Numbers (e : in Substitution_Event_Ptr; id_1 : out Integer; id_2 : out Integer);
 
+   function Get_Team (e : in Substitution_Event_Ptr) return Team_Id;
+
 private
 
    type Substitution_Event is new Event with

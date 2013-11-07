@@ -163,6 +163,8 @@ package body Soccer.PlayersPkg is
       -- Match Event (Begin_Of_Match, End_Of_First_Half, ...) pointer
       m_event : Match_Event_Ptr;
 
+      foolproof_catch : Boolean := False;
+
       -- Output file with JSON object
       output      : File_Type;
       output_name : String(1..8);			-- output file name
@@ -359,6 +361,7 @@ package body Soccer.PlayersPkg is
                                                              Field      => "penalty_kick");
                   end case;
                elsif current_generic_status.game_status = Game_Blocked then
+                  foolproof_catch := True;
                   if current_generic_status.substitutions.Length > 0 then
                      declare
                         id_1 : Integer;
@@ -368,6 +371,9 @@ package body Soccer.PlayersPkg is
                            subbed := False;
                            json_obj.Set_Field(Field_Name => "substitution",
                                               Field      => "in");
+                        elsif subbed then
+                           json_obj.Set_Field(Field_Name => "substitution",
+                                              Field      => "out");
 			elsif not subbed then
                            for i in current_generic_status.substitutions.First_Index ..
                              current_generic_status.substitutions.Last_Index loop
@@ -555,9 +561,6 @@ package body Soccer.PlayersPkg is
                                          Field  => "X"));
          if decision_x = 1000 then
             decision_x := id;
-            if subbed then
-               id := new_player_id;
-            end if;
          end if;
          decision_y := Integer'Value(Get(Val   => json,
                            	        Field  => "Y"));
@@ -601,14 +604,19 @@ package body Soccer.PlayersPkg is
                new_catch_event : Catch_Event_Ptr;
                target 	       : Coordinate;
             begin
-               if Get_Formation_Id(player_number, player_team) = 1 then
-                  target := Action_Outcome(Coordinate'(decision_x,decision_y),
-                                           player_stats(3),
-                                           player_stats(6));
+               if not foolproof_catch then
+                  if Get_Formation_Id(player_number, player_team) = 1 then
+                     target := Action_Outcome(Coordinate'(decision_x,decision_y),
+                                              player_stats(3),
+                                              player_stats(6));
+                  else
+                     target := Action_Outcome(Coordinate'(decision_x,decision_y),
+                                              player_stats(5),
+                                              player_stats(6));
+                  end if;
                else
-                  target := Action_Outcome(Coordinate'(decision_x,decision_y),
-                                           player_stats(5),
-                                           player_stats(6));
+                  target := Coordinate'(decision_x,decision_y);
+                  foolproof_catch := False;
                end if;
 
                new_catch_event := new Catch_Event;
@@ -690,18 +698,23 @@ package body Soccer.PlayersPkg is
             end;
          end if;
 
-         Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
-                  ") ] Starting coord: " & Print_Coord (current_coord));
+--           Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
+--                    ") ] Starting coord: " & Print_Coord (current_coord));
 
-         Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
-                  ") ] Target coord: " & Print_Coord (Coordinate'(decision_x, decision_y)) &
-               "Decision: " & Ada.Strings.Unbounded.To_String(decision));
+--           Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
+--                    ") ] Target coord: " & Print_Coord (Coordinate'(decision_x, decision_y)) &
+--                 "Decision: " & Ada.Strings.Unbounded.To_String(decision));
 
 	 if current_action.event /= null and not do_nothing then
 --  	    Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Start");
 --  	    Game_Entity.Start;
-	    Print ("[PLAYER_" & I2S (id) & "] Chiamo la Write");
-	    ControllerPkg.Controller.Write(current_action);
+--  	    Print ("[PLAYER_" & I2S (id) & "] Chiamo la Write");
+            ControllerPkg.Controller.Write(current_action);
+
+            if subbed and player_position.coord_x = 26 and player_position.coord_y = 0 then
+               id := new_player_id;
+               Print("[CAMBIOOOOOOOOOOOOOOOOOOO ID]");
+            end if;
          end if;
 
          current_action.event := null;
