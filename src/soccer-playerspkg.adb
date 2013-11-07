@@ -170,8 +170,8 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
+--        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
@@ -711,7 +711,10 @@ package body Soccer.PlayersPkg is
 --  	    Print ("[PLAYER_" & I2S (id) & "] Chiamo la Write");
             ControllerPkg.Controller.Write(current_action);
 
-            if subbed and player_position.coord_x = 26 and player_position.coord_y = 0 then
+	    if subbed and player_position.coord_x = 26 and player_position.coord_y = 0 then
+	       -- notifico alla squadra il cambiamento
+	       Update_Map (id, new_player_id, player_team);
+
                id := new_player_id;
                Print("[CAMBIOOOOOOOOOOOOOOOOOOO ID]");
             end if;

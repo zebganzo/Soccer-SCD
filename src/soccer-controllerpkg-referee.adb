@@ -107,35 +107,62 @@ package body Soccer.ControllerPkg.Referee is
       if Get_Game_Status = Game_Blocked then
 	 declare
 	    current_substitution : Substitution_Event_Ptr;
-	    to_remove : array (0 .. pending_substitutions.Length) of Integer := (others => 0);
+	    length : Integer;
+--  	    to_remove : array (0 .. length) of Integer := (others => 0);
 	    id_1 : Integer;
 	    id_2 : Integer;
 	 begin
-	    -- controllo se i giocatori che devono entrare.. sono entrati
-	    for i in pending_substitutions.First_Index .. pending_substitutions.Last_Index loop
-	       current_substitution := pending_substitutions.Element (i);
-	       Get_Numbers (current_substitution, id_1, id_2);
-	       if Get_Player_Position (id_2).coord_y >= 1 then
-		  to_remove (Count_Type(i)) := 1;
-	       end if;
-	    end loop;
 
-	    -- rimuovo ogni indice salvato dal vector
-	    for i in to_remove'Last .. to_remove'First loop
-	       if to_remove (i) = 1 then
-		  current_substitution := pending_substitutions.Element (Integer(i));
+--  	    Print ("Pending subs length " & I2S (length));
+
+	    length := Integer (pending_substitutions.Length);
+
+	    -- controllo se i giocatori che devono entrare.. sono entrati
+	    if length > 0 then
+	       for i in pending_substitutions.Last_Index .. pending_substitutions.First_Index loop
+		  current_substitution := pending_substitutions.Element (i);
 		  Get_Numbers (current_substitution, id_1, id_2);
-		  current_status (id_1).on_the_field := False;
-		  current_status (id_2).on_the_field := True;
-		  pending_substitutions.Delete (Integer(i), 1);
-	       end if;
-	    end loop;
+
+		  Print ("[CANEDIO] ID_1 : " & I2S (id_1));
+		  Print ("[CANEDIO] ID_2 : " & I2S (id_2));
+		  if Get_Player_Position (id_2).coord_y >= 1 then
+		     Print ("[CANEDIO] FOUND IT" & I2S (i));
+		     --  		  to_remove (i) := 1;
+		     current_status (id_1).on_the_field := False;
+		     current_status (id_2).on_the_field := True;
+		     pending_substitutions.Delete (i, 1);
+
+		  end if;
+	       end loop;
+	    end if;
+
+--  	    Print ("To remove length " & I2S (to_remove'Length));
+
+--  	    for i in to_remove'Last .. to_remove'First loop
+--  	       Print ("pos " & I2S (i) & " value " & I2S (to_remove (i)));
+--  	    end loop;
+--
+--  	    -- rimuovo ogni indice salvato dal vector
+--  	    for i in to_remove'Last .. to_remove'First loop
+--  	       if to_remove (i) = 1 then
+--  		  Print ("[PRE_CHECK] Removing successful substitution");
+--  		  current_substitution := pending_substitutions.Element (Integer(i));
+--  		  Get_Numbers (current_substitution, id_1, id_2);
+--  		  current_status (id_1).on_the_field := False;
+--  		  current_status (id_2).on_the_field := True;
+--  		  pending_substitutions.Delete (Integer(i), 1);
+--  	       end if;
+--  	    end loop;
 
 	    -- controllo se posso procedere con gli altri controlli (solo se
 	    -- non ci sono piu' sosituzioni in pending)
-	    if pending_substitutions.Length /= 0 then
+	    length := Integer (pending_substitutions.Length);
+	    if length >= 0 then
 	       -- non posso fare gli altri controlli
+	       Print ("[PRE_CHECK] Still substituting");
 	       return;
+	    else
+	       Print ("[PRE_CHECK] Substitution ended");
 	    end if;
 
 	 end;
@@ -494,6 +521,9 @@ package body Soccer.ControllerPkg.Referee is
                         first_condition := True;
                      end if;
 
+		     Print ("[CANEDIO] 12 " & Boolean'Image (current_status(1).on_the_field));
+		     Print ("[CANEDIO] 60 " & Boolean'Image (current_status(5).on_the_field));
+
                      -- controllo che ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa
                      for i in current_status'Range loop
@@ -662,8 +692,6 @@ package body Soccer.ControllerPkg.Referee is
 		     Get_Numbers (new_substitution_event, number_to_id_1, number_to_id_2);
 		     substitution_team := Get_Team(new_substitution_event);
 --                       Print("[MAGIMAGIADIOBOIA]:" & I2S(number_to_id_1) & " " & I2S(number_to_id_2));
-		     -- notifico alla squadra il cambiamento
-  		     Update_Map (number_to_id_1, number_to_id_2, substitution_team);
 
 		     -- sostituisco i numeri di maglia con i rispettivi ID
                      id1 := ControllerPkg.Get_Id_From_Number (number_to_id_1, substitution_team);
