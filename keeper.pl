@@ -251,16 +251,26 @@ action(CellX, CellY, move) :-
  *										GAME RUNNING	CATCH RULES											   *
  **************************************************************************************************************/
 
-% Catch action : the goalkeeper catches the ball if he is in the ball's position
+% Catch action : Player do not have the ball / The ball is at distance = 1 / The ball is free
 % action(
 % 	CellX,																			X coordinate of the ball
 % 	CellY																			Y coordinate of the ball
 %	Move) 																			'catch'
 action(CellX, CellY, catch) :-
-	game(running),
-	player(position(PlayerX, PlayerY), has_not, _, not_last_holder),
-	ball(position(PlayerX, PlayerY),_), !,
-	ball(position(CellX, CellY),_).
+	game(running),																	% game status: 'running'
+	player(position(PlayerX,PlayerY), has_not, _, not_last_holder),
+	ball(position(BallX,BallY),_),													% get ball position
+	see_ball(position(PlayerX, PlayerY), position(BallX, BallY)),					% Do I see the ball?
+	distance(position(PlayerX, PlayerY), position(BallX, BallY), Distance),			% the 'catch' action can be performed only with
+	round(Distance) =< 1,															% the ball at distance 1 
+	(
+		current_predicate(nearby_player/3),
+		\+(bagof(_, nearby_player(_, has, _), _)), !,								% the ball is currently free (nobody near me has it) 
+		ball(position(CellX, CellY), _)
+		;
+		\+(current_predicate(nearby_player/3)),
+		ball(position(CellX, CellY), _)
+	).
 
 % Move action if the game status is 'running'. The player checks if the ball is "free" (nobody is holding it) and near him. 
 % If so he moves towards the ball to perform a Catch action. The player moves one cell at a time.
@@ -271,17 +281,19 @@ action(CellX, CellY, catch) :-
 action(CellX, CellY, move) :-
 	game(running),																	% game status: 'running'
 	player(position(PlayerX, PlayerY), has_not, _, not_last_holder),
-	ball(position(BallX, BallY), _),												% get ball position
+	ball(position(BallX,BallY),_),
 	see_ball(position(PlayerX, PlayerY), position(BallX, BallY)), 					% Do I see the ball?
-	distance(position(PlayerX, PlayerY), position(BallX, BallY), Distance),			
-	round(Distance) =< 3,			
 	(
 		current_predicate(nearby_player/3),
-		\+(bagof(_, nearby_player(_, has, _), _)), !,								% the ball is currently free (nobody near me has it) 
-		move_to_pos(PlayerX, BallY, CellX, CellY)
+		bagof(Position, Team^nearby_player(Position, _, Team), TargetPosition),
+		add(position(PlayerX, PlayerY), TargetPosition, List),
+		min_distance_from(List, TargetCell, _, position(BallX,BallY)),
+		TargetCell =.. [_, TargetX, TargetY],
+		player(position(TargetX, TargetY), _, _, _), !,
+		move_to_pos(BallX, BallY, CellX, CellY)
 		;
-		\+(current_predicate(nearby_player/3)),
-		move_to_pos(PlayerX, BallY, CellX, CellY)
+		\+(current_predicate(nearby_player/3)), !,
+		move_to_pos(BallX, BallY, CellX, CellY)
 	).
 
 /***************************************************************************************************************

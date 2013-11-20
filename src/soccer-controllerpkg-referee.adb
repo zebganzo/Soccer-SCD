@@ -157,7 +157,7 @@ package body Soccer.ControllerPkg.Referee is
 	    -- controllo se posso procedere con gli altri controlli (solo se
 	    -- non ci sono piu' sosituzioni in pending)
 	    length := Integer (pending_substitutions.Length);
-	    if length >= 0 then
+	    if length /= 0 then
 	       -- non posso fare gli altri controlli
 	       Print ("[PRE_CHECK] Still substituting");
 	       return;

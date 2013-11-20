@@ -452,10 +452,10 @@ action(CellX, CellY, move) :-
 		add(position(PlayerX, PlayerY), TargetPosition, List),
 		min_distance_from(List, TargetCell, _, position(BallX,BallY)),
 		TargetCell =.. [_, TargetX, TargetY],
-		player(position(TargetX, TargetY), _, _, _),
+		player(position(TargetX, TargetY), _, _, _), !,
 		move_to_pos(BallX, BallY, CellX, CellY)
 		;
-		\+(current_predicate(nearby_player/3)),
+		\+(current_predicate(nearby_player/3)), !,
 		move_to_pos(BallX, BallY, CellX, CellY)
 	).
 
