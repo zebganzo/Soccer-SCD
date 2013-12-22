@@ -22,6 +22,16 @@ package body Soccer.ControllerPkg.Referee is
       game_event := event;
    end Notify_Game_Event;
 
+   procedure Simulate_Begin_Of_1T is
+	new_event : Match_Event_Ptr;
+   begin
+      new_event := new Match_Event;
+      new_event.Initialize (Begin_Of_Match,
+			    Get_Nearest_Player(Ball.Get_Position, Team_One));
+      Set_Game_Status (Game_Blocked);
+      Set_Last_Game_Event (Game_Event_Ptr (new_event));
+   end Simulate_Begin_Of_1T;
+
    procedure Simulate_End_Of_1T is
       new_event : Match_Event_Ptr;
    begin

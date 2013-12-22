@@ -40,6 +40,7 @@ package Soccer.ControllerPkg.Referee is
 
    function TEMP_Get_Substitutions return Substitutions_Container.Vector;
 
+   procedure Simulate_Begin_Of_1T;
    procedure Simulate_End_Of_1T;
    procedure Simulate_Begin_Of_2T;
    procedure Simulate_End_Of_Match;

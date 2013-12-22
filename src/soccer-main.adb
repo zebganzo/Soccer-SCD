@@ -126,6 +126,10 @@ begin
 	    -- chiama notify
 	    Set_Game_Status (Game_Paused);
 	    Game_Entity.Notify;
+	 elsif char = 'b' then
+	    pragma Debug (Put_Line ("[MAIN] Simulating begin of 1st half"));
+	    Referee.Simulate_Begin_Of_1T;
+	    Game_Entity.Notify;
 	 elsif char = '1' then
 	    pragma Debug (Put_Line ("[MAIN] Simulating end of 1st half"));
 	    Referee.Simulate_End_Of_1T;

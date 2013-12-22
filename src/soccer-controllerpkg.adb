@@ -793,9 +793,9 @@ package body Soccer.ControllerPkg is
       initialized := False;
 
       -- imposto l'evento d'inizio gioco
-      initial_match_event := new Match_Event;
-      initial_match_event.Initialize (Begin_Of_Match,
-                                      Get_Nearest_Player(Ball.Get_Position, Team_One));
+      initial_match_event := null;
+--        initial_match_event.Initialize (Begin_Of_Match,
+--                                        Get_Nearest_Player(Ball.Get_Position, Team_One));
 
       last_game_event := Game_Event_Ptr (initial_match_event);
       game_status := Game_Paused;

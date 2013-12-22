@@ -55,7 +55,8 @@ package body Soccer.Game is
       begin
 	 if Is_Match_Event (Get_Last_Game_Event) then
 	    event := Match_Event_Ptr (Get_Last_Game_Event);
-	    if Get_Match_Event_Id (event) = Begin_Of_Second_Half then
+	    if Get_Match_Event_Id (event) = Begin_Of_Match or
+	      Get_Match_Event_Id (event) = Begin_Of_Second_Half then
 	       return True;
 	    end if;
 	 end if;

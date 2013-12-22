@@ -292,8 +292,10 @@ package body Soccer.Utils is
 
    function Is_Match_Event (event : Game_Event_Ptr) return Boolean is
    begin
-      if event.all in Match_Event'Class then
-	 return True;
+      if event /= null then
+	 if event.all in Match_Event'Class then
+	    return True;
+	 end if;
       end if;
 
       return False;

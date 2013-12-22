@@ -170,8 +170,8 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
+--        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
@@ -182,7 +182,8 @@ package body Soccer.PlayersPkg is
 --        Set_Directory (ai_basedir);
 
       Controller.Get_Id (id);
---        Print ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T");
+      --        Print ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T");
+      Game_Entity.Rest;
       Game_Entity.Start_1T;
 
       -- chiedo il mio ID al controllore
