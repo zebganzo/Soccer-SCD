@@ -45,4 +45,6 @@ package Soccer.Server.WebServer is
 
    procedure PublishFieldUpdate (events : JSON_Array);
 
+   procedure PublishTestUpdate;
+
 end Soccer.Server.WebServer;

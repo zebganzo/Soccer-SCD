@@ -842,9 +842,9 @@ package body Soccer.ControllerPkg is
 		     Guard.Update (Field_Zones (Get_Zone (current_action.event.Get_From)), False);
 		  end if;
 
-		  if current_action.event.all not in Move_Event'Class then
+--  		  if current_action.event.all not in Move_Event'Class then
 		     last_player_event := current_action.event;
-		  end if;
+--  		  end if;
 	       end if;
 
 	       if not compute_result and revaluate then
@@ -872,8 +872,9 @@ package body Soccer.ControllerPkg is
 			  & " rivalutata alla cella " & Print_Coord (alternative));
 
 			Compute (new_move, compute_result, revaluate);
-
 			Guard.Update (Field_Zones (Get_Zone (from)), False);
+
+			last_player_event := new_move;
 
 			Referee.Pre_Check (last_player_event);
 			Referee.Post_Check;

@@ -97,55 +97,79 @@ begin
 --        task9  : Player;
 --        task10 : Player;
 
-      char : Character;
+--        char : Character;
    begin
 
---        Soccer.Server.WebServer.Start;
+--        declare
+--        begin
+	 Soccer.Server.WebServer.Start;
+--        exception
+--  	 when
+--  	      Constraint_Error => Put_Line ("DIOBOIA!");
+--  	    when others => Put_Line ("DIOCANE!");
+--        end;
 
-      declare
-	 obj : JSON_Value := Create_Object;
-	 arr_1 : JSON_Array := Empty_Array;
-	 arr_2 : JSON_Array := Empty_Array;
-      begin
-         Append (arr_1, Create(arr_2));
-      end;
+--        declare
+--  	 obj : JSON_Value := Create_Object;
+--  	 arr_1 : JSON_Array := Empty_Array;
+--  	 arr_2 : JSON_Array := Empty_Array;
+--        begin
+--           Append (arr_1, Create(arr_2));
+--        end;
+
+--        while True loop
+--  	 delay 10.0;
+
+
+--        end loop;
 
       loop
-	 Get (Item => char);
 
-	 if char = 'p' then
-	    -- metti in pausa il gioco
-	    if Get_Game_Status = Game_Paused then
-	       Set_Game_Status (Game_Blocked);
-	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
-	    else
-	       Set_Game_Status (Game_Paused);
-	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
-	    end if;
-	 elsif char = 'n' then
-	    -- chiama notify
-	    Set_Game_Status (Game_Paused);
-	    Game_Entity.Notify;
-	 elsif char = 'b' then
-	    pragma Debug (Put_Line ("[MAIN] Simulating begin of 1st half"));
-	    Referee.Simulate_Begin_Of_1T;
-	    Game_Entity.Notify;
-	 elsif char = '1' then
-	    pragma Debug (Put_Line ("[MAIN] Simulating end of 1st half"));
-	    Referee.Simulate_End_Of_1T;
-	 elsif char = '2' then
-	    pragma Debug (Put_Line ("[MAIN] Simulating start of 2nd half"));
-	    Referee.Simulate_Begin_Of_2T;
-	    Game_Entity.Notify;
-	 elsif char = 'e' then
-	    pragma Debug (Put_Line ("[MAIN] Simulating end of 2nd half"));
-	    Referee.Simulate_End_Of_Match;
-	 elsif char = 's' then
-	    pragma Debug (Put_Line ("[MAIN] Substitution"));
-	    Referee.Simulate_Substitution;
-	 end if;
+--  	 Soccer.Server.WebServer.PublishTestUpdate;
+--  	 delay 1.0;
 
+	 delay 10.0;
+	 Referee.Simulate_Begin_Of_1T;
+	 Game_Entity.Notify;
 
+--  	 Get (Item => char);
+--
+--  	 if char = 'p' then
+--  	    -- metti in pausa il gioco
+--  	    if Get_Game_Status = Game_Paused then
+--  	       Set_Game_Status (Game_Blocked);
+--  	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
+--  	    else
+--  	       Set_Game_Status (Game_Paused);
+--  	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
+--  	    end if;
+--  	 elsif char = 'n' then
+--  	    -- chiama notify
+--  	    Set_Game_Status (Game_Paused);
+--  	    Game_Entity.Notify;
+--  	 elsif char = 'b' then
+--  	    pragma Debug (Put_Line ("[MAIN] Simulating begin of 1st half"));
+--  	    Referee.Simulate_Begin_Of_1T;
+--  	    Game_Entity.Notify;
+--  	 elsif char = '1' then
+--  	    pragma Debug (Put_Line ("[MAIN] Simulating end of 1st half"));
+--  	    Referee.Simulate_End_Of_1T;
+--  	 elsif char = '2' then
+--  	    pragma Debug (Put_Line ("[MAIN] Simulating start of 2nd half"));
+--  	    Referee.Simulate_Begin_Of_2T;
+--  	    Game_Entity.Notify;
+--  	 elsif char = 'e' then
+--  	    pragma Debug (Put_Line ("[MAIN] Simulating end of 2nd half"));
+--  	    Referee.Simulate_End_Of_Match;
+--  	 elsif char = 's' then
+--  	    pragma Debug (Put_Line ("[MAIN] Substitution"));
+--  	    Referee.Simulate_Substitution;
+--  	 elsif char = 't' then
+--  	    pragma Debug (Put_Line ("[MAIN] Sending test message"));
+--  	    Soccer.Server.WebServer.PublishTestUpdate;
+--  	 end if;
+--
+--
       end loop;
 
 

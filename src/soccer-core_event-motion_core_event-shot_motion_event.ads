@@ -9,6 +9,8 @@ package Soccer.Core_Event.Motion_Core_Event.Shot_Motion_Event is
 
    function Get_Shot_Power (E : in Shot_Event) return Power_Range;
 
+   procedure Update_Serialized_Object (E : Shot_Event; Serialized_Obj : in out JSON_Value);
+
 private
 
    type Shot_Event is new Motion_Event with

@@ -11,7 +11,7 @@ package Soccer.ControllerPkg is
    -- New Types
 
    --+-------------
-   debug : Boolean := True;
+   debug : Boolean := False;
    --+-------------
 
    type Action is

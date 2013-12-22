@@ -39,19 +39,15 @@ package body Soccer.Bridge.Output is
          now : Ada.Calendar.Time := Clock;
       begin
 
+	 Put_Line ("BUFFER PUT PROCEDURE");
+
          if new_event.all in Game_Event'Class then
             new_element.event := new_event;
             new_element.time_start := t0 - now;
             size := size + 1;
             event_buffer(size) := new_element;
 
-	    -- Se è un evento del Match (es. fine primo tempo) forzo la send
-     	    -- cambiare Match Event in Game Event: questo perche' se sono eventi
-            -- tipo goal, sostituzione va notificato
-            if new_event.all in Match_Event'Class then
-               Send;
-            end if;
-
+            Send;
          else
             -- motion event, devo gestire i vari casi!
             if new_event.all in Move_Event'Class then
@@ -66,11 +62,18 @@ package body Soccer.Bridge.Output is
                            found := True;
                            exit;
                         end if;
-                     else
-                        found := False;
-                        exit;
+--                       else
+--                          found := False;
+--                          exit;
                      end if;
-                  end loop;
+		  end loop;
+
+		  if not found then
+		     new_element.event := new_event;
+		     new_element.time_start := t0 - now;
+		     size := size + 1;
+		     event_buffer(size) := new_element;
+		  end if;
                end;
             else
                -- Codice uguale a sopra, lo tengo separato per problematiche future
@@ -92,9 +95,11 @@ package body Soccer.Bridge.Output is
          field_events : JSON_Array;
          manager_events : JSON_Array;
       begin
+
 	if size > 0 then
 	    for event in 1 .. size loop
 	       event_buffer(event).event.Serialize(j_value);
+	       event_buffer(event).event.Update_Serialized_Object (j_value);
 	       GNATCOLL.JSON.Append(Arr => field_events,
 			     Val => j_value);
 	       if event_buffer(event).event.all in Game_Event'Class then
@@ -105,10 +110,23 @@ package body Soccer.Bridge.Output is
 
 	    size := 0;
 
+	    for i in 1 .. Length (field_events) loop
+	       declare
+		  value : JSON_Value;
+	       begin
+		  value := Get (field_events, i);
+		  Put_Line ("Value (" & I2S (i) & ") : " & Get (value));
+	       end;
+	    end loop;
+
 	    -- Server
-	    Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
+--  	    Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
 	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
 	 end if;
+
+	 Reset_Timer;
+	 Start_Timer;
+
       end Send;
 
    end Buffer_Wrapper;

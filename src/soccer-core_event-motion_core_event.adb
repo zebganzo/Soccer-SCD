@@ -29,8 +29,6 @@ package body Soccer.Core_Event.Motion_Core_Event is
    procedure Serialize (E : Motion_Event; Serialized_Obj : out JSON_Value) is
    begin
       Serialized_Obj := Create_Object;
-      Serialized_Obj.Set_Field(Field_Name => "type_of_event",
-                               Field      => "motion");
       Serialized_Obj.Set_Field(Field_Name => "player_id",
                                Field      => E.Player_Id);
       Serialized_Obj.Set_Field(Field_Name => "from_x",

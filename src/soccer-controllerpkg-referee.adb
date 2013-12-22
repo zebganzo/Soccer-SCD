@@ -2,6 +2,7 @@ with Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 with Soccer.Motion_AgentPkg; use Soccer.Motion_AgentPkg;
 with Soccer.Bridge.Output; use Soccer.Bridge.Output;
+with Soccer.Server.WebServer;
 
 package body Soccer.ControllerPkg.Referee is
 
@@ -23,13 +24,14 @@ package body Soccer.ControllerPkg.Referee is
    end Notify_Game_Event;
 
    procedure Simulate_Begin_Of_1T is
-	new_event : Match_Event_Ptr;
+      new_event : Match_Event_Ptr;
    begin
       new_event := new Match_Event;
       new_event.Initialize (Begin_Of_Match,
 			    Get_Nearest_Player(Ball.Get_Position, Team_One));
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
+      Soccer.Bridge.Output.Start_Timer;
    end Simulate_Begin_Of_1T;
 
    procedure Simulate_End_Of_1T is
@@ -39,16 +41,19 @@ package body Soccer.ControllerPkg.Referee is
       new_event.Initialize (End_Of_First_Half, 0);
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
+      Soccer.Bridge.Output.Reset_Timer;
    end Simulate_End_Of_1T;
 
    procedure Simulate_Begin_Of_2T is
       new_event : Match_Event_Ptr;
    begin
       new_event := new Match_Event;
-      new_event.Initialize (Begin_Of_Second_Half, Get_Nearest_Player (Ball.Get_Position, Team_One));
+      new_event.Initialize (Begin_Of_Second_Half,
+			    Get_Nearest_Player (Ball.Get_Position, Team_One));
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Ball.Set_Position (middle_field_coord);
+      Soccer.Bridge.Output.Start_Timer;
    end Simulate_Begin_Of_2T;
 
    procedure Simulate_End_Of_Match is
@@ -58,6 +63,7 @@ package body Soccer.ControllerPkg.Referee is
       new_event.Initialize (End_Of_Match, 0);
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
+      Soccer.Bridge.Output.Reset_Timer;
    end Simulate_End_Of_Match;
 
    procedure Simulate_Substitution is
@@ -118,12 +124,9 @@ package body Soccer.ControllerPkg.Referee is
 	 declare
 	    current_substitution : Substitution_Event_Ptr;
 	    length : Integer;
---  	    to_remove : array (0 .. length) of Integer := (others => 0);
 	    id_1 : Integer;
 	    id_2 : Integer;
 	 begin
-
---  	    Print ("Pending subs length " & I2S (length));
 
 	    length := Integer (pending_substitutions.Length);
 
@@ -133,11 +136,7 @@ package body Soccer.ControllerPkg.Referee is
 		  current_substitution := pending_substitutions.Element (i);
 		  Get_Numbers (current_substitution, id_1, id_2);
 
-		  Print ("[CANEDIO] ID_1 : " & I2S (id_1));
-		  Print ("[CANEDIO] ID_2 : " & I2S (id_2));
 		  if Get_Player_Position (id_2).coord_y >= 1 then
-		     Print ("[CANEDIO] FOUND IT" & I2S (i));
-		     --  		  to_remove (i) := 1;
 		     current_status (id_1).on_the_field := False;
 		     current_status (id_2).on_the_field := True;
 		     pending_substitutions.Delete (i, 1);
@@ -146,33 +145,16 @@ package body Soccer.ControllerPkg.Referee is
 	       end loop;
 	    end if;
 
---  	    Print ("To remove length " & I2S (to_remove'Length));
-
---  	    for i in to_remove'Last .. to_remove'First loop
---  	       Print ("pos " & I2S (i) & " value " & I2S (to_remove (i)));
---  	    end loop;
---
---  	    -- rimuovo ogni indice salvato dal vector
---  	    for i in to_remove'Last .. to_remove'First loop
---  	       if to_remove (i) = 1 then
---  		  Print ("[PRE_CHECK] Removing successful substitution");
---  		  current_substitution := pending_substitutions.Element (Integer(i));
---  		  Get_Numbers (current_substitution, id_1, id_2);
---  		  current_status (id_1).on_the_field := False;
---  		  current_status (id_2).on_the_field := True;
---  		  pending_substitutions.Delete (Integer(i), 1);
---  	       end if;
---  	    end loop;
-
 	    -- controllo se posso procedere con gli altri controlli (solo se
 	    -- non ci sono piu' sosituzioni in pending)
 	    length := Integer (pending_substitutions.Length);
-	    if length /= 0 then
+	    if length > 0 then
 	       -- non posso fare gli altri controlli
-	       Print ("[PRE_CHECK] Still substituting");
+--  	       Print ("[PRE_CHECK] Still substituting");
 	       return;
 	    else
-	       Print ("[PRE_CHECK] Substitution ended");
+	       null;
+--  	       Print ("[PRE_CHECK] Substitution ended");
 	    end if;
 
 	 end;
@@ -194,9 +176,8 @@ package body Soccer.ControllerPkg.Referee is
 		     -- faccio partire i timer del primo tempo
 		     -- (tempo partita e buffer eventi)
 		     Game_Timer_First_Half.Start;
-		     Soccer.Bridge.Output.Start_Timer;
 		     -- mando l'evento alla distribuzione
---  		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+		     Buffer_Wrapper.Put (Core_Event.Event_Ptr(e));
                      return; -- TODO:: controlla se serve!
                   end if;
                end if;
@@ -261,7 +242,7 @@ package body Soccer.ControllerPkg.Referee is
 		     Game_Timer_Second_Half.Start;
 		     Soccer.Bridge.Output.Start_Timer;
 		     -- mando l'evento alla distribuzione
---  		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
                      return; -- TODO:: controlla se serve!
                   end if;
                end if;
@@ -531,9 +512,6 @@ package body Soccer.ControllerPkg.Referee is
                         first_condition := True;
                      end if;
 
-		     Print ("[CANEDIO] 12 " & Boolean'Image (current_status(1).on_the_field));
-		     Print ("[CANEDIO] 60 " & Boolean'Image (current_status(5).on_the_field));
-
                      -- controllo che ci siano giocatori attorno alla posizione
                      -- di chi deve fare la rimessa
                      for i in current_status'Range loop
@@ -600,7 +578,7 @@ package body Soccer.ControllerPkg.Referee is
       end if;
 
       -- mando l'evento alla distribuzione
---        Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
 
    end Pre_Check;
 
@@ -852,7 +830,7 @@ package body Soccer.ControllerPkg.Referee is
          Set_Game_Status (Game_Blocked);
 
 	 -- mando l'evento alla distribuzione
---  	 Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_game_status));
+	 Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_game_status));
 
          -- setto la nuova posizione della palla E STOPPO IL MOTION AGENT, SE ATTIVO
          if Ball.Get_Moving then
@@ -877,7 +855,8 @@ package body Soccer.ControllerPkg.Referee is
             current_distance : Integer := Distance (From => event_coord,
                                                     To => current_status (i).coord);
          begin
-            if current_status(i).team = team and current_distance < smallest_distance then
+	    if current_status (i).team = team and current_distance < smallest_distance
+	      and current_status (i).on_the_field then
                smallest_distance := current_distance;
                player := i;
             end if;

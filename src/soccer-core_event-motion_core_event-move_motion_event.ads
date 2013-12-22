@@ -7,6 +7,8 @@ package Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event is
 
    procedure Update_To_Coordinate (E : in out Move_Event; new_coord : in Coordinate);
 
+   procedure Update_Serialized_Object (E : Move_Event; Serialized_Obj : in out JSON_Value);
+
 private
 
    type Move_Event is new Motion_Event with null record;

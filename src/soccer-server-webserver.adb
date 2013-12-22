@@ -1,4 +1,5 @@
 with Soccer.Server.WebServer;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Server.WebServer is
 
@@ -11,15 +12,16 @@ package body Soccer.Server.WebServer is
 
       --  Start the server
 
-      Net.WebSocket.Registry.Register ("/managerVisitors/registerForStatistics", Soccer.Server.WebSockets.Create'Access);
-      Net.WebSocket.Registry.Register ("/managerHome/registerForStatistics", Soccer.Server.WebSockets.Create'Access);
-      Net.WebSocket.Registry.Register ("/field/registerForEvents", Soccer.Server.WebSockets.Create'Access);
+      AWS.Server.Start(Web_Server => Web_Server,
+		       Config     => Web_Config,
+		       Callback   => Soccer.Server.Callbacks.Services'Unrestricted_Access);
+
 
       Net.WebSocket.Registry.Control.Start;
 
-      AWS.Server.Start(Web_Server => Web_Server,
-                       Config     => Web_Config,
-                       Callback   => Soccer.Server.Callbacks.Services'Unrestricted_Access);
+      Net.WebSocket.Registry.Register ("/managerVisitors/registerForStatistics", Soccer.Server.WebSockets.Create'Access);
+      Net.WebSocket.Registry.Register ("/managerHome/registerForStatistics", Soccer.Server.WebSockets.Create'Access);
+      Net.WebSocket.Registry.Register ("/field/registerForEvents", Soccer.Server.WebSockets.Create'Access);
 
    end Start;
 
@@ -38,5 +40,11 @@ package body Soccer.Server.WebServer is
 			   Field      => events);
       Net.WebSocket.Registry.Send(Field, Write (Item => container));
    end PublishFieldUpdate;
+
+   procedure PublishTestUpdate is
+   begin
+      Net.WebSocket.Registry.Send(Field, "test!!!!");
+   end PublishTestUpdate;
+
 
 end Soccer.Server.WebServer;

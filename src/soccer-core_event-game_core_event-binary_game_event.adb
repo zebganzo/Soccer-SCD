@@ -17,7 +17,7 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
 
    procedure Serialize (E : Binary_Event; Serialized_Obj : out JSON_Value) is
    begin
-      Put_Line("binary event");
+
       Serialized_Obj := Create_Object;
       Serialized_Obj.Set_Field(Field_Name => "type_of_event",
                                Field      => "binary");
