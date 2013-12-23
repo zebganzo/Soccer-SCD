@@ -621,6 +621,7 @@ package body Soccer.ControllerPkg.Referee is
 		     is_penalty : Boolean := Is_In_Penalty_Area (offender_team,
 						   		 current_status (evt.Get_Id_Player_2).coord);
 		     foul_type : Unary_Event_Id;
+		     nearest_player : Integer;
 		  begin
 		     -- controllo se il fallo e' stato fatto nell'area di rigore
 		     if is_penalty then
@@ -635,8 +636,10 @@ package body Soccer.ControllerPkg.Referee is
 		     end if;
 
 		     -- inizializzo l'evento di fallo
+		     nearest_player := Get_Nearest_Player (evt_coord, victim_team);
 		     foul_event.Initialize (foul_type,
-			      Get_Nearest_Player (evt_coord, victim_team),
+			      nearest_player,
+			      Get_Number_From_Id (nearest_player),
 			      victim_team,
 			      evt_coord);
 
@@ -720,6 +723,7 @@ package body Soccer.ControllerPkg.Referee is
 		     goal_event : Unary_Event_Ptr := new Unary_Event;
 		     scoring_team : Team_Id;
 		     opposing_team : Team_Id;
+		     new_player : Integer;
 		  begin
 		     if last_team_possession = Team_One then
 			scoring_team := Team_One;
@@ -735,8 +739,10 @@ package body Soccer.ControllerPkg.Referee is
 			opposing_team := Team_One;
 		     end if;
 
+		     new_player := Get_Id_From_Number (Get_Number_From_Formation (10, opposing_team), opposing_team);
 		     goal_event.Initialize (new_event_id    => Goal,
-			      new_player_id   => Get_Id_From_Number (Get_Number_From_Formation (10, opposing_team), opposing_team),
+			      new_player_id   => new_player,
+			      new_player_number => Get_Number_From_Id (new_player),
 			      new_team_id     => scoring_team,
 			      new_event_coord => middle_field_coord);
 		     new_game_status := goal_event;
@@ -746,15 +752,21 @@ package body Soccer.ControllerPkg.Referee is
                elsif ball_coord.coord_x > 0 and ball_coord.coord_x < field_max_x + 1 then
                   Print ("[POST_CHECK] Rimessa laterale");
 
-                  new_game_status := new Unary_Event;
-                  new_game_status.Initialize (
-                                              new_event_id    => Throw_In,
-                                              new_player_id   => Get_Nearest_Field_Player (ball_coord, Get_Opposing_Team (last_team_possession)),
-                                              new_team_id     => Get_Opposing_Team (last_team_possession),
-                                              new_event_coord => ball_coord);
-                  Print("[RIMESSA LATERALE]: BALL COORDINATE: " & Print_Coord(ball_coord));
-                  Print("[RIMESSA LATERALE]: OPPOSING TEAM: " & Team_Id'Image(Get_Opposing_Team (last_team_possession)));
-                  Print("[RIMESSA LATERALE]: NEAREST PLAYER: " & I2S(Get_Nearest_Field_Player (ball_coord, Get_Opposing_Team (last_team_possession))));
+		  declare
+		     player_id : Integer := Get_Nearest_Field_Player (ball_coord, Get_Opposing_Team (last_team_possession));
+		  begin
+		     new_game_status := new Unary_Event;
+		     new_game_status.Initialize (
+				   new_event_id    => Throw_In,
+				   new_player_id   => player_id,
+				   new_player_number => Get_Number_From_Id (player_id),
+				   new_team_id     => Get_Opposing_Team (last_team_possession),
+				   new_event_coord => ball_coord);
+		     Print ("[RIMESSA LATERALE]: BALL COORDINATE: " & Print_Coord(ball_coord));
+		     Print ("[RIMESSA LATERALE]: OPPOSING TEAM: " & Team_Id'Image(Get_Opposing_Team (last_team_possession)));
+		     Print ("[RIMESSA LATERALE]: NEAREST PLAYER: " & I2S(Get_Nearest_Field_Player (ball_coord, Get_Opposing_Team (last_team_possession))));
+		  end;
+
 	       elsif ball_coord.coord_x = 0 or ball_coord.coord_x = field_max_x + 1 then
 		  -- controllo se va assegnato un calcio d'angolo o un rinvio dal
 		  -- fondo (non controllo la y perche' ho gia' controllato il gol)
@@ -762,6 +774,7 @@ package body Soccer.ControllerPkg.Referee is
 		  declare
 		     new_event : Unary_Event_Ptr := new Unary_Event;
 		     new_evt_coord : Coordinate := Coordinate'(0,0);
+		     player_id : Integer;
 		  begin
 		     if ball_coord.coord_y < field_max_y / 2 then
 			Set_Coord_Y (coord => new_evt_coord, value => 1);
@@ -776,10 +789,12 @@ package body Soccer.ControllerPkg.Referee is
 
 			   Set_Coord_X (coord => new_evt_coord, value => 1);
 
+			   player_id := Get_Id_From_Number(Get_Number_From_Formation(6, Team_Two),Team_Two);
 			   new_event.Initialize (new_event_id    => Corner_Kick,
-			    			 new_player_id   => Get_Id_From_Number(Get_Number_From_Formation(6, Team_Two),Team_Two),
-                            			 new_team_id     => Team_Two,
-                            new_event_coord => new_evt_coord);
+			    new_player_id   => player_id,
+			    new_player_number => Get_Number_From_Id (player_id),
+			    new_team_id     => Team_Two,
+			    new_event_coord => new_evt_coord);
 			elsif ball_coord.coord_x = field_max_x + 1 then
 			   -- assegna una rimessa dal fondo a Team_Two
 			   Print ("[POST_CHECK] Rimessa dal fondo per Team_Two");
@@ -787,8 +802,10 @@ package body Soccer.ControllerPkg.Referee is
 			   Set_Coord_X (coord => new_evt_coord, value => field_max_x - 3);
 			   Set_Coord_Y (new_evt_coord, field_max_y / 2);
 
+			   player_id := Get_Id_From_Number (Get_Goalkeeper_Number (Team_Two),Team_Two);
 			   new_event.Initialize (new_event_id    => Goal_Kick,
-			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_Two),Team_Two),
+			    new_player_id   => player_id,
+			    new_player_number => Get_Number_From_Id (player_id),
 			    new_team_id     => Team_Two,
 			    new_event_coord => new_evt_coord);
 			end if;
@@ -800,8 +817,10 @@ package body Soccer.ControllerPkg.Referee is
 			   Set_Coord_X (coord => new_evt_coord, value => 3);
 			   Set_Coord_Y (new_evt_coord, field_max_y / 2);
 
+			   player_id := Get_Id_From_Number (Get_Goalkeeper_Number (Team_One),Team_One); -- portiere
 			   new_event.Initialize (new_event_id    => Goal_Kick,
-			    new_player_id   => Get_Id_From_Number (Get_Goalkeeper_Number (Team_One),Team_One), -- portiere
+			    new_player_id   => player_id,
+			    new_player_number => Get_Number_From_Id (player_id),
 			    new_team_id     => Team_One,
 			    new_event_coord => new_evt_coord);
 			elsif ball_coord.coord_x = field_max_x + 1 then
@@ -813,6 +832,7 @@ package body Soccer.ControllerPkg.Referee is
 
 			   new_event.Initialize (new_event_id    => Corner_Kick,
 			    new_player_id   => Get_Id_From_Number(Get_Number_From_Formation(6, Team_One),Team_One),
+			    new_player_number => Get_Number_From_Id (player_id),
 			    new_team_id     => Team_One,
                             new_event_coord => new_evt_coord);
 			end if;

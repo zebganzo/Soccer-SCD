@@ -43,7 +43,7 @@ package body Soccer.Server.WebServer is
 
    procedure PublishTestUpdate is
    begin
-      Net.WebSocket.Registry.Send(Field, "test!!!!");
+      Net.WebSocket.Registry.Send(Field, "test!");
    end PublishTestUpdate;
 
 

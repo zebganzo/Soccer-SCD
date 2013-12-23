@@ -10,7 +10,6 @@ package Soccer.Core_Event.Game_Core_Event is
 
    procedure Update_Serialized_Object (E : Game_Event; Serialized_Obj : in out JSON_Value);
 
-
 private
 
    type Game_Event is abstract new Event with record

@@ -6,11 +6,13 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
    procedure Initialize (E : in out Unary_Event;
 			 new_event_id : in Unary_Event_Id;
 			 new_player_id : in Integer;
+			 new_player_number : in Integer;
 			 new_team_id : in Team_Id;
 			 new_event_coord : in Coordinate) is
    begin
       E.event_id := new_event_id;
       E.player_id := new_player_id;
+      E.player_number := new_player_number;
       E.event_team_id := new_team_id;
       E.event_coord := new_event_coord;
    end Initialize;
@@ -26,8 +28,14 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
                                Field      => Unary_Event_Id'Image(E.event_id));
       Serialized_Obj.Set_Field(Field_Name => "player_id",
 			       Field      => E.player_id);
+      Serialized_Obj.Set_Field(Field_Name => "player_number",
+			       Field	  => E.player_number);
       Serialized_Obj.Set_Field(Field_Name => "team_id",
 			       Field	  => To_String (E.event_team_id));
+      Serialized_Obj.Set_Field(Field_Name => "event_coord_x",
+			       Field	  => E.event_coord.coord_x);
+      Serialized_Obj.Set_Field(Field_Name => "event_coord_x",
+			       Field	  => E.event_coord.coord_y);
    end Serialize;
 
    function Get_Team (e : in Unary_Event_Ptr) return Team_Id is
@@ -39,6 +47,12 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
    begin
       return e.player_id;
    end Get_Player_Id;
+
+   function Get_Player_Number (e : in Unary_Event_Ptr) return Integer is
+   begin
+      return e.player_number;
+   end Get_Player_Number;
+
 
    function Get_Type (e : in Unary_Event_Ptr) return Unary_Event_Id is
    begin

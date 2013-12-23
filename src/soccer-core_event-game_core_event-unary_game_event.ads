@@ -21,6 +21,7 @@ package Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
    procedure Initialize (E : in out Unary_Event;
 			 new_event_id : in Unary_Event_Id;
 			 new_player_id : in Integer;
+			 new_player_number : in Integer;
 			 new_team_id : in Team_Id;
 			 new_event_coord : in Coordinate);
 
@@ -35,6 +36,7 @@ private
    type Unary_Event is new Game_Event with record
       event_id : Unary_Event_Id;
       player_id : Integer;
+      player_number : Integer;
       event_team_id : Team_Id;
       event_coord : Coordinate;
    end record;

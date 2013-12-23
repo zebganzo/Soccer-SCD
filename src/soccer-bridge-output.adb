@@ -43,7 +43,8 @@ package body Soccer.Bridge.Output is
 
          if new_event.all in Game_Event'Class then
             new_element.event := new_event;
-            new_element.time_start := t0 - now;
+	    new_element.time_start := t0 - now;
+	    new_element.time_stop := new_element.time_start;
             size := size + 1;
             event_buffer(size) := new_element;
 
@@ -71,6 +72,7 @@ package body Soccer.Bridge.Output is
 		  if not found then
 		     new_element.event := new_event;
 		     new_element.time_start := t0 - now;
+		     new_element.time_stop := new_element.time_start;
 		     size := size + 1;
 		     event_buffer(size) := new_element;
 		  end if;
@@ -79,7 +81,8 @@ package body Soccer.Bridge.Output is
                -- Codice uguale a sopra, lo tengo separato per problematiche future
                -- attualmente non considerate!
                new_element.event := new_event;
-               new_element.time_start := t0 - now;
+	       new_element.time_start := t0 - now;
+	       new_element.time_stop := new_element.time_start;
                size := size + 1;
                event_buffer(size) := new_element;
             end if;
@@ -100,6 +103,10 @@ package body Soccer.Bridge.Output is
 	    for event in 1 .. size loop
 	       event_buffer(event).event.Serialize(j_value);
 	       event_buffer(event).event.Update_Serialized_Object (j_value);
+	       j_value.Set_Field ("start_time",
+			   Duration'Image (event_buffer(event).time_start));
+	       j_value.Set_Field ("end_time",
+				 Duration'Image (event_buffer(event).time_stop));
 	       GNATCOLL.JSON.Append(Arr => field_events,
 			     Val => j_value);
 	       if event_buffer(event).event.all in Game_Event'Class then
