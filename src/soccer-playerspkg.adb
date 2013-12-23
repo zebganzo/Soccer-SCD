@@ -584,7 +584,6 @@ package body Soccer.PlayersPkg is
                new_shot_event.Set_Shot_Power(15);
                current_action.event := Motion_Event_Ptr(new_shot_event);
 	       current_action.utility := 10;
-
             end;
          elsif decision = "shot" then
                declare

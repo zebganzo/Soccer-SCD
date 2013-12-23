@@ -33,10 +33,20 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
                                Field      => Binary_Event_Id'Image(E.event_id));
       Serialized_Obj.Set_Field(Field_Name => "player_1_id",
                                Field      => E.player_1_id);
+      Serialized_Obj.Set_Field(Field_Name => "player_1_number",
+                               Field      => E.player_1_number);
+      Serialized_Obj.Set_Field(Field_Name => "player_1_team",
+                               Field      => Team_Id'Image(E.player_1_team));
       Serialized_Obj.Set_Field(Field_Name => "player_2_id",
-			       Field      => E.player_2_id);
-      Serialized_Obj.Set_Field(Field_Name => "event_coord",
-                               Field      => Serialize_Coordinate (E.event_coord) );
+                               Field      => E.player_2_id);
+      Serialized_Obj.Set_Field(Field_Name => "player_2_number",
+                               Field      => E.player_2_number);
+      Serialized_Obj.Set_Field(Field_Name => "player_2_team",
+			       Field      => Team_Id'Image(E.player_2_team));
+      Serialized_Obj.Set_Field(Field_Name => "event_coord_x",
+			       Field	  => E.event_coord.coord_x);
+      Serialized_Obj.Set_Field(Field_Name => "event_coord_y",
+			       Field	  => E.event_coord.coord_y);
    end Serialize;
 
    function Get_Event_Id (event : Binary_Event) return Binary_Event_Id is

@@ -34,7 +34,7 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 			       Field	  => To_String (E.event_team_id));
       Serialized_Obj.Set_Field(Field_Name => "event_coord_x",
 			       Field	  => E.event_coord.coord_x);
-      Serialized_Obj.Set_Field(Field_Name => "event_coord_x",
+      Serialized_Obj.Set_Field(Field_Name => "event_coord_y",
 			       Field	  => E.event_coord.coord_y);
    end Serialize;
 
