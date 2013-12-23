@@ -16,6 +16,8 @@ with Ada.Direct_IO;
 with Soccer.Server.Callbacks; use Soccer.Server.Callbacks;
 with Soccer.Game; use Soccer.Game;
 with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
+with Soccer.ControllerPkg; use Soccer.ControllerPkg;
+with Soccer.TeamPkg; use Soccer.TeamPkg;
 
 
 package body Soccer.Server.Callbacks is
@@ -24,8 +26,8 @@ package body Soccer.Server.Callbacks is
    -- Default --
    -------------
 
-   function Services (Request : in Status.Data) return Response.Data is
-      URI : constant String := Status.URI (Request);
+   function Services (Request : in AWS.Status.Data) return Response.Data is
+      URI : constant String := AWS.Status.URI (Request);
       PARAMS : constant AWS.Parameters.List := AWS.Status.Parameters (Request);
       a : JSON_Value := GNATCOLL.JSON.Read ( "{""foo"":""bar"",""foo2"":""bar2""}", "");
       b : JSON_Value;
@@ -45,7 +47,9 @@ package body Soccer.Server.Callbacks is
       elsif URI = "/field/pauseGame" then
 	 -- pause the current game
 	 null;
-
+      elsif URI = "/field/getParams" then
+	 -- send players' params
+	 return AWS.Response.Build (MIME.Text_Plain, Get_Params);
       end if;
 
 --        Put_Line (AWS.Parameters.Get (PARAMS, "a"));
@@ -59,6 +63,25 @@ package body Soccer.Server.Callbacks is
       return AWS.Response.Build (MIME.Text_HTML, "Hello WebServer!");
 
    end Services;
+
+   function Get_Params return String is
+      result : JSON_Array;
+      current : JSON_Value;
+      container : JSON_Value;
+   begin
+      for player in 1 .. total_players loop
+	 current := Create_Object;
+	 Set_Field (current, "id", player);
+	 Set_Field (current, "number", ControllerPkg.Get_Number_From_Id (player));
+	 Set_Field (current, "team", Team_Id'Image (ControllerPkg.Get_Player_Team_From_Id (player)));
+	 Append (result, current);
+      end loop;
+
+      container := Create_Object;
+      Set_Field (container, "players", result);
+      return Write (container);
+   end Get_Params;
+
 
    ----------------
    --  Iterator  --

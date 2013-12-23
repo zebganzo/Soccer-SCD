@@ -9,6 +9,8 @@ package Soccer.Server.Callbacks is
 
    function Services (Request : in Status.Data) return Response.Data;
 
+   function Get_Params return String;
+
    procedure Handler (Name  : in UTF8_String; Value : in JSON_Value);
 
    function Load_File (Filename : in String) return String;
