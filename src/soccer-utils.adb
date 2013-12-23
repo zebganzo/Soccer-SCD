@@ -3,6 +3,7 @@ with Ada.Numerics.Discrete_Random;
 with Ada.Text_IO;
 use Ada.Text_IO;
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+with Ada.Unchecked_Conversion;
 
 package body Soccer.Utils is
 
@@ -301,6 +302,20 @@ package body Soccer.Utils is
       return False;
    end Is_Match_Event;
 
+   function Time_Image_Two (Item : in Ada.Calendar.Time) return String
+   is
+      type New_Time is mod 2 ** 64;
+      pragma Assert (New_Time'Size = Ada.Calendar.Time'Size);
+
+      function To_Time
+      is new Ada.Unchecked_Conversion (Source => Ada.Calendar.Time,
+				       Target => New_Time);
+
+      Time_Stamp : constant New_Time := To_Time (Item);
+   begin
+      return To_String (Trim (Source => To_Unbounded_String (New_Time'Image (Time_Stamp)),
+			      Side   => Ada.Strings.Left));
+   end Time_Image_Two;
 
 --     function Get_Nearest_Player (point_coord : Coordinate; team : Team_Id) return Integer is
 --        current_status : Status := Get_Players_Status;

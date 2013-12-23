@@ -32,6 +32,8 @@ package Soccer.Utils is
 
    function Is_Match_Event (event : Game_Event_Ptr) return Boolean;
 
+   function Time_Image_Two (Item : in Ada.Calendar.Time) return String;
+
 --     function Get_Nearest_Player (point_coord : Coordinate; team : Team_Id) return Integer;
 
 end Soccer.Utils;
