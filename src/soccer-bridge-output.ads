@@ -3,6 +3,8 @@ with Soccer.Generic_Timers;
 
 package Soccer.Bridge.Output is
 
+   pragma Suppress (Elaboration_Check);
+
    type Event_Buffer_Element is
       record
          event : Soccer.Core_Event.Event_Ptr;

@@ -14,6 +14,8 @@ with Ada.Directories;
 use Ada.Directories;
 with Ada.Direct_IO;
 with Soccer.Server.Callbacks; use Soccer.Server.Callbacks;
+with Soccer.Game; use Soccer.Game;
+with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
 
 
 package body Soccer.Server.Callbacks is
@@ -37,6 +39,8 @@ package body Soccer.Server.Callbacks is
 	 null;
       elsif URI = "/field/newGame" then
 	 -- start new game
+	 Soccer.ControllerPkg.Referee.Simulate_Begin_Of_1T;
+	 Game_Entity.Notify;
 	 null;
       elsif URI = "/field/pauseGame" then
 	 -- pause the current game

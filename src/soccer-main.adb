@@ -20,7 +20,6 @@ with Soccer.Core_Event.Game_Core_Event.Match_Game_Event; use Soccer.Core_Event.G
 with Soccer.Core_Event; use Soccer.Core_Event;
 with Soccer.TeamPkg; use Soccer.TeamPkg;
 with Soccer.Game; use Soccer.Game;
-with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
 with GNATCOLL; use GNATCOLL;
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
@@ -125,12 +124,13 @@ begin
 
       loop
 
+	 null;
 --  	 Soccer.Server.WebServer.PublishTestUpdate;
 --  	 delay 1.0;
 
-	 delay 10.0;
-	 Referee.Simulate_Begin_Of_1T;
-	 Game_Entity.Notify;
+--  	 delay 10.0;
+--  	 Referee.Simulate_Begin_Of_1T;
+--  	 Game_Entity.Notify;
 
 --  	 Get (Item => char);
 --

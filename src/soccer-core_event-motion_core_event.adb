@@ -59,7 +59,7 @@ package body Soccer.Core_Event.Motion_Core_Event is
       Serialized_Obj.Set_Field(Field_Name => "to_x",
                                Field      => E.To.coord_x);
       Serialized_Obj.Set_Field(Field_Name => "to_y",
-                               Field      => E.To.coord_x);
+                               Field      => E.To.coord_y);
    end Serialize;
 
 end Soccer.Core_Event.Motion_Core_Event;
