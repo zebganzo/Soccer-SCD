@@ -7,6 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event; use Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
 with Soccer.Core_Event.Motion_Core_Event; use Soccer.Core_Event.Motion_Core_Event;
 with Soccer.Bridge.Output; use Soccer.Bridge.Output;
+with Soccer.TeamPkg; use Soccer.TeamPkg;
 
 package body Soccer.Motion_AgentPkg is
 
@@ -73,7 +74,7 @@ package body Soccer.Motion_AgentPkg is
 
 		  -- manda l'evento alla distribuzione
 		  new_event := new Move_Event;
-		  new_event.Initialize (0, starting_coord, actual_coord);
+		  new_event.Initialize (0, 0, Team_One, starting_coord, actual_coord);
 		  Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
 	       else
 		  Print ("[MOTION_AGENT] FIXME! Ramo else su -select-");

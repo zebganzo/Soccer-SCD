@@ -6,12 +6,20 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
    procedure Initialize (E : in out Binary_Event;
                          new_event_id : in Binary_Event_Id;
                          new_player_1_id : in Integer;
-			 new_player_2_id : in Integer;
-			 new_event_coord : in Coordinate) is
+                         new_player_1_number : Integer;
+                         new_player_1_team : Team_Id;
+                         new_player_2_id : Integer;
+                         new_player_2_number : Integer;
+                         new_player_2_team : Team_Id;
+                         new_event_coord : in Coordinate) is
    begin
       E.event_id := new_event_id;
       E.player_1_id := new_player_1_id;
+      E.player_1_number := new_player_1_number;
+      E.player_1_team := new_player_1_team;
       E.player_2_id := new_player_2_id;
+      E.player_2_number := new_player_2_number;
+      E.player_2_team := new_player_2_team;
       E.event_coord := new_event_coord;
    end Initialize;
 
@@ -42,9 +50,29 @@ package body Soccer.Core_Event.Game_Core_Event.Binary_Game_Event is
       return event.player_1_id;
    end;
 
+   function Get_Number_Player_1 (event : Binary_Event) return Integer is
+   begin
+      return event.player_1_number;
+   end;
+
+   function Get_Team_Player_1 (event : Binary_Event) return Team_Id is
+   begin
+      return event.player_1_team;
+   end;
+
    function Get_Id_Player_2 (event : Binary_Event) return Integer is
    begin
       return event.player_2_id;
+   end;
+
+   function Get_Number_Player_2 (event : Binary_Event) return Integer is
+   begin
+      return event.player_2_number;
+   end;
+
+   function Get_Team_Player_2 (event : Binary_Event) return Team_Id is
+   begin
+      return event.player_2_team;
    end;
 
    function Get_Coordinate (event : Binary_Event) return Coordinate is

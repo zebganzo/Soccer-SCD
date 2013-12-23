@@ -679,7 +679,11 @@ package body Soccer.ControllerPkg is
                   Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
                   foul_event.Initialize(new_event_id    => Foul,
                                         new_player_1_id => action.Get_Player_Id,
+                                        new_player_1_number => action.Get_Player_Number,
+                                        new_player_1_team => action.Get_Player_Team,
                                         new_player_2_id => action.Get_Other_Player_Id,
+                                        new_player_2_number => Get_Number_From_Id(action.Get_Other_Player_Id),
+                                        new_player_2_team => Get_Player_Team_From_Id(action.Get_Other_Player_Id),
 					new_event_coord => action.Get_To);
 
 		  ball_holder_id := 0;
@@ -698,19 +702,26 @@ package body Soccer.ControllerPkg is
             success := False;
          end if;
       else
-	 declare
-	    foul_event : Binary_Event_Ptr := new Binary_Event;
-	 begin
-	    Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
-	    foul_event.Initialize(new_event_id    => Foul,
-			   new_player_1_id => action.Get_Player_Id,
-			   new_player_2_id => action.Get_Other_Player_Id,
-			   new_event_coord => action.Get_To);
+         if Compare_Coordinates (coord1 => action.Get_To,
+                                 coord2 => current_status(action.Get_Other_Player_Id).coord) then
+            declare
+               foul_event : Binary_Event_Ptr := new Binary_Event;
+            begin
+               Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha commesso un fallo su Giocatore " & I2S (action.Get_Other_Player_Id));
+               foul_event.Initialize(new_event_id    => Foul,
+                                     new_player_1_id => action.Get_Player_Id,
+                                     new_player_1_number => action.Get_Player_Number,
+                                     new_player_1_team => action.Get_Player_Team,
+                                     new_player_2_id => action.Get_Other_Player_Id,
+                                     new_player_2_number => Get_Number_From_Id(action.Get_Other_Player_Id),
+                                     new_player_2_team => Get_Player_Team_From_Id(action.Get_Other_Player_Id),
+                                     new_event_coord => action.Get_To);
 
-	    ball_holder_id := 0;
+               ball_holder_id := 0;
 
-	    Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
-	 end;
+               Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
+            end;
+         end if;
       end if;
    end Compute;
 
