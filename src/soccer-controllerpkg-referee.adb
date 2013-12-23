@@ -32,6 +32,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Start_Timer;
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_1T;
 
    procedure Simulate_End_Of_1T is
@@ -42,6 +43,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Reset_Timer;
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_1T;
 
    procedure Simulate_Begin_Of_2T is
@@ -54,6 +56,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Ball.Set_Position (middle_field_coord);
       Soccer.Bridge.Output.Start_Timer;
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_2T;
 
    procedure Simulate_End_Of_Match is
@@ -64,6 +67,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Reset_Timer;
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_Match;
 
    procedure Simulate_Substitution is
