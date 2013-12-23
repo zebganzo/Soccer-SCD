@@ -26,7 +26,7 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
                                Field      => Unary_Event_Id'Image(E.event_id));
       Serialized_Obj.Set_Field(Field_Name => "player_id",
 			       Field      => E.player_id);
-      Serialized_Obj.Set_Field(Field_Name => "team_id",
+      Serialized_Obj.Set_Field(Field_Name => "player_team",
 			       Field	  => To_String (E.event_team_id));
    end Serialize;
 
