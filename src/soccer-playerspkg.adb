@@ -170,8 +170,8 @@ package body Soccer.PlayersPkg is
       output_name : String(1..8);			-- output file name
 
       -- Variables needed to launch the Intelligence.jar file
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
+      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
+ --     command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
       arguments   : Argument_List_Access;
       exit_status : Integer;
       file        : File_Type;
@@ -575,6 +575,8 @@ package body Soccer.PlayersPkg is
                new_shot_event := new Shot_Event;
 
                new_shot_event.Initialize(id,
+                                         player_number,
+                                         player_team,
                                          current_coord,
                                          Action_Outcome(Coordinate'(decision_x,decision_y),
                    					player_stats(4),
@@ -590,11 +592,13 @@ package body Soccer.PlayersPkg is
                begin
                   new_shot_event := new Shot_Event;
 
-                  new_shot_event.Initialize(id,
-                    			    current_coord,
-                                            Action_Outcome(Coordinate'(decision_x,decision_y),
-                      					   player_stats(1),
-				                           player_stats(4)));
+               new_shot_event.Initialize(id,
+                                         player_number,
+                                         player_team,
+                                         current_coord,
+                                         Action_Outcome(Coordinate'(decision_x,decision_y),
+                      					player_stats(1),
+				                        player_stats(4)));
                   new_shot_event.Set_Shot_Power(15);
                   current_action.event := Motion_Event_Ptr(new_shot_event);
                   current_action.utility := 10;
@@ -623,6 +627,8 @@ package body Soccer.PlayersPkg is
                new_catch_event := new Catch_Event;
 
                new_catch_event.Initialize(id,
+                                          player_number,
+                                          player_team,
                                           current_coord,
                                           target);
                current_action.event := Motion_Event_Ptr(new_catch_event);
@@ -639,6 +645,8 @@ package body Soccer.PlayersPkg is
                                         player_stats(2),
                                         player_stats(7));
                new_tackle_event.Initialize(id,
+                                           player_number,
+                                           player_team,
                                            current_coord,
                                            target);
                for i in current_read_result.players_in_my_zone.First_Index ..
@@ -660,6 +668,8 @@ package body Soccer.PlayersPkg is
                new_move_event := new Move_Event;
 
                new_move_event.Initialize(id,
+                                         player_number,
+                                         player_team,
                                          current_coord,
                                          Coordinate'(decision_x,decision_y));
                current_action.event := Motion_Event_Ptr(new_move_event);

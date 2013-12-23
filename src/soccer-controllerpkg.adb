@@ -812,25 +812,25 @@ package body Soccer.ControllerPkg is
 	    accept Write (current_action : in out Action) do
 
 	       -- simulating corner kick
-	       if first_time then
-		  if current_action.event.Get_Player_Id = 2
-		    and current_action.event.all in Shot_Event'Class then
-		     declare
-			new_shot_event : Shot_Event_Ptr := new Shot_Event;
-		     begin
-			first_time := False;
-
-			new_shot_event.Initialize(2,
-                             			  current_status (2).coord,
-                             			  Coordinate' (20,0));
-
-			new_shot_event.Set_Shot_Power(15);
-
-			current_action.event := Motion_Event_Ptr (new_shot_event);
-			current_action.utility := 10;
-		     end;
-		  end if;
-	       end if;
+--  	       if first_time then
+--  		  if current_action.event.Get_Player_Id = 2
+--  		    and current_action.event.all in Shot_Event'Class then
+--  		     declare
+--  			new_shot_event : Shot_Event_Ptr := new Shot_Event;
+--  		     begin
+--  			first_time := False;
+--
+--  			new_shot_event.Initialize(2,
+--                               			  current_status (2).coord,
+--                               			  Coordinate' (20,0));
+--
+--  			new_shot_event.Set_Shot_Power(15);
+--
+--  			current_action.event := Motion_Event_Ptr (new_shot_event);
+--  			current_action.utility := 10;
+--  		     end;
+--  		  end if;
+--  	       end if;
 
 	       -- provo a soddisfare la richiesta del giocatore
 	       Compute (current_action.event, compute_result, revaluate);
@@ -867,7 +867,7 @@ package body Soccer.ControllerPkg is
 			alternative : Coordinate := Get_Alternative_Coord (from, to);
 		     begin
 			revaluate := False;
-			new_move.Initialize (id, from, alternative);
+			new_move.Initialize (id, Get_Number_From_Id(id), Get_Player_Team_From_Id(id), from, alternative);
 			Print ("[CONTROLLER] Mossa per il Giocatore " & I2S(current_action.event.Get_Player_Id)
 			  & " rivalutata alla cella " & Print_Coord (alternative));
 
