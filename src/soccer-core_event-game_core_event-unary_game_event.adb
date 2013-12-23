@@ -30,7 +30,7 @@ package body Soccer.Core_Event.Game_Core_Event.Unary_Game_Event is
 			       Field      => E.player_id);
       Serialized_Obj.Set_Field(Field_Name => "player_number",
 			       Field	  => E.player_number);
-      Serialized_Obj.Set_Field(Field_Name => "team_id",
+      Serialized_Obj.Set_Field(Field_Name => "player_team",
 			       Field	  => To_String (E.event_team_id));
       Serialized_Obj.Set_Field(Field_Name => "event_coord_x",
 			       Field	  => E.event_coord.coord_x);
