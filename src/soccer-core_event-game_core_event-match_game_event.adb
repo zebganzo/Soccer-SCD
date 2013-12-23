@@ -18,7 +18,7 @@ package body Soccer.Core_Event.Game_Core_Event.Match_Game_Event is
       Serialized_Obj.Set_Field(Field_Name => "event_id",
 			       Field      => Match_Event_Id'Image(E.event_id));
       Serialized_Obj.Set_Field(Field_Name => "player_id",
-			       Field      => Integer'Image(E.player_id));
+			       Field      => E.player_id);
    end Serialize;
 
    function Get_Match_Event_Id (e : Match_Event_Ptr) return Match_Event_Id is
