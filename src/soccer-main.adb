@@ -22,7 +22,8 @@ with Soccer.TeamPkg; use Soccer.TeamPkg;
 with Soccer.Game; use Soccer.Game;
 with GNATCOLL; use GNATCOLL;
 with GNATCOLL.JSON; use GNATCOLL.JSON;
-
+with Ada.Calendar.Formatting;
+with Ada.Unchecked_Conversion;
 
 procedure Soccer.Main is
 
@@ -96,7 +97,8 @@ begin
 --        task9  : Player;
 --        task10 : Player;
 
---        char : Character;
+      --        char : Character;
+
    begin
 
 --        declare
@@ -174,7 +176,6 @@ begin
 
 
    end;
-
 
 
 --     delay 10.0;

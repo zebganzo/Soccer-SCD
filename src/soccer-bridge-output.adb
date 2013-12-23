@@ -43,7 +43,7 @@ package body Soccer.Bridge.Output is
 
          if new_event.all in Game_Event'Class then
             new_element.event := new_event;
-	    new_element.time_start := t0 - now;
+	    new_element.time_start := now - t0;
 	    new_element.time_stop := new_element.time_start;
             size := size + 1;
             event_buffer(size) := new_element;
@@ -59,7 +59,7 @@ package body Soccer.Bridge.Output is
                      if event_buffer(event).event.all in Move_Event'Class then
                         if Motion_Event(event_buffer(event).event.all).Get_Player_Id = Motion_Event(new_event.all).Get_Player_Id then
                            Move_Event(event_buffer(event).event.all).Update_To_Coordinate(new_coord => Motion_Event(new_event.all).Get_To);
-                           event_buffer(event).time_stop := t0 - now;
+                           event_buffer(event).time_stop := now - t0;
                            found := True;
                            exit;
                         end if;
@@ -71,7 +71,7 @@ package body Soccer.Bridge.Output is
 
 		  if not found then
 		     new_element.event := new_event;
-		     new_element.time_start := t0 - now;
+		     new_element.time_start := now - t0;
 		     new_element.time_stop := new_element.time_start;
 		     size := size + 1;
 		     event_buffer(size) := new_element;
@@ -81,7 +81,7 @@ package body Soccer.Bridge.Output is
                -- Codice uguale a sopra, lo tengo separato per problematiche future
                -- attualmente non considerate!
                new_element.event := new_event;
-	       new_element.time_start := t0 - now;
+	       new_element.time_start := now - t0;
 	       new_element.time_stop := new_element.time_start;
                size := size + 1;
                event_buffer(size) := new_element;
