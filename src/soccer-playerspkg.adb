@@ -638,27 +638,45 @@ package body Soccer.PlayersPkg is
                new_tackle_event : Tackle_Event_Ptr;
                target           : Coordinate;
             begin
-               new_tackle_event := new Tackle_Event;
-
                target := Action_Outcome(Coordinate'(decision_x,decision_y),
                                         player_stats(2),
                                         player_stats(7));
-               new_tackle_event.Initialize(id,
-                                           player_number,
-                                           player_team,
-                                           current_coord,
-                                           target);
-               for i in current_read_result.players_in_my_zone.First_Index ..
-                 current_read_result.players_in_my_zone.Last_Index loop
-                  if Compare_Coordinates(target,
-                                         current_read_result.players_in_my_zone.Element(i).coord) then
-                     new_tackle_event.Set_Other_Player_Id(id => current_read_result.players_in_my_zone.Element(i).id);
-                     exit;
-                  end if;
-               end loop;
-               current_action.event := Motion_Event_Ptr(new_tackle_event);
-               current_action.utility := 10;
-               -- todo: id giocatore su cui fare tackle
+               -- se coordinate ottenute dall'IA e quelle ottenute dalla funzione
+               -- Action_Outcome sono uguali allora la tackle viene eseguita
+               if Compare_Coordinates(Coordinate'(decision_x,decision_y), target) then
+                  new_tackle_event := new Tackle_Event;
+                  new_tackle_event.Initialize(id,
+                                              player_number,
+                                              player_team,
+                                              current_coord,
+                                              target);
+                  for i in current_read_result.players_in_my_zone.First_Index ..
+                    current_read_result.players_in_my_zone.Last_Index loop
+                     if Compare_Coordinates(target,
+                                            current_read_result.players_in_my_zone.Element(i).coord) then
+                        new_tackle_event.Set_Other_Player_Id(id => current_read_result.players_in_my_zone.Element(i).id);
+                        exit;
+                     end if;
+                  end loop;
+                  current_action.event := Motion_Event_Ptr(new_tackle_event);
+                  current_action.utility := 10;
+               else
+                  -- altrimenti la tackle non viene eseguita
+                  -- faccio eseguire una move al giocatore sulle coordinate
+                  -- ottenute dalla funzione Action_Outcome (target)
+                  declare
+                     new_move_event : Move_Event_Prt;
+                  begin
+                     new_move_event := new Move_Event;
+                     new_move_event.Initialize(id,
+                                               player_number,
+                                               player_team,
+                                               current_coord,
+                                               target);
+                     current_action.event := Motion_Event_Ptr(new_move_event);
+                     current_action.utility := Get_Move_Utility(current_coord, Coordinate'(ball_x,ball_y));
+                  end;
+               end if;
             end;
          else
             declare
