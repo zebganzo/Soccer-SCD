@@ -99,6 +99,11 @@ package body Soccer.ControllerPkg is
       game_status := new_status;
    end Set_Game_Status;
 
+   function Is_On_The_Field (id : Integer) return Boolean is
+   begin
+      return current_status (id).on_the_field;
+   end Is_On_The_Field;
+
    function Get_Players_Status return Status is
    begin
       return current_status;
@@ -659,6 +664,7 @@ package body Soccer.ControllerPkg is
       with_foul : Boolean := False;
       tackle_success : Boolean;
    begin
+      Print ("[CONTROLLER] Who is the other player? " & I2S (action.Get_Other_Player_Id));
       Print ("[CONTROLLER] Tackle_Event per Giocatore " & I2S (Get_Player_Id (action.all)));
       if Compare_Coordinates (coord1 => action.Get_To,
 			      coord2 => current_status(action.Get_Other_Player_Id).coord) and

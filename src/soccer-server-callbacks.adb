@@ -73,6 +73,7 @@ package body Soccer.Server.Callbacks is
 	 current := Create_Object;
 	 Set_Field (current, "id", player);
 	 Set_Field (current, "number", ControllerPkg.Get_Number_From_Id (player));
+	 Set_Field (current, "on_the_field", ControllerPkg.Is_On_The_Field (player));
 	 Set_Field (current, "team", Team_Id'Image (ControllerPkg.Get_Player_Team_From_Id (player)));
 	 Append (result, current);
       end loop;

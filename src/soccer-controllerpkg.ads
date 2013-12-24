@@ -11,7 +11,7 @@ package Soccer.ControllerPkg is
    -- New Types
 
    --+-------------
-   debug : Boolean := False;
+   debug : Boolean := True;
    --+-------------
 
    type Action is
@@ -77,6 +77,8 @@ package Soccer.ControllerPkg is
    procedure Set_Game_Status (new_status : Game_State);
 
    function Get_Players_Status return Status;
+
+   function Is_On_The_Field (id : Integer) return Boolean;
 
    function Get_Player_Position (id : Integer) return Coordinate;
 
