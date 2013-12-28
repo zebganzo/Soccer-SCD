@@ -9,6 +9,7 @@ with Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
 use Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
+with Soccer.Utils; use Soccer.Utils;
 
 package body Soccer.Bridge.Output is
 
@@ -39,8 +40,6 @@ package body Soccer.Bridge.Output is
          now : Ada.Calendar.Time := Clock;
       begin
 
-	 Put_Line ("BUFFER PUT PROCEDURE");
-
          if new_event.all in Game_Event'Class then
             new_element.event := new_event;
 	    new_element.time_start := now - t0;
@@ -57,7 +56,8 @@ package body Soccer.Bridge.Output is
                begin
                   for event in reverse 1 .. size loop
                      if event_buffer(event).event.all in Move_Event'Class then
-                        if Motion_Event(event_buffer(event).event.all).Get_Player_Id = Motion_Event(new_event.all).Get_Player_Id then
+			if Motion_Event(event_buffer(event).event.all).Get_Player_Id = Motion_Event(new_event.all).Get_Player_Id then
+			   Print ("[BRIDGE] Merging moves - From " & Print_Coord (Motion_Event(event_buffer(event).event.all).Get_From) & " / To " & Print_Coord (Motion_Event(event_buffer(event).event.all).Get_To));
                            Move_Event(event_buffer(event).event.all).Update_To_Coordinate(new_coord => Motion_Event(new_event.all).Get_To);
                            event_buffer(event).time_stop := now - t0;
                            found := True;
@@ -99,14 +99,16 @@ package body Soccer.Bridge.Output is
          manager_events : JSON_Array;
       begin
 
-	if size > 0 then
+	 Reset_Timer;
+
+	 if size > 0 then
 	    for event in 1 .. size loop
 	       event_buffer(event).event.Serialize(j_value);
 	       event_buffer(event).event.Update_Serialized_Object (j_value);
 	       j_value.Set_Field ("start_time",
 			   Duration'Image (event_buffer(event).time_start));
 	       j_value.Set_Field ("end_time",
-				 Duration'Image (event_buffer(event).time_stop));
+			   Duration'Image (event_buffer(event).time_stop));
 	       GNATCOLL.JSON.Append(Arr => field_events,
 			     Val => j_value);
 	       if event_buffer(event).event.all in Game_Event'Class then
@@ -117,21 +119,20 @@ package body Soccer.Bridge.Output is
 
 	    size := 0;
 
-	    for i in 1 .. Length (field_events) loop
-	       declare
-		  value : JSON_Value;
-	       begin
-		  value := Get (field_events, i);
-		  Put_Line ("Value (" & I2S (i) & ") : " & Get (value));
-	       end;
-	    end loop;
+--  	    for i in 1 .. Length (field_events) loop
+--  	       declare
+--  		  value : JSON_Value;
+--  	       begin
+--  		  value := Get (field_events, i);
+--  		  Put_Line ("Value (" & I2S (i) & ") : " & Get (value));
+--  	       end;
+--  	    end loop;
 
 	    -- Server
 --  	    Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
 	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
 	 end if;
 
-	 Reset_Timer;
 	 Start_Timer;
 
       end Send;
@@ -147,5 +148,13 @@ package body Soccer.Bridge.Output is
    begin
       Buffer_Timer.Cancel;
    end Reset_Timer;
+
+   procedure Print (input : String) is
+   begin
+      if debug then
+	 pragma Debug (Put_Line (input));
+	 null;
+      end if;
+   end Print;
 
 end Soccer.Bridge.Output;

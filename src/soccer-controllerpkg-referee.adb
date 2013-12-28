@@ -727,9 +727,11 @@ package body Soccer.ControllerPkg.Referee is
 		  begin
 		     if last_team_possession = Team_One then
 			scoring_team := Team_One;
+			team_one_score := team_one_score + 1;
 			Print ("[POST_CHECK] Team_One ha segnato!");
 		     else
 			scoring_team := Team_Two;
+			team_two_score := team_two_score + 1;
 			Print ("[POST_CHECK] Team_Two ha segnato!");
 		     end if;
 

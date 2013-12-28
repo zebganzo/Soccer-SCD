@@ -26,6 +26,9 @@ package Soccer is
 
    half_game_duration : Positive := 120;
 
+   team_one_score : Integer := 0;
+   team_two_score : Integer := 0;
+
    -- team one [LEFT]
    team_one_goal_lower_coord : Coordinate := Coordinate'(0,15);
    team_one_goal_upper_coord : Coordinate := Coordinate'(0,19);
@@ -64,15 +67,15 @@ package Soccer is
    -- oblivium
    oblivium : Coordinate := Coordinate'((field_max_x/2)+1,0);
 
-   buffer_dim : Positive := 10;
+   buffer_dim : Positive := 30;
    nearby_distance : Integer := 3;
-   send_buffer_delay : Integer := 1;
+   send_buffer_delay : Integer := 500;
    t0 : Time := Clock;
 
    number_of_zones : Integer := 4;
 
    ball_speed : Float := 0.7;
-   players_delay : Float := 0.7;
+   players_delay : Float := 0.2;
    print_delay : Float := 0.5;
 
    type Power_Range is range 0 .. 15;

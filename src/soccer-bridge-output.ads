@@ -3,6 +3,10 @@ with Soccer.Generic_Timers;
 
 package Soccer.Bridge.Output is
 
+   --+-------------
+   debug : Boolean := True;
+   --+-------------
+
    pragma Suppress (Elaboration_Check);
 
    type Event_Buffer_Element is
@@ -29,9 +33,11 @@ package Soccer.Bridge.Output is
    procedure Start_Timer;
    procedure Reset_Timer;
 
+   procedure Print (input : String);
+
 private
    -- Timer
-   buffer_time_span : constant Time_Span := Seconds (send_buffer_delay);
+   buffer_time_span : constant Time_Span := Milliseconds (send_buffer_delay);
    id : constant String := "[TIMER] Buffer timer";
    package Buffer_Timer is new Generic_Timers (True, id, buffer_time_span, Buffer_Wrapper.Send);
 
