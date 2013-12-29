@@ -46,6 +46,8 @@ package Soccer.TeamPkg is
 
    procedure Set_Formation (team : in Team_Ptr; formation : in Formation_Scheme_Id);
 
+   function Get_Formation (team : in Team_Id) return Formation_Scheme_Id;
+
    function To_String (team : in Team_Id) return String;
 
    function Get_Coordinate_For_Player (my_team     : in Team_Id;

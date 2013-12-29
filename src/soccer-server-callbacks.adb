@@ -94,33 +94,35 @@ package body Soccer.Server.Callbacks is
    end Get_Params;
 
    function Get_Stats (manager : in String) return String is
-      json_obj : JSON_Value;
-      player   : JSON_Value;
-      team     : JSON_Array;
-      id_team  : Team_Id;
+      json_obj     : JSON_Value;
+      player       : JSON_Value;
+      team     	   : JSON_Array;
+      player_team  : Team_Id;
    begin
       for i in 1 .. total_players loop
-         id_team := ControllerPkg.Get_Player_Team_From_Id (i);
-         if manager = Team_Id'Image (id_team) then
+         player_team := ControllerPkg.Get_Player_Team_From_Id (i);
+         if manager = Team_Id'Image (player_team) then
             declare
                number : Integer := ControllerPkg.Get_Number_From_Id (i);
             begin
                player := Create_Object;
                player.Set_Field ("number"	, number);
-               player.Set_Field ("attack"	, TeamPkg.Get_Attack       (number, id_team));
-               player.Set_Field ("defense"	, TeamPkg.Get_Defense 	   (number, id_team));
-               player.Set_Field ("goal_keeping"	, TeamPkg.Get_Goal_Keeping (number, id_team));
-               player.Set_Field ("power"	, TeamPkg.Get_Power 	   (number, id_team));
-               player.Set_Field ("precision"	, TeamPkg.Get_Precision    (number, id_team));
-               player.Set_Field ("speed"	, TeamPkg.Get_Speed 	   (number, id_team));
-               player.Set_Field ("tackle"	, TeamPkg.Get_Tackle 	   (number, id_team));
+               player.Set_Field ("attack"	, TeamPkg.Get_Attack       (number, player_team));
+               player.Set_Field ("defense"	, TeamPkg.Get_Defense 	   (number, player_team));
+               player.Set_Field ("goal_keeping"	, TeamPkg.Get_Goal_Keeping (number, player_team));
+               player.Set_Field ("power"	, TeamPkg.Get_Power 	   (number, player_team));
+               player.Set_Field ("precision"	, TeamPkg.Get_Precision    (number, player_team));
+               player.Set_Field ("speed"	, TeamPkg.Get_Speed 	   (number, player_team));
+               player.Set_Field ("tackle"	, TeamPkg.Get_Tackle 	   (number, player_team));
                Append (team, player);
             end;
          end if;
       end loop;
 
       json_obj := Create_Object;
-      json_obj.Set_Field ("stats",team);
+      json_obj.Set_Field("formation",Formation_Scheme_Id'Image(TeamPkg.Get_Formation(Team_Id'Value(manager))));
+      json_obj.Set_Field ("stats", Create(team));
+      --json_obj.Set_Field ("in", manager);
       return Write (json_obj);
    end Get_Stats;
 
