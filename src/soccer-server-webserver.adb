@@ -46,5 +46,4 @@ package body Soccer.Server.WebServer is
       Net.WebSocket.Registry.Send(Field, "test!");
    end PublishTestUpdate;
 
-
 end Soccer.Server.WebServer;

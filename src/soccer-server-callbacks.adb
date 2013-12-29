@@ -56,10 +56,13 @@ package body Soccer.Server.Callbacks is
 	 Soccer.ControllerPkg.Referee.Simulate_Begin_Of_2T;
       elsif URI = "/field/pauseGame" then
 	 -- pause the current game
-	 null;
+	 return AWS.Response.Build (MIME.Text_Plain, Get_Game_Status);
       elsif URI = "/field/getParams" then
 	 -- send players' params
 	 return AWS.Response.Build (MIME.Text_Plain, Get_Params);
+      elsif URI = "field/quit" then
+	 -- quit everything!
+	 null;
       end if;
 
 --        Put_Line (AWS.Parameters.Get (PARAMS, "a"));
@@ -120,10 +123,26 @@ package body Soccer.Server.Callbacks is
       end loop;
 
       json_obj := Create_Object;
-      json_obj.Set_Field ("stats",team);
+      json_obj.Set_Field ("stats", team);
       return Write (json_obj);
    end Get_Stats;
 
+   function Get_Game_Status return String is
+      current_state : Game_State;
+      state_string : Unbounded_String;
+      response : JSON_Value;
+   begin
+      current_state := ControllerPkg.Get_Game_Status;
+      if current_state = Game_Paused then
+	 state_string := To_Unbounded_String ("paused");
+      else
+	 state_string := To_Unbounded_String ("playing");
+      end if;
+
+      response := Create_Object;
+      response.Set_Field ("status", state_string);
+      return Write (response);
+   end Get_Game_Status;
 
    ----------------
    --  Iterator  --

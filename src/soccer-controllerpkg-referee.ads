@@ -50,6 +50,7 @@ package Soccer.ControllerPkg.Referee is
    procedure End_Of_Second_Half;
 
 private
+
    game_event : Game_Event_Ptr;
    package Manager_Events_Container is new Vectors (Natural, Manager_Event.Event_Ptr);
    manager_events : Manager_Events_Container.Vector;

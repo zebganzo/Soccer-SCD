@@ -93,7 +93,7 @@ package Soccer.ControllerPkg is
    -- Returns the player number from id
    function Get_Number_From_Id (id : in Integer) return Integer;
 
-   task Field_Printer;
+--     task Field_Printer;
 
    procedure Print_Status;
 

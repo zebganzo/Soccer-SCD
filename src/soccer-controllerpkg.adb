@@ -373,13 +373,13 @@ package body Soccer.ControllerPkg is
       Put_Line("");
    end Print_Field;
 
-   task body Field_Printer is
-   begin
-      loop
-         Print_Field;
-         delay duration (print_delay);
-      end loop;
-   end Field_Printer;
+--     task body Field_Printer is
+--     begin
+--        loop
+--           Print_Field;
+--           delay duration (print_delay);
+--        end loop;
+--     end Field_Printer;
 
    function Get_Player_Position (id : Integer) return Coordinate is
    begin
@@ -806,7 +806,7 @@ package body Soccer.ControllerPkg is
 
       init_players_count := 1;
       team_one_players_count := 1;
-      team_two_players_count := 1;
+      team_two_players_count := 0;
       initialized := False;
 
       -- imposto l'evento d'inizio gioco
@@ -969,7 +969,7 @@ package body Soccer.ControllerPkg is
 		     team_one_players_count := team_one_players_count + 1;
 --                       Print ("[CONTROLLER] New count " & I2S (team_one_players_count));
                   else
-		     if team_two_players_count <= num_of_players/2 then
+		     if team_two_players_count < num_of_players/2 then
 			result := current_status(team_one_players_count + team_two_players_count).id;
                         current_status(result).on_the_field := True;
 --                          Print ("[CONTROLLER] Team 2 - ID " & I2S (result) & " - NUMBER "

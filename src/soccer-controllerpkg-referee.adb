@@ -32,7 +32,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Start_Timer;
-      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+--        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_1T;
 
    procedure Simulate_End_Of_1T is
@@ -43,7 +43,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Reset_Timer;
-      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+--        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_1T;
 
    procedure Simulate_Begin_Of_2T is
@@ -56,7 +56,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Ball.Set_Position (middle_field_coord);
       Soccer.Bridge.Output.Start_Timer;
-      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+--        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_2T;
 
    procedure Simulate_End_Of_Match is
@@ -67,7 +67,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Reset_Timer;
-      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+--        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_Match;
 
    procedure Simulate_Substitution is
@@ -181,6 +181,7 @@ package body Soccer.ControllerPkg.Referee is
 		     -- (tempo partita e buffer eventi)
 		     Game_Timer_First_Half.Start;
 		     -- mando l'evento alla distribuzione
+		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr(e));
                      return; -- TODO:: controlla se serve!
                   end if;
@@ -230,7 +231,7 @@ package body Soccer.ControllerPkg.Referee is
             end;
          elsif Get_Match_Event_Id (current_match_status) = End_Of_First_Half then
             --
-            null;
+            Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
          elsif Get_Match_Event_Id (current_match_status) = Begin_Of_Second_Half then
             -- controllo se il gioco puo' partire
             Print ("[PRE_CHECK] Controllo se il gioco puo' ripartire");
@@ -246,6 +247,7 @@ package body Soccer.ControllerPkg.Referee is
 		     Game_Timer_Second_Half.Start;
 		     Soccer.Bridge.Output.Start_Timer;
 		     -- mando l'evento alla distribuzione
+		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
                      return; -- TODO:: controlla se serve!
                   end if;
@@ -292,7 +294,10 @@ package body Soccer.ControllerPkg.Referee is
                if first_condition and second_condition then
                   Set_Game_Status (Game_Ready);
                end if;
-            end;
+	    end;
+	 else
+	    -- fine gioco
+	    Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
          end if;
          -- controllo il game event (dovrebbe essere settato)
       elsif current_game_status /= null then
@@ -623,6 +628,10 @@ package body Soccer.ControllerPkg.Referee is
 		     foul_type : Unary_Event_Id;
 		     nearest_player : Integer;
 		  begin
+
+		     -- mando l'evento fallo alla distribuzione
+		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (evt));
+
 		     -- controllo se il fallo e' stato fatto nell'area di rigore
 		     if is_penalty then
 			foul_type := Penalty_Kick;
