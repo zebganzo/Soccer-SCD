@@ -77,6 +77,15 @@ package body Soccer.TeamPkg is
       team.formation := formation;
    end Set_Formation;
 
+   function Get_Formation (team : in Team_Id) return Formation_Scheme_Id is
+   begin
+      if team = Team_One then
+         return team_1.formation;
+      else
+         return team_2.formation;
+      end if;
+   end Get_Formation;
+
    function To_String (team : in Team_Id) return String is
    begin
       if team = Team_One then
