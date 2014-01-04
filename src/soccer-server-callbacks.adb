@@ -49,20 +49,28 @@ package body Soccer.Server.Callbacks is
          end;
       elsif URI = "/field/newGame" then
 	 -- start new game
-	 Soccer.ControllerPkg.Referee.Simulate_Begin_Of_1T;
+	 ControllerPkg.Reset_Game;
+	 ControllerPkg.Set_Game_Status (Game_Paused);
+	 Game_Entity.Notify;
+	 ControllerPkg.Referee.Simulate_Begin_Of_1T;
 	 Game_Entity.Notify;
       elsif URI = "/field/secondHalf" then
 	 -- continue with second half
 	 Soccer.ControllerPkg.Referee.Simulate_Begin_Of_2T;
+	 Game_Entity.Notify;
       elsif URI = "/field/pauseGame" then
 	 -- pause the current game
+	 Game_Entity.Set_Paused;
+	 Game_Entity.Notify;
+	 ControllerPkg.Controller.Notify;
+
 	 return AWS.Response.Build (MIME.Text_Plain, Get_Game_Status);
       elsif URI = "/field/getParams" then
 	 -- send players' params
 	 return AWS.Response.Build (MIME.Text_Plain, Get_Params);
-      elsif URI = "field/quit" then
+      elsif URI = "/field/quit" then
 	 -- quit everything!
-	 null;
+	 ControllerPkg.Set_Must_Exit;
       end if;
 
 --        Put_Line (AWS.Parameters.Get (PARAMS, "a"));
@@ -130,12 +138,12 @@ package body Soccer.Server.Callbacks is
    end Get_Stats;
 
    function Get_Game_Status return String is
-      current_state : Game_State;
+      is_controller_paused : Boolean;
       state_string : Unbounded_String;
       response : JSON_Value;
    begin
-      current_state := ControllerPkg.Get_Game_Status;
-      if current_state = Game_Paused then
+      is_controller_paused := Game_Entity.Is_Paused;
+      if is_controller_paused then
 	 state_string := To_Unbounded_String ("paused");
       else
 	 state_string := To_Unbounded_String ("playing");

@@ -35,16 +35,14 @@ package body Soccer.Game is
 	 end if;
       end Start;
 
-      entry Start_1T
-	when Start_1T'Count = num_of_players or open_1T is
+      entry Start_1T when Start_1T'Count = num_of_players or open_1T is
       begin
 	 open_1T := True;
 	 Set_Game_Status (Game_Blocked);
 	 -- manca sincronizzazione dei giocatori
       end Start_1T;
 
-      entry Start_2T
-	when Start_2T'Count = num_of_players or open_2T is
+      entry Start_2T when Start_2T'Count = num_of_players or open_2T is
       begin
 	 open_2T := True;
 	 -- manca sincronizzazione dei giocatori
@@ -64,8 +62,7 @@ package body Soccer.Game is
 	 return False;
       end Evaluate_Rest;
 
-      entry Rest
-	when Evaluate_Rest is
+      entry Rest when Evaluate_Rest is
       begin
 	 null;
       end Rest;
@@ -79,8 +76,7 @@ package body Soccer.Game is
 	 return False;
       end Evaluate_End_Match;
 
-      entry End_Match
-	when Evaluate_End_Match is
+      entry End_Match when Evaluate_End_Match is
       begin
 	 null;
       end End_Match;
@@ -89,6 +85,16 @@ package body Soccer.Game is
       begin
 	 null;
       end Notify;
+
+      procedure Set_Paused is
+      begin
+	 paused := not paused;
+      end Set_Paused;
+
+      function Is_Paused return Boolean is
+      begin
+	 return paused;
+      end Is_Paused;
 
    end Game_Entity;
 

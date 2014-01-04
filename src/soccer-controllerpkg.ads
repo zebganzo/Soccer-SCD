@@ -29,7 +29,7 @@ package Soccer.ControllerPkg is
          on_the_field : Boolean := False;
 	 coord : Coordinate; -- := Coordinate'(coord_x => 0, coord_y => 0); -- FIXME:: se ci sono problemi, rimettilo!
 	 reference_coord : Coordinate;
-         distance : Integer;
+	 distance : Integer;
       end record;
 
    type Status is array (1 .. total_players) of Player_Status;
@@ -55,6 +55,7 @@ package Soccer.ControllerPkg is
          substitutions : Substitutions_Container.Vector;
          holder_team : Team_Id;
 	 last_ball_holder_id : Integer;
+	 must_exit : Boolean;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
 
@@ -66,7 +67,19 @@ package Soccer.ControllerPkg is
 
    function Get_Last_Game_Event return Game_Event_Ptr;
 
+   procedure Reset_Game;
+
    function Is_Cell_Free (coord : Coordinate) return Boolean;
+
+--     procedure Set_Paused;
+
+--     procedure Is_Paused (pause : out Boolean);
+
+--     function Evaluate_Pause return Boolean;
+
+--     procedure Notify;
+
+   procedure Set_Must_Exit;
 
    function Get_Alternative_Coord (coord : Coordinate; target : Coordinate) return Coordinate;
 
@@ -105,6 +118,8 @@ package Soccer.ControllerPkg is
    task Controller is
       entry Get_Id (id : out Integer);
       entry Write (current_action : in out Action);
+      entry Notify;
+      entry Must_Exit;
    end Controller;
 
    protected Guard is
@@ -116,10 +131,19 @@ package Soccer.ControllerPkg is
    end Guard;
 
 private
+   must_exit : Boolean;
+   exit_count : Integer;
    last_player_event : Motion_Event_Ptr;
    last_game_event : Game_Event_Ptr;
    current_status : Status;
-   ball_holder_id : Integer := 0;
+   ball_holder_id : Integer;
    game_status : Game_State;
+
+   init_players_count : Integer;
+   team_one_players_count : Integer;
+   team_two_players_count : Integer;
+   initialized : Boolean;
+
+   first_time : Boolean;
 
 end Soccer.ControllerPkg;

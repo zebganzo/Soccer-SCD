@@ -32,7 +32,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Start_Timer;
---        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_1T;
 
    procedure Simulate_End_Of_1T is
@@ -43,7 +43,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Reset_Timer;
---        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_1T;
 
    procedure Simulate_Begin_Of_2T is
@@ -67,7 +67,7 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Reset_Timer;
---        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_Match;
 
    procedure Simulate_Substitution is
@@ -179,7 +179,7 @@ package body Soccer.ControllerPkg.Referee is
                      Print ("[PRE_CHECK] Inizio primo tempo!");
 		     -- faccio partire i timer del primo tempo
 		     -- (tempo partita e buffer eventi)
-		     Game_Timer_First_Half.Start;
+		     Game_Timer_Second_Half.Start; ----------------------------------------------------------- DIOPOROCOCOOCOCOOCOC
 		     -- mando l'evento alla distribuzione
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr(e));
@@ -230,8 +230,9 @@ package body Soccer.ControllerPkg.Referee is
                end if;
             end;
          elsif Get_Match_Event_Id (current_match_status) = End_Of_First_Half then
-            --
-            Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
+	    --
+	    null;
+--              Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
          elsif Get_Match_Event_Id (current_match_status) = Begin_Of_Second_Half then
             -- controllo se il gioco puo' partire
             Print ("[PRE_CHECK] Controllo se il gioco puo' ripartire");
@@ -297,7 +298,8 @@ package body Soccer.ControllerPkg.Referee is
 	    end;
 	 else
 	    -- fine gioco
-	    Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
+	    null;
+--  	    Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
          end if;
          -- controllo il game event (dovrebbe essere settato)
       elsif current_game_status /= null then

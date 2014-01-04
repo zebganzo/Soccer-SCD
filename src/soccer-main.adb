@@ -156,9 +156,9 @@ begin
 
 --        end loop;
 
-      loop
+--        loop
 
-	 null;
+--  	 null;
 --  	 Soccer.Server.WebServer.PublishTestUpdate;
 --  	 delay 1.0;
 
@@ -204,7 +204,7 @@ begin
 --  	 end if;
 --
 --
-      end loop;
+--        end loop;
 
 
    end;
