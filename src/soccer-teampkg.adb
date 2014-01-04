@@ -38,6 +38,35 @@ package body Soccer.TeamPkg is
       return formation_id;
    end Get_Formation_Id;
 
+   function Get_Role (formation_id : Integer; formation_scheme : Formation_Scheme_Id) return String is
+      player_role : Integer range 1..11;
+   begin
+      player_role := formation_id;
+      case formation_scheme is
+         when O_352 =>
+            case player_role is
+               when 1	    => return "Goal Keeper";
+               when 2..4    => return "Defender";
+               when 5..9    => return "Midfielder";
+               when 10 | 11 => return "Forward";
+            end case;
+         when B_442 =>
+            case player_role is
+               when 1	    => return "Goal Keeper";
+               when 2..5    => return "Defender";
+               when 6..9    => return "Midfielder";
+               when 10 | 11 => return "Forward";
+            end case;
+         when D_532 =>
+            case player_role is
+               when 1	    => return "Goal Keeper";
+               when 2..6    => return "Defender";
+               when 7..9    => return "Midfielder";
+               when 10 | 11 => return "Forward";
+            end case;
+      end case;
+   end Get_Role;
+
    function Get_Number_From_Formation (formation_id : Integer;
                                        team	    : Team_Id) return Integer is
       number : Integer;

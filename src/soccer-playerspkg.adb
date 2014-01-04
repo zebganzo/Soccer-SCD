@@ -1,5 +1,9 @@
 with Ada.Directories; use Ada.Directories;
 with Soccer.Manager_Event.Substitution; use Soccer.Manager_Event.Substitution;
+with Ada.Containers.Vectors; use Ada.Containers;
+with GNATCOLL.JSON; use GNATCOLL.JSON;
+with Ada.Characters;
+with Ada.Characters.Latin_1;
 
 package body Soccer.PlayersPkg is
 
@@ -124,8 +128,6 @@ package body Soccer.PlayersPkg is
       seed_y : Rand_Int.Generator;
 
       -- Artificial Intelligence Related Variables
-      json_obj        : JSON_Value;			-- JSON object
-      coords_array    : JSON_Array;			-- Array of coordinates
       event           : Game_Event_Ptr;			-- generic Game Event ptr
       ball_team       : Team_Id;			-- team holding the ball
       ball_x          : Integer;
@@ -167,15 +169,47 @@ package body Soccer.PlayersPkg is
 
       -- Output file with JSON object
       output      : File_Type;
-      output_name : String(1..8);			-- output file name
+      output_name : Unbounded_String;			-- output file name
 
-      -- Variables needed to launch the Intelligence.jar file
-      command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/i686-linux -jar Intelligence.jar ";
---        command     : constant String := "/usr/bin/java -Djava.library.path=/usr/local/pl-6.4.1/lib/swipl-6.4.1/lib/x86_64-linux -jar Intelligence.jar ";
-      arguments   : Argument_List_Access;
+      assert_game_status : Unbounded_String;		-- game status
+      assert_event 	 : Unbounded_String;		-- event type
+      assert_goal_pos	 : Unbounded_String;		-- goal position
+
+      package Nearby_Players is new Vectors(Natural, Unbounded_String);
+      assert_nearby_all  : Nearby_Players.Vector;
+      assert_nearby 	 : Unbounded_String;		-- nearby player
+      assert_nearby_poss : Unbounded_String;		-- nearby player ball possession
+      assert_nearby_team : Unbounded_String;		-- nearby player team
+
+      assert_sub	 : Unbounded_String;		-- substitution
+
+      assert_ball	 : Unbounded_String;		-- ball
+      assert_ball_pos	 : Unbounded_String;		-- ball position
+      assert_ball_poss	 : Unbounded_String;		-- ball possession
+
+      assert_att_pos 	 : Unbounded_String;		-- attack position
+      assert_start_pos 	 : Unbounded_String;		-- starting position
+      assert_def_pos 	 : Unbounded_String;		-- defense position
+      assert_ref_pos 	 : Unbounded_String;		-- reference position
+      assert_gkick_pos	 : Unbounded_String;		-- goal kick position
+      assert_ckick_pos   : Unbounded_String;		-- corner kick position
+      assert_tin_pos	 : Unbounded_String;		-- throw-in position
+      assert_fkick_pos	 : Unbounded_String;		-- free kick position
+
+      assert_player	 : Unbounded_String;		-- player
+      assert_position 	 : Unbounded_String;		-- player position
+      assert_team	 : Unbounded_String;		-- player team
+      assert_possession  : Unbounded_String;		-- player ball possession
+      assert_last_holder : Unbounded_String;		-- player last holder
+      assert_number 	 : Unbounded_String;		-- player number
+      assert_radius	 : Unbounded_String;		-- player radius
+      goalkeeper	 : Boolean := False;		-- goal keeper
+
+      -- Variables needed to launch the Prolog engine
+      command : constant String := "./test/exe";
+      arguments : Argument_List_Access;
       exit_status : Integer;
-      file        : File_Type;
-      json        : JSON_Value;
+      file : File_Type;
 
    begin
 
@@ -197,107 +231,104 @@ package body Soccer.PlayersPkg is
 	 current_coord := current_generic_status.coord;
 	 current_game_status := current_generic_status.game_status;
 
-         -- Creates an empty JSON object
-         json_obj := Create_Object;
+         -- Json file name : STATUS<PlayerID>
+         output_name := To_Unbounded_String("STATUS") & I2S(id);
+
+	 -- Creates the file
+         Create (File => output,
+                 Mode => Out_File,
+                 Name => To_String(output_name));
+	Close (output);
 
          -- Get player current position
          player_position := current_generic_status.coord;
-   	 Append(coords_array, Create(player_position.coord_x));
-  	 Append(coords_array, Create(player_position.coord_y));
-   	 json_obj.Set_Field(Field_Name => "position",
-                    	    Field      => coords_array);
-	 coords_array := Empty_Array;
+         assert_position := To_Unbounded_String("position(") & Integer'Image(player_position.coord_x) & ","
+           & Integer'Image(player_position.coord_y) & ")";
 
-	 -- Get player's team
-	 player_team := current_generic_status.team;
+         -- Get player's team
+         player_team := current_generic_status.team;
          if player_team = Team_One then
-            json_obj.Set_Field(Field_Name => "team",
-                               Field 	  => "team1");
+            assert_team := To_Unbounded_String("team1");
          else
-            json_obj.Set_Field(Field_Name => "team",
-                               Field 	  => "team2");
+            assert_team := To_Unbounded_String("team2");
          end if;
+
+         -- Do I have the ball?
+         if current_generic_status.holder then
+            assert_possession := To_Unbounded_String("has");
+         else
+            assert_possession := To_Unbounded_String("has_not");
+         end if;
+
+         -- Checks if the player was the last ball holder
+         if current_generic_status.last_ball_holder_id = id then
+            assert_last_holder := To_Unbounded_String("last_holder");
+         else
+            assert_last_holder := To_Unbounded_String("not_last_holder");
+         end if;
+
+         -- Create player clause
+         assert_player := "player(" & assert_position & "," & assert_possession & "," &
+           assert_team & "," & assert_last_holder & ").";
 
          -- Get player's number
          player_number := current_generic_status.number;
-         json_obj.Set_Field(Field_Name => "number",
-                            Field      => Create(player_number));
+         assert_number := To_Unbounded_String("number(") & Integer'Image(player_number) & ")";
 
          -- Check if the player is the goalkeeper
          if player_number = Get_Goalkeeper_Number(player_team) then
-            json_obj.Set_Field(Field_Name => "goalkeeper",
-                               Field      => "yes");
+            goalkeeper := True;
+         else
+            goalkeeper := False;
          end if;
 
          -- Get player's starting position
          formation_pos := Get_Starting_Position(player_number, player_team);
-         Append(coords_array, Create(formation_pos.coord_x));
-	 Append(coords_array, Create(formation_pos.coord_y));
-         json_obj.Set_Field(Field_Name => "starting_position",
-                            Field      => coords_array);
-         coords_array := Empty_Array;
+         assert_start_pos := To_Unbounded_String("starting_position(") & Integer'Image(formation_pos.coord_x) & ","
+           & Integer'Image(formation_pos.coord_y) & ").";
 
          -- Get player's defense position
          formation_pos := Get_Defense_Position(player_number, player_team);
-         Append(coords_array, Create(formation_pos.coord_x));
-	 Append(coords_array, Create(formation_pos.coord_y));
-         json_obj.Set_Field(Field_Name => "defense_position",
-                            Field      => coords_array);
-         coords_array := Empty_Array;
+         assert_def_pos := To_Unbounded_String("defense_position(") & Integer'Image(formation_pos.coord_x) & ","
+           & Integer'Image(formation_pos.coord_y) & ").";
 
          -- Get player's attack position
          formation_pos := Get_Attack_Position(player_number, player_team);
-	 Append(coords_array, Create(formation_pos.coord_x));
-	 Append(coords_array, Create(formation_pos.coord_y));
-         json_obj.Set_Field(Field_Name => "attack_position",
-                            Field      => coords_array);
-         coords_array := Empty_Array;
+	 assert_att_pos := To_Unbounded_String("attack_position(") & Integer'Image(formation_pos.coord_x) & ","
+           & Integer'Image(formation_pos.coord_y) & ").";
 
          -- Get the ball coordinates
          ball_x := Ball.Get_Position.coord_x;
          ball_y := Ball.Get_Position.coord_y;
-         Append(coords_array, Create(ball_x));
-         Append(coords_array, Create(ball_y));
-         json_obj.Set_Field(Field_Name => "ball_position",
-                            Field      => coords_array);
-         coords_array := Empty_Array;
+         assert_ball_pos := To_Unbounded_String("position(") & Integer'Image(ball_x) & "," & Integer'Image(ball_y) & ")";
 
-         -- Do I have the ball?
-         if current_generic_status.holder then
-            json_obj.Set_Field(Field_Name => "possession",
-                               Field      => "has");
-         else
-            json_obj.Set_Field(Field_Name => "possession",
-                               Field 	  => "has_not");
+         -- Get the team with ball possession
+         ball_team := current_generic_status.holder_team;
+         if ball_team = Team_One then
+            assert_ball_poss := To_Unbounded_String("team1");
+         elsif ball_team = Team_Two then
+            assert_ball_poss := To_Unbounded_String("team2");
          end if;
+
+         assert_ball := "ball(" & assert_ball_pos & "," & assert_ball_poss & ").";
 
          -- Get game status (running, blocked, ready)
          if current_generic_status.game_status = Game_Running then
-            json_obj.Set_Field(Field_Name => "game",
-                               Field 	  => "running");
+            assert_game_status := To_Unbounded_String("game(running).");
          elsif current_generic_status.game_status = Game_Blocked then
-            json_obj.Set_Field(Field_Name => "game",
-                               Field 	  => "blocked");
+            assert_game_status := To_Unbounded_String("game(blocked).");
          elsif current_generic_status.game_status = Game_Ready then
-           json_obj.Set_Field(Field_Name => "game",
-                              Field 	 => "ready");
+            assert_game_status := To_Unbounded_String("game(ready).");
          end if;
 
          -- Get goal position
          if player_team = Team_One then
-            Append(coords_array, Create(51));
-            Append(coords_array, Create(15));
-            Append(coords_array, Create(51));
-            Append(coords_array, Create(19));
+            assert_goal_pos := To_Unbounded_String("goal_position(position(") & Integer'Image(51) & "," &
+              Integer'Image(15) & "),position(" & Integer'Image(51) & "," & Integer'Image(19) & ")).";
          else
-            Append(coords_array, Create(1));
-            Append(coords_array, Create(15));
-            Append(coords_array, Create(1));
-            Append(coords_array, Create(19));
+           assert_goal_pos := To_Unbounded_String("goal_position(position(") & Integer'Image(1) & "," &
+              Integer'Image(15) & "),position(" & Integer'Image(1) & "," & Integer'Image(19) & ")).";
          end if;
-         json_obj.Set_Field(Field_Name => "goal_position",
-                            Field      => coords_array);
-         coords_array := Empty_Array;
 
          -- Get player's statistics
          player_stats := Get_Statistics(player_number,player_team);
@@ -309,9 +340,8 @@ package body Soccer.PlayersPkg is
            		   player_stats(4) +
            		   player_stats(5) +
            		   player_stats(6) +
-                           player_stats(7)) / factor;
-         json_obj.Set_Field(Field_Name => "radius",
-                            Field      => Create(player_radius));
+                             player_stats(7)) / factor;
+         assert_radius := To_Unbounded_String("radius(") & Integer'Image(player_radius) & ").";
 
          -- Get game event.
          -- It could be either an Unary_Event_Ptr (Goal_Kick, Corner_Kick, ...)
@@ -324,42 +354,31 @@ package body Soccer.PlayersPkg is
 	       -- Match Event: Begin_Of_Match or Begin_Of_Second_Half
                if Get_Match_Event_Id(m_event) = Begin_Of_Match
                  or Get_Match_Event_Id(m_event) = Begin_Of_Second_Half then
-                  json_obj.Set_Field(Field_Name => "event",
-                                     Field 	=> "init");
+                  assert_event := To_Unbounded_String("event(init).");
 
                   -- If it's my duty to start the game
                   if Get_Kick_Off_Player(m_event) = id then
                      -- Get the ball coordinates
-                     Append(coords_array, Create(ball_x));
-                     Append(coords_array, Create(ball_y));
-                     json_obj.Set_Field(Field_Name => "reference_position",
-                                        Field      => coords_array);
-                     coords_array := Empty_Array;
+                     assert_ref_pos := To_Unbounded_String("reference_position(") & Integer'Image(ball_x) & ","
+                       & Integer'Image(ball_y) & ").";
                      resume_player := True;
                      radius_offset := 10;
                   end if;
                else
 		  -- Match Event: End_Of_First_Half or End_Of_Match
-                  json_obj.Set_Field(Field_Name => "event",
-                                     Field 	=> "end");
+                  assert_event := To_Unbounded_String("event(end).");
                end if;
 	    else
 	       -- Unary Event
 	       u_event := Unary_Event_Ptr(event);
                if current_generic_status.game_status = Game_Ready then
                   case Get_Type(u_event) is
-                     when Goal         => json_obj.Set_Field(Field_Name => "event",
-                                                             Field      => "goal");
-                     when Throw_In     => json_obj.Set_Field(Field_Name => "event",
-                                                             Field      => "throw_in");
-                     when Goal_Kick    => json_obj.Set_Field(Field_Name => "event",
-                                                             Field      => "goal_kick");
-                     when Corner_Kick  => json_obj.Set_Field(Field_Name => "event",
-                                                             Field      => "corner_kick");
-                     when Free_Kick    => json_obj.Set_Field(Field_Name => "event",
-                                                             Field      => "free_kick");
-                     when Penalty_Kick => json_obj.Set_Field(Field_Name => "event",
-                                                             Field      => "penalty_kick");
+                     when Goal         => assert_event := To_Unbounded_String("event(goal).");
+                     when Throw_In     => assert_event := To_Unbounded_String("event(throw_in).");
+                     when Goal_Kick    => assert_event := To_Unbounded_String("event(goal_kick).");
+                     when Corner_Kick  => assert_event := To_Unbounded_String("event(corner_kick).");
+                     when Free_Kick    => assert_event := To_Unbounded_String("event(free_kick).");
+                     when Penalty_Kick => assert_event := To_Unbounded_String("event(penalty_kick).");
                   end case;
                elsif current_generic_status.game_status = Game_Blocked then
                   foolproof_catch := True;
@@ -370,18 +389,15 @@ package body Soccer.PlayersPkg is
                      begin
                         if subbed and (player_position.coord_y = 0)  then
                            subbed := False;
-                           json_obj.Set_Field(Field_Name => "substitution",
-                                              Field      => "in");
+                           assert_sub := To_Unbounded_String("substitution(in).");
                         elsif subbed then
-                           json_obj.Set_Field(Field_Name => "substitution",
-                                              Field      => "out");
+                           assert_sub := To_Unbounded_String("substitution(out).");
 			elsif not subbed then
                            for i in current_generic_status.substitutions.First_Index ..
                              current_generic_status.substitutions.Last_Index loop
                               Get_Numbers(current_generic_status.substitutions.Element(i), id_1, id_2);
                               if id = id_1 then
-                                 json_obj.Set_Field(Field_Name => "substitution",
-                                                    Field      => "out");
+                                 assert_sub := To_Unbounded_String("substitution(out).");
                                  subbed := True;
                                  new_player_id := id_2;
                               end if;
@@ -391,63 +407,41 @@ package body Soccer.PlayersPkg is
                   end if;
 
                   case Get_Type(u_event) is
-                     when Goal =>
-                        json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "goal");
+                     when Goal => assert_event := To_Unbounded_String("event(goal).");
                      when Goal_Kick =>
-                        json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "goal_kick");
-
+                        assert_event := To_Unbounded_String("event(goal_kick).");
                         -- get player's goal kick position
                         formation_pos := Get_Goal_Kick_Position(player_number, player_team);
-                        Append(coords_array, Create(formation_pos.coord_x));
-                        Append(coords_array, Create(formation_pos.coord_y));
-                        json_obj.Set_Field(Field_Name => "goal_kick_position",
-                                           Field      => coords_array);
-                        coords_array := Empty_Array;
+                        assert_gkick_pos := To_Unbounded_String("goal_kick_position(") & Integer'Image(formation_pos.coord_x) &
+                          "," & Integer'Image(formation_pos.coord_y) & ").";
                      when Corner_Kick =>
-                        json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "corner_kick");
-
+                        assert_event := To_Unbounded_String("event(corner_kick).");
                         -- get player's corner kick position
                         formation_pos := Get_Corner_Kick_Position(player_number,
                                                                   player_team,
                                                                   current_generic_status.holder_team);
-                        Append(coords_array, Create(formation_pos.coord_x));
-                        Append(coords_array, Create(formation_pos.coord_y));
-                        json_obj.Set_Field(Field_Name => "corner_kick_position",
-                                           Field      => coords_array);
-                        coords_array := Empty_Array;
+                        assert_ckick_pos := To_Unbounded_String("corner_kick_position(") & Integer'Image(formation_pos.coord_x) &
+                          "," & Integer'Image(formation_pos.coord_y) & ").";
                      when Penalty_Kick =>
-                        json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "penalty_kick");
-
+                        assert_event := To_Unbounded_String("event(penalty_kick).");
                         -- get player's penalty kick position
                         formation_pos := Get_Penalty_Kick_Position(player_number,
                                                                    player_team,
                                                                    current_generic_status.holder_team);
-                        Append(coords_array, Create(formation_pos.coord_x));
-                        Append(coords_array, Create(formation_pos.coord_y));
-                        json_obj.Set_Field(Field_Name => "penalty_kick_position",
-                                           Field      => coords_array);
-                        coords_array := Empty_Array;
+                        assert_ckick_pos := To_Unbounded_String("penalty_kick_position(") & Integer'Image(formation_pos.coord_x) &
+                          "," & Integer'Image(formation_pos.coord_y) & ").";
                      when Throw_In =>
-                        json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "throw_in");
+                        assert_event := To_Unbounded_String("event(throw_in).");
                      when Free_Kick =>
-                        json_obj.Set_Field(Field_Name => "event",
-                                           Field      => "free_kick");
+                        assert_event := To_Unbounded_String("event(free_kick).");
                   end case;
                end if;
 
 	       -- If it's my duty to resume the game
                if Get_Player_Id(u_event) = id then
 		  -- Get the event coordinates
-                  Append(coords_array, Create(Get_Coordinate(u_event).coord_x));
-                  Append(coords_array, Create(Get_Coordinate(u_event).coord_y));
-                  json_obj.Set_Field(Field_Name => "reference_position",
-                                     Field      => coords_array);
-               	  coords_array := Empty_Array;
+                  assert_ref_pos := To_Unbounded_String("reference_position(") & Integer'Image(Get_Coordinate(u_event).coord_x) &
+                    "," & Integer'Image(Get_Coordinate(u_event).coord_y) & ").";
                   resume_player := True;
                   radius_offset := 50;
                end if;
@@ -475,80 +469,59 @@ package body Soccer.PlayersPkg is
                                         r => player_radius);
          end if;
 
-         -- Get the team with ball possession
---           if Ball.Get_Controlled then
---              ball_team := Get_Player_Team_From_Id(current_read_result.holder_id);
-         ball_team := current_generic_status.holder_team;
-         if ball_team = Team_One then
-            json_obj.Set_Field(Field_Name => "team_possession",
-                               Field      => "team1");
-         elsif ball_team = Team_Two then
-            json_obj.Set_Field(Field_Name => "team_possession",
-                               Field      => "team2");
-         end if;
-
-         -- Checks if the player was the last ball holder
-         if current_generic_status.last_ball_holder_id = id then
-            json_obj.Set_Field(Field_Name => "last_holder",
-                               Field      => "yes");
-         end if;
-            --           else
-            --              json_obj.Set_Field(Field_Name => "team_possession",
-            --                                 Field      => "none");
-            --              if current_generic_status.last_ball_holder_id = id then
-            --                 json_obj.Set_Field(Field_Name => "last_holder",
-            --                                    Field      => "yes");
---           end if;
-
-         for i in current_read_result.players_in_my_zone.First_Index ..
-           current_read_result.players_in_my_zone.Last_Index loop
-            Append(nearby_player,
-                   Create(current_read_result.players_in_my_zone.Element(i).coord.coord_x));
-            Append(nearby_player,
-                   Create(current_read_result.players_in_my_zone.Element(i).coord.coord_y));
-            if current_read_result.holder_id = current_read_result.players_in_my_zone.Element(i).id then
-               Append(nearby_player, Create("has"));
-            else
-               Append(nearby_player, Create("has_not"));
-            end if;
-            if current_read_result.players_in_my_zone.Element(i).team = Team_One then
-               Append(nearby_player, Create("team1"));
-            else
-               Append(nearby_player, Create("team2"));
-            end if;
-            Append(nearby_folks, Create(nearby_player));
-            nearby_player := Empty_Array;
-         end loop;
-
          if current_read_result.players_in_my_zone.Length > 0 then
-            json_obj.Set_Field(Field_Name => "nearby",
-                               Field   => nearby_folks);
-            nearby_folks := Empty_Array;
+            for i in current_read_result.players_in_my_zone.First_Index ..
+              current_read_result.players_in_my_zone.Last_Index loop
+               assert_nearby := To_Unbounded_String("nearby_player(position(") &
+                 Integer'Image(current_read_result.players_in_my_zone.Element(i).coord.coord_x) &
+                 "," &
+                 Integer'Image(current_read_result.players_in_my_zone.Element(i).coord.coord_y) & "),";
+
+               if current_read_result.holder_id = current_read_result.players_in_my_zone.Element(i).id then
+                  assert_nearby := assert_nearby & "has,";
+               else
+                  assert_nearby := assert_nearby & "has_not,";
+               end if;
+               if current_read_result.players_in_my_zone.Element(i).team = Team_One then
+                  assert_nearby := assert_nearby & "team1).";
+               else
+                  assert_nearby := assert_nearby & "team2).";
+               end if;
+               assert_nearby_all.Append(assert_nearby);
+            end loop;
          end if;
 
-         -- Json file name : STATUS<PlayerID>
---           if current_generic_status.game_status = Game_Ready then
---              output_name := "READYS" & Integer'Image(id);
---           else
-            output_name := "STATUS " & I2S(id);
+--           if current_read_result.players_in_my_zone.Length > 0 then
+--              json_obj.Set_Field(Field_Name => "nearby",
+--                                 Field   => nearby_folks);
+--              nearby_folks := Empty_Array;
 --           end if;
 
-	 -- Creates the file
-         Create (File => output,
-                 Mode => Out_File,
-                 Name => output_name);
---  	 -- Writes the Json object in the file
-  	 String'Write(Stream(Output), json_obj.Write);
-	 Close (Output);
+         Open (File => output,
+               Mode => Append_File,
+               Name => To_String(output_name));
+         String'Write(Stream(output), To_String(assert_game_status) & Ada.Characters.Latin_1.CR);
+         String'Write(Stream(Output), To_String(assert_event & Ada.Characters.Latin_1.CR));
+         String'Write(Stream(Output), To_String(assert_player) & Ada.Characters.Latin_1.CR);
+         String'Write(Stream(Output), To_String(assert_ball) & Ada.Characters.Latin_1.CR);
+         if assert_nearby_all.Length > 0 then
+            for i in assert_nearby_all.First_Index .. assert_nearby_all.Last_Index loop
+               String'Write(Stream(Output), To_String(assert_nearby_all.Element(i)) & Ada.Characters.Latin_1.CR);
+            end loop;
+         end if;
+         String'Write(Stream(Output), To_String(assert_goal_pos) & Ada.Characters.Latin_1.CR);
+         String'Write(Stream(Output), To_String(assert_start_pos) & Ada.Characters.Latin_1.CR);
+         String'Write(Stream(Output), To_String(assert_def_pos) & Ada.Characters.Latin_1.CR);
+         String'Write(Stream(Output), To_String(assert_att_pos) & Ada.Characters.Latin_1.CR);
+         Close (Output);
 
-         -- Load Intelligence.jar and read output file
---           Put_Line("************LOAD JAR" & Integer'Image(id) & "************");
-	 arguments := Argument_String_To_List (command & Integer'Image(id));
+         -- Load Prolog engine and read output file
+         arguments := Argument_String_To_List (command & " " & To_String(output_name) & " > " & "DECISION" & I2S(id));
          exit_status := Spawn (Program_Name => arguments(arguments'First).all,
-                               Args	    => arguments(arguments'First + 1 .. arguments'Last));
+                               Args         => arguments(arguments'First + 1 .. arguments'Last));
 
-         json := Read(Strm     => Load_File("DECISION" & Integer'Image(id)),
-                      Filename => "");
+--           json := Read(Strm     => Load_File("DECISION" & Integer'Image(id)),
+--                        Filename => "");
 
 --           Print("************JSON RESULT" & Integer'Image(id) & "************");
 --           Print(Get(Val   => json,
@@ -558,15 +531,18 @@ package body Soccer.PlayersPkg is
 --           Print(Get(Val   => json,
 --                     Field => "Decision"));
 
-         decision_x := Integer'Value(Get(Val   => json,
-                                         Field  => "X"));
-         if decision_x = 1000 then
-            decision_x := id;
-         end if;
-         decision_y := Integer'Value(Get(Val   => json,
-                           	        Field  => "Y"));
-         decision := Get(Val   => json,
-                         Field => "Decision");
+--           decision_x := Integer'Value(Get(Val   => json,
+--                                           Field  => "X"));
+--           if decision_x = 1000 then
+--              decision_x := id;
+--           end if;
+--           decision_y := Integer'Value(Get(Val   => json,
+--                             	        Field  => "Y"));
+--           decision := Get(Val   => json,
+--                           Field => "Decision");
+         decision_x := 0;
+         decision_y := 0;
+         decision := To_Unbounded_String("move");
 
          if decision = "pass" then
             declare
