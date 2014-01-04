@@ -28,10 +28,10 @@ package body Soccer.Server.WebSockets is
       Put_Line ("Aperta connessione. ");
    end On_Open;
 
-   overriding procedure Send (Socket : in out Object; Message : String) is
-   begin
-      -- Invio del messaggio
-      Net.WebSocket.Object (Socket).Send (Message);
-   end Send;
+--     overriding procedure Send (Socket : in out Object; Message : String) is
+--     begin
+--        -- Invio del messaggio
+--        Net.WebSocket.Object (Socket).Send (Message);
+--     end Send;
 
 end Soccer.Server.WebSockets;

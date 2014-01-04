@@ -193,6 +193,7 @@ package body Soccer.PlayersPkg is
       assert_ref_pos 	 : Unbounded_String;		-- reference position
       assert_gkick_pos	 : Unbounded_String;		-- goal kick position
       assert_ckick_pos   : Unbounded_String;		-- corner kick position
+      assert_pkick_pos   : Unbounded_String;		-- penalty kick position
       assert_tin_pos	 : Unbounded_String;		-- throw-in position
       assert_fkick_pos	 : Unbounded_String;		-- free kick position
 
@@ -206,10 +207,11 @@ package body Soccer.PlayersPkg is
       goalkeeper	 : Boolean := False;		-- goal keeper
 
       -- Variables needed to launch the Prolog engine
-      command : constant String := "./test/exe";
+      command : Unbounded_String;
       arguments : Argument_List_Access;
       exit_status : Integer;
       file : File_Type;
+      count : Integer;
 
    begin
 
@@ -238,12 +240,16 @@ package body Soccer.PlayersPkg is
          Create (File => output,
                  Mode => Out_File,
                  Name => To_String(output_name));
-	Close (output);
+         Close (output);
+
+         Open (File => output,
+               Mode => Append_File,
+               Name => To_String(output_name));
 
          -- Get player current position
          player_position := current_generic_status.coord;
-         assert_position := To_Unbounded_String("position(") & Integer'Image(player_position.coord_x) & ","
-           & Integer'Image(player_position.coord_y) & ")";
+         assert_position := To_Unbounded_String("position(") & I2S(player_position.coord_x) & ","
+           & I2S(player_position.coord_y) & ")";
 
          -- Get player's team
          player_team := current_generic_status.team;
@@ -271,9 +277,12 @@ package body Soccer.PlayersPkg is
          assert_player := "player(" & assert_position & "," & assert_possession & "," &
            assert_team & "," & assert_last_holder & ").";
 
+	String'Write(Stream(output), To_String(assert_player) & Ada.Characters.Latin_1.CR);
+
          -- Get player's number
          player_number := current_generic_status.number;
-         assert_number := To_Unbounded_String("number(") & Integer'Image(player_number) & ")";
+         assert_number := To_Unbounded_String("number(") & I2S(player_number) & ").";
+        -- String'Write(Stream(output), To_String(assert_number) & Ada.Characters.Latin_1.CR);
 
          -- Check if the player is the goalkeeper
          if player_number = Get_Goalkeeper_Number(player_team) then
@@ -284,23 +293,26 @@ package body Soccer.PlayersPkg is
 
          -- Get player's starting position
          formation_pos := Get_Starting_Position(player_number, player_team);
-         assert_start_pos := To_Unbounded_String("starting_position(") & Integer'Image(formation_pos.coord_x) & ","
-           & Integer'Image(formation_pos.coord_y) & ").";
+         assert_start_pos := To_Unbounded_String("starting_position(") & I2S(formation_pos.coord_x) & ","
+           & I2S(formation_pos.coord_y) & ").";
+         String'Write(Stream(output), To_String(assert_start_pos) & Ada.Characters.Latin_1.CR);
 
          -- Get player's defense position
          formation_pos := Get_Defense_Position(player_number, player_team);
-         assert_def_pos := To_Unbounded_String("defense_position(") & Integer'Image(formation_pos.coord_x) & ","
-           & Integer'Image(formation_pos.coord_y) & ").";
+         assert_def_pos := To_Unbounded_String("defense_position(") & I2S(formation_pos.coord_x) & ","
+           & I2S(formation_pos.coord_y) & ").";
+         String'Write(Stream(output), To_String(assert_def_pos) & Ada.Characters.Latin_1.CR);
 
          -- Get player's attack position
          formation_pos := Get_Attack_Position(player_number, player_team);
-	 assert_att_pos := To_Unbounded_String("attack_position(") & Integer'Image(formation_pos.coord_x) & ","
-           & Integer'Image(formation_pos.coord_y) & ").";
+	 assert_att_pos := To_Unbounded_String("attack_position(") & I2S(formation_pos.coord_x) & ","
+           & I2S(formation_pos.coord_y) & ").";
+         String'Write(Stream(output), To_String(assert_att_pos) & Ada.Characters.Latin_1.CR);
 
          -- Get the ball coordinates
          ball_x := Ball.Get_Position.coord_x;
          ball_y := Ball.Get_Position.coord_y;
-         assert_ball_pos := To_Unbounded_String("position(") & Integer'Image(ball_x) & "," & Integer'Image(ball_y) & ")";
+         assert_ball_pos := To_Unbounded_String("position(") & I2S(ball_x) & "," & I2S(ball_y) & ")";
 
          -- Get the team with ball possession
          ball_team := current_generic_status.holder_team;
@@ -311,6 +323,7 @@ package body Soccer.PlayersPkg is
          end if;
 
          assert_ball := "ball(" & assert_ball_pos & "," & assert_ball_poss & ").";
+         String'Write(Stream(output), To_String(assert_ball) & Ada.Characters.Latin_1.CR);
 
          -- Get game status (running, blocked, ready)
          if current_generic_status.game_status = Game_Running then
@@ -320,15 +333,17 @@ package body Soccer.PlayersPkg is
          elsif current_generic_status.game_status = Game_Ready then
             assert_game_status := To_Unbounded_String("game(ready).");
          end if;
+         String'Write(Stream(output), To_String(assert_game_status) & Ada.Characters.Latin_1.CR);
 
          -- Get goal position
          if player_team = Team_One then
-            assert_goal_pos := To_Unbounded_String("goal_position(position(") & Integer'Image(51) & "," &
-              Integer'Image(15) & "),position(" & Integer'Image(51) & "," & Integer'Image(19) & ")).";
+            assert_goal_pos := To_Unbounded_String("goal_position(position(") & I2S(51) & "," &
+              I2S(15) & "),position(" & I2S(51) & "," & I2S(19) & ")).";
          else
-           assert_goal_pos := To_Unbounded_String("goal_position(position(") & Integer'Image(1) & "," &
-              Integer'Image(15) & "),position(" & Integer'Image(1) & "," & Integer'Image(19) & ")).";
+           assert_goal_pos := To_Unbounded_String("goal_position(position(") & I2S(1) & "," &
+              I2S(15) & "),position(" & I2S(1) & "," & I2S(19) & ")).";
          end if;
+         String'Write(Stream(output), To_String(assert_goal_pos) & Ada.Characters.Latin_1.CR);
 
          -- Get player's statistics
          player_stats := Get_Statistics(player_number,player_team);
@@ -341,7 +356,8 @@ package body Soccer.PlayersPkg is
            		   player_stats(5) +
            		   player_stats(6) +
                              player_stats(7)) / factor;
-         assert_radius := To_Unbounded_String("radius(") & Integer'Image(player_radius) & ").";
+         assert_radius := To_Unbounded_String("radius(") & I2S(player_radius) & ").";
+         String'Write(Stream(output), To_String(assert_radius) & Ada.Characters.Latin_1.CR);
 
          -- Get game event.
          -- It could be either an Unary_Event_Ptr (Goal_Kick, Corner_Kick, ...)
@@ -355,30 +371,45 @@ package body Soccer.PlayersPkg is
                if Get_Match_Event_Id(m_event) = Begin_Of_Match
                  or Get_Match_Event_Id(m_event) = Begin_Of_Second_Half then
                   assert_event := To_Unbounded_String("event(init).");
+                  String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
 
                   -- If it's my duty to start the game
                   if Get_Kick_Off_Player(m_event) = id then
                      -- Get the ball coordinates
-                     assert_ref_pos := To_Unbounded_String("reference_position(") & Integer'Image(ball_x) & ","
-                       & Integer'Image(ball_y) & ").";
+                     assert_ref_pos := To_Unbounded_String("reference_position(") & I2S(ball_x) & ","
+                       & I2S(ball_y) & ").";
+                     String'Write(Stream(output), To_String(assert_ref_pos) & Ada.Characters.Latin_1.CR);
                      resume_player := True;
                      radius_offset := 10;
                   end if;
                else
 		  -- Match Event: End_Of_First_Half or End_Of_Match
                   assert_event := To_Unbounded_String("event(end).");
+                  String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                end if;
 	    else
 	       -- Unary Event
 	       u_event := Unary_Event_Ptr(event);
                if current_generic_status.game_status = Game_Ready then
                   case Get_Type(u_event) is
-                     when Goal         => assert_event := To_Unbounded_String("event(goal).");
-                     when Throw_In     => assert_event := To_Unbounded_String("event(throw_in).");
-                     when Goal_Kick    => assert_event := To_Unbounded_String("event(goal_kick).");
-                     when Corner_Kick  => assert_event := To_Unbounded_String("event(corner_kick).");
-                     when Free_Kick    => assert_event := To_Unbounded_String("event(free_kick).");
-                     when Penalty_Kick => assert_event := To_Unbounded_String("event(penalty_kick).");
+                     when Goal         =>
+                        assert_event := To_Unbounded_String("event(goal).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
+                     when Throw_In     =>
+                        assert_event := To_Unbounded_String("event(throw_in).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
+                     when Goal_Kick    =>
+                        assert_event := To_Unbounded_String("event(goal_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
+                     when Corner_Kick  =>
+                        assert_event := To_Unbounded_String("event(corner_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
+                     when Free_Kick    =>
+                        assert_event := To_Unbounded_String("event(free_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
+                     when Penalty_Kick =>
+                        assert_event := To_Unbounded_String("event(penalty_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                   end case;
                elsif current_generic_status.game_status = Game_Blocked then
                   foolproof_catch := True;
@@ -403,45 +434,57 @@ package body Soccer.PlayersPkg is
                               end if;
                            end loop;
                         end if;
+                        String'Write(Stream(output), To_String(assert_sub) & Ada.Characters.Latin_1.CR);
                      end;
                   end if;
 
                   case Get_Type(u_event) is
-                     when Goal => assert_event := To_Unbounded_String("event(goal).");
+                     when Goal =>
+                        assert_event := To_Unbounded_String("event(goal).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                      when Goal_Kick =>
                         assert_event := To_Unbounded_String("event(goal_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                         -- get player's goal kick position
                         formation_pos := Get_Goal_Kick_Position(player_number, player_team);
-                        assert_gkick_pos := To_Unbounded_String("goal_kick_position(") & Integer'Image(formation_pos.coord_x) &
-                          "," & Integer'Image(formation_pos.coord_y) & ").";
+                        assert_gkick_pos := To_Unbounded_String("goal_kick_position(") & I2S(formation_pos.coord_x) &
+                          "," & I2S(formation_pos.coord_y) & ").";
+                        String'Write(Stream(output), To_String(assert_gkick_pos) & Ada.Characters.Latin_1.CR);
                      when Corner_Kick =>
                         assert_event := To_Unbounded_String("event(corner_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                         -- get player's corner kick position
                         formation_pos := Get_Corner_Kick_Position(player_number,
                                                                   player_team,
                                                                   current_generic_status.holder_team);
-                        assert_ckick_pos := To_Unbounded_String("corner_kick_position(") & Integer'Image(formation_pos.coord_x) &
-                          "," & Integer'Image(formation_pos.coord_y) & ").";
+                        assert_ckick_pos := To_Unbounded_String("corner_kick_position(") & I2S(formation_pos.coord_x) &
+                          "," & I2S(formation_pos.coord_y) & ").";
+                        String'Write(Stream(output), To_String(assert_ckick_pos) & Ada.Characters.Latin_1.CR);
                      when Penalty_Kick =>
                         assert_event := To_Unbounded_String("event(penalty_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                         -- get player's penalty kick position
                         formation_pos := Get_Penalty_Kick_Position(player_number,
                                                                    player_team,
                                                                    current_generic_status.holder_team);
-                        assert_ckick_pos := To_Unbounded_String("penalty_kick_position(") & Integer'Image(formation_pos.coord_x) &
-                          "," & Integer'Image(formation_pos.coord_y) & ").";
+                        assert_pkick_pos := To_Unbounded_String("penalty_kick_position(") & I2S(formation_pos.coord_x) &
+                          "," & I2S(formation_pos.coord_y) & ").";
+                        String'Write(Stream(output), To_String(assert_pkick_pos) & Ada.Characters.Latin_1.CR);
                      when Throw_In =>
                         assert_event := To_Unbounded_String("event(throw_in).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                      when Free_Kick =>
                         assert_event := To_Unbounded_String("event(free_kick).");
+                        String'Write(Stream(output), To_String(assert_event) & Ada.Characters.Latin_1.CR);
                   end case;
                end if;
 
 	       -- If it's my duty to resume the game
                if Get_Player_Id(u_event) = id then
 		  -- Get the event coordinates
-                  assert_ref_pos := To_Unbounded_String("reference_position(") & Integer'Image(Get_Coordinate(u_event).coord_x) &
-                    "," & Integer'Image(Get_Coordinate(u_event).coord_y) & ").";
+                  assert_ref_pos := To_Unbounded_String("reference_position(") & I2S(Get_Coordinate(u_event).coord_x) &
+                    "," & I2S(Get_Coordinate(u_event).coord_y) & ").";
+                  String'Write(Stream(output), To_String(assert_ref_pos) & Ada.Characters.Latin_1.CR);
                   resume_player := True;
                   radius_offset := 50;
                end if;
@@ -473,9 +516,9 @@ package body Soccer.PlayersPkg is
             for i in current_read_result.players_in_my_zone.First_Index ..
               current_read_result.players_in_my_zone.Last_Index loop
                assert_nearby := To_Unbounded_String("nearby_player(position(") &
-                 Integer'Image(current_read_result.players_in_my_zone.Element(i).coord.coord_x) &
+                 I2S(current_read_result.players_in_my_zone.Element(i).coord.coord_x) &
                  "," &
-                 Integer'Image(current_read_result.players_in_my_zone.Element(i).coord.coord_y) & "),";
+                 I2S(current_read_result.players_in_my_zone.Element(i).coord.coord_y) & "),";
 
                if current_read_result.holder_id = current_read_result.players_in_my_zone.Element(i).id then
                   assert_nearby := assert_nearby & "has,";
@@ -487,43 +530,64 @@ package body Soccer.PlayersPkg is
                else
                   assert_nearby := assert_nearby & "team2).";
                end if;
-               assert_nearby_all.Append(assert_nearby);
+               String'Write(Stream(output), To_String(assert_nearby) & Ada.Characters.Latin_1.CR);
             end loop;
          end if;
 
---           if current_read_result.players_in_my_zone.Length > 0 then
---              json_obj.Set_Field(Field_Name => "nearby",
---                                 Field   => nearby_folks);
---              nearby_folks := Empty_Array;
+         Close (output);
+
+         if goalkeeper then
+            command := To_Unbounded_String("sh launch_keeper.sh");
+         else
+            command :=  To_Unbounded_String("sh launch_player.sh");
+         end if;
+
+--           if goalkeeper then
+--              command := To_Unbounded_String("./exe_keeper");
+--           else
+--              command :=  To_Unbounded_String("./exe_player");
 --           end if;
 
-         Open (File => output,
-               Mode => Append_File,
-               Name => To_String(output_name));
-         String'Write(Stream(output), To_String(assert_game_status) & Ada.Characters.Latin_1.CR);
-         String'Write(Stream(Output), To_String(assert_event & Ada.Characters.Latin_1.CR));
-         String'Write(Stream(Output), To_String(assert_player) & Ada.Characters.Latin_1.CR);
-         String'Write(Stream(Output), To_String(assert_ball) & Ada.Characters.Latin_1.CR);
-         if assert_nearby_all.Length > 0 then
-            for i in assert_nearby_all.First_Index .. assert_nearby_all.Last_Index loop
-               String'Write(Stream(Output), To_String(assert_nearby_all.Element(i)) & Ada.Characters.Latin_1.CR);
-            end loop;
-         end if;
-         String'Write(Stream(Output), To_String(assert_goal_pos) & Ada.Characters.Latin_1.CR);
-         String'Write(Stream(Output), To_String(assert_start_pos) & Ada.Characters.Latin_1.CR);
-         String'Write(Stream(Output), To_String(assert_def_pos) & Ada.Characters.Latin_1.CR);
-         String'Write(Stream(Output), To_String(assert_att_pos) & Ada.Characters.Latin_1.CR);
-         Close (Output);
-
          -- Load Prolog engine and read output file
-         arguments := Argument_String_To_List (command & " " & To_String(output_name) & " > " & "DECISION" & I2S(id));
+         arguments := Argument_String_To_List (To_String(command) & " " & To_String(output_name));
          exit_status := Spawn (Program_Name => arguments(arguments'First).all,
                                Args         => arguments(arguments'First + 1 .. arguments'Last));
 
---           json := Read(Strm     => Load_File("DECISION" & Integer'Image(id)),
+         Put_Line("PLAYER" & I2S(id) & "***************");
+         Open (File => file,
+               Mode => In_File,
+               Name => "DECISION" & I2S(id));
+
+         count := 0;
+         while not End_Of_File (file) loop
+            declare
+               line  : String := Get_Line (file);
+            begin
+               Put_Line("DECISION" & I2S(id) & ": " & line & "****************");
+               if count = 0 then
+                  decision_x := Integer'Value(line);
+                  count := count + 1;
+                  Put_Line("DECISION" & I2S(id) & ": decision_x : " & I2S(decision_x) & "****************");
+               elsif count = 1 then
+                  decision_y := Integer'Value(line);
+                  count := count + 1;
+                  Put_Line("DECISION" & I2S(id) & ": decision_y : " & I2S(decision_y) & "****************");
+               else
+                  decision := To_Unbounded_String(line);
+                  Put_Line("DECISION" & I2S(id) & ": decision : " & To_String(decision) & "****************");
+               end if;
+            end;
+         end loop;
+         Close (file);
+
+--           decision_x := 26;
+--           decision_y := 17;
+--           decision := To_Unbounded_String("move");
+
+--           json := Read(Strm     => Load_File("DECISION" & I2S(id)),
 --                        Filename => "");
 
---           Print("************JSON RESULT" & Integer'Image(id) & "************");
+--           Print("************JSON RESULT" & I2S(id) & "************");
 --           Print(Get(Val   => json,
 --                     Field => "X"));
 --           Print(Get(Val   => json,
@@ -533,16 +597,14 @@ package body Soccer.PlayersPkg is
 
 --           decision_x := Integer'Value(Get(Val   => json,
 --                                           Field  => "X"));
---           if decision_x = 1000 then
---              decision_x := id;
---           end if;
+         if decision_x = 1000 then
+            decision_x := id;
+         end if;
+
 --           decision_y := Integer'Value(Get(Val   => json,
 --                             	        Field  => "Y"));
 --           decision := Get(Val   => json,
 --                           Field => "Decision");
-         decision_x := 0;
-         decision_y := 0;
-         decision := To_Unbounded_String("move");
 
          if decision = "pass" then
             declare
@@ -720,7 +782,6 @@ package body Soccer.PlayersPkg is
 	       Update_Map (id, new_player_id, player_team);
 
                id := new_player_id;
-               Print("[CAMBIOOOOOOOOOOOOOOOOOOO ID]");
             end if;
          end if;
 
