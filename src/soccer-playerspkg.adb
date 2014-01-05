@@ -69,6 +69,7 @@ package body Soccer.PlayersPkg is
       action_prob : Integer;
       outcome     : Integer;
       error	  : Offset;
+      new_target  : Coordinate;
    begin
       action_prob := ((stat_1 + stat_2)/2);
 
@@ -81,30 +82,278 @@ package body Soccer.PlayersPkg is
          Random_Offset.Reset(off);
          error := Random_Offset.Random(off);
          case error is
-            when 1  => return Coordinate'(target.coord_x-1,target.coord_y+1);
-            when 2  => return Coordinate'(target.coord_x  ,target.coord_y+1);
-            when 3  => return Coordinate'(target.coord_x+1,target.coord_y+1);
-            when 4  => return Coordinate'(target.coord_x+1,target.coord_y);
-            when 5  => return Coordinate'(target.coord_x+1,target.coord_y-1);
-            when 6  => return Coordinate'(target.coord_x  ,target.coord_y-1);
-            when 7  => return Coordinate'(target.coord_x-1,target.coord_y-1);
-            when 8  => return Coordinate'(target.coord_x-1,target.coord_y);
-            when 9  => return Coordinate'(target.coord_x-1,target.coord_y+2);
-            when 10 => return Coordinate'(target.coord_x  ,target.coord_y+2);
-            when 11 => return Coordinate'(target.coord_x+1,target.coord_y+2);
-            when 12 => return Coordinate'(target.coord_x+2,target.coord_y+2);
-            when 13 => return Coordinate'(target.coord_x+2,target.coord_y+1);
-            when 14 => return Coordinate'(target.coord_x+2,target.coord_y);
-            when 15 => return Coordinate'(target.coord_x+2,target.coord_y-1);
-            when 16 => return Coordinate'(target.coord_x+2,target.coord_y-2);
-            when 17 => return Coordinate'(target.coord_x+1,target.coord_y-2);
-            when 18 => return Coordinate'(target.coord_x  ,target.coord_y-2);
-            when 19 => return Coordinate'(target.coord_x-1,target.coord_y-2);
-            when 20 => return Coordinate'(target.coord_x-2,target.coord_y-2);
-            when 21 => return Coordinate'(target.coord_x-2,target.coord_y-1);
-            when 22 => return Coordinate'(target.coord_x-2,target.coord_y);
-            when 23 => return Coordinate'(target.coord_x-2,target.coord_y+1);
-            when 24 => return Coordinate'(target.coord_x-2,target.coord_y+2);
+            when 1  =>
+               if target.coord_x > 0 then
+                  new_target.coord_x := target.coord_x-1;
+               else
+                  new_target.coord_x := target.coord_x+1;
+               end if;
+               if target.coord_y < field_max_y then
+                  new_target.coord_y := target.coord_y+1;
+               else
+                  new_target.coord_y := target.coord_y-1;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 return Coordinate'(target.coord_x-1,target.coord_y+1);
+            when 2  =>
+               if target.coord_y < field_max_y then
+                  new_target.coord_y := target.coord_y+1;
+               else
+                  new_target.coord_y := target.coord_y-1;
+               end if;
+               return Coordinate'(target.coord_x, new_target.coord_y);
+--                 return Coordinate'(target.coord_x  ,target.coord_y+1);
+            when 3  =>
+               if target.coord_x < field_max_x then
+                  new_target.coord_x := target.coord_x+1;
+               else
+                  new_target.coord_x := target.coord_x-1;
+               end if;
+               if target.coord_y < field_max_y then
+                  new_target.coord_y := target.coord_y+1;
+               else
+                  new_target.coord_y := target.coord_y-1;
+               end if;
+               return Coordinate'(new_target.coord_x,new_target.coord_y);
+--                 return Coordinate'(target.coord_x+1,target.coord_y+1);
+            when 4  =>
+               if target.coord_x < field_max_x then
+                  new_target.coord_x := target.coord_x+1;
+               else
+                  new_target.coord_x := target.coord_x-1;
+               end if;
+               return Coordinate'(new_target.coord_x,target.coord_y);
+--                  return Coordinate'(target.coord_x+1,target.coord_y);
+            when 5  =>
+               if target.coord_x < field_max_x then
+                  new_target.coord_x := target.coord_x+1;
+               else
+                  new_target.coord_x := target.coord_x-1;
+               end if;
+               if target.coord_y > 0 then
+                  new_target.coord_y := target.coord_y-1;
+               else
+                  new_target.coord_y := target.coord_y+1;
+               end if;
+               return Coordinate'(new_target.coord_x,new_target.coord_y);
+--                 return Coordinate'(target.coord_x+1,target.coord_y-1);
+            when 6  =>
+               if target.coord_y > 0 then
+                  new_target.coord_y := target.coord_y-1;
+               else
+                  new_target.coord_y := target.coord_y+1;
+               end if;
+               return Coordinate'(target.coord_x,new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x  ,target.coord_y-1);
+            when 7  =>
+               if target.coord_x > 0 then
+                  new_target.coord_x := target.coord_x-1;
+               else
+                  new_target.coord_x := target.coord_x+1;
+               end if;
+               if target.coord_y > 0 then
+                  new_target.coord_y := target.coord_y-1;
+               else
+                  new_target.coord_x := target.coord_y+1;
+               end if;
+               return Coordinate'(new_target.coord_x,new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-1,target.coord_y-1);
+            when 8  =>
+               if target.coord_x > 0 then
+                  new_target.coord_x := target.coord_x-1;
+               else
+                  new_target.coord_x := target.coord_x+1;
+               end if;
+               return Coordinate'(new_target.coord_x,target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-1,target.coord_y);
+            when 9  =>
+               if target.coord_x > 0 then
+                  new_target.coord_x := target.coord_x-1;
+               else
+                  new_target.coord_x := target.coord_x+1;
+               end if;
+               if target.coord_y < field_max_y-1 then
+                  new_target.coord_y := target.coord_y+2;
+               else
+                  new_target.coord_y := target.coord_y-2;
+               end if;
+               return Coordinate'(new_target.coord_x,new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-1,target.coord_y+2);
+            when 10 =>
+               if target.coord_y < field_max_y-1 then
+                  new_target.coord_y := target.coord_y+2;
+               else
+                  new_target.coord_y := target.coord_y-2;
+               end if;
+               return Coordinate'(target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x  ,target.coord_y+2);
+            when 11 =>
+               if target.coord_x < field_max_x then
+                  new_target.coord_x := target.coord_x+1;
+               else
+                  new_target.coord_x := target.coord_x-1;
+               end if;
+               if target.coord_y < field_max_y-1 then
+                  new_target.coord_y := target.coord_y+2;
+               else
+                  new_target.coord_y := target.coord_y-2;
+               end if;
+               return Coordinate'(new_target.coord_x+1, new_target.coord_y+2);
+--                 new_target := Coordinate'(target.coord_x+1,target.coord_y+2);
+            when 12 =>
+               if target.coord_x < field_max_x-1 then
+                  new_target.coord_x := target.coord_x+2;
+               else
+                  new_target.coord_x := target.coord_x-2;
+               end if;
+               if target.coord_y < field_max_y-1 then
+                  new_target.coord_y := target.coord_y+2;
+               else
+                  new_target.coord_y := target.coord_y-2;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x+2,target.coord_y+2);
+            when 13 =>
+               if target.coord_x < field_max_x-1 then
+                  new_target.coord_x := target.coord_x+2;
+               else
+                  new_target.coord_x := target.coord_x-2;
+               end if;
+               if target.coord_y < field_max_y then
+                  new_target.coord_y := target.coord_y+1;
+               else
+                  new_target.coord_y := target.coord_y-1;
+               end if;
+               return Coordinate'(target.coord_x, target.coord_y);
+--                 new_target := Coordinate'(target.coord_x+2,target.coord_y+1);
+            when 14 =>
+               if target.coord_x < field_max_x-1 then
+                  new_target.coord_x := target.coord_x+2;
+               else
+                  new_target.coord_x := target.coord_x-2;
+               end if;
+               return Coordinate'(new_target.coord_x, target.coord_y);
+--                 new_target := Coordinate'(target.coord_x+2,target.coord_y);
+            when 15 =>
+               if target.coord_x < field_max_x-1 then
+                  new_target.coord_x := target.coord_x+2;
+               else
+                  new_target.coord_x := target.coord_x-2;
+               end if;
+               if target.coord_y > 0 then
+                  new_target.coord_y := target.coord_y-1;
+               else
+                  new_target.coord_y := target.coord_y+1;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x+2,target.coord_y-1);
+            when 16 =>
+               if target.coord_x < field_max_x-1 then
+                  new_target.coord_x := target.coord_x+2;
+               else
+                  new_target.coord_x := target.coord_x-2;
+               end if;
+               if target.coord_y > 1 then
+                  new_target.coord_y := target.coord_y-2;
+               else
+                  new_target.coord_y := target.coord_y+2;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x+2,target.coord_y-2);
+            when 17 =>
+               if target.coord_x < field_max_x then
+                  new_target.coord_x := target.coord_x+1;
+               else
+                  new_target.coord_x := target.coord_x-1;
+               end if;
+               if target.coord_y > 1 then
+                  new_target.coord_y := target.coord_y-2;
+               else
+                  new_target.coord_y := target.coord_y+2;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x+1,target.coord_y-2);
+            when 18 =>
+               if target.coord_y > 1 then
+                  new_target.coord_y := target.coord_y-2;
+               else
+                  new_target.coord_y := target.coord_y+2;
+               end if;
+               return Coordinate'(target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x  ,target.coord_y-2);
+            when 19 =>
+               if target.coord_x > 0 then
+                  new_target.coord_x := target.coord_x-1;
+               else
+                  new_target.coord_x := target.coord_x+1;
+               end if;
+               if target.coord_y > 1 then
+                  new_target.coord_y := target.coord_y-2;
+               else
+                  new_target.coord_y := target.coord_y+2;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-1,target.coord_y-2);
+            when 20 =>
+               if target.coord_x > 1 then
+                  new_target.coord_x := target.coord_x-2;
+               else
+                  new_target.coord_x := target.coord_x+2;
+               end if;
+               if target.coord_y > 1 then
+                  new_target.coord_y := target.coord_y-2;
+               else
+                  new_target.coord_y := target.coord_y+2;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-2,target.coord_y-2);
+            when 21 =>
+               if target.coord_x > 1 then
+                  new_target.coord_x := target.coord_x-2;
+               else
+                  new_target.coord_x := target.coord_x+2;
+               end if;
+               if target.coord_y > 0 then
+                  new_target.coord_y := target.coord_y-1;
+               else
+                  new_target.coord_y := target.coord_y+1;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-2,target.coord_y-1);
+            when 22 =>
+               if target.coord_x > 1 then
+                  new_target.coord_x := target.coord_x-2;
+               else
+                  new_target.coord_x := target.coord_x+2;
+               end if;
+               return Coordinate'(new_target.coord_x, target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-2,target.coord_y);
+            when 23 =>
+               if target.coord_x > 1 then
+                  new_target.coord_x := target.coord_x-2;
+               else
+                  new_target.coord_x := target.coord_x+2;
+               end if;
+               if target.coord_y < field_max_y then
+                  new_target.coord_y := target.coord_y+1;
+               else
+                  new_target.coord_y := target.coord_y-1;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-2,target.coord_y+1);
+            when 24 =>
+               if target.coord_x > 1 then
+                  new_target.coord_x := target.coord_x-2;
+               else
+                  new_target.coord_x := target.coord_x+2;
+               end if;
+               if target.coord_y > 1 then
+                  new_target.coord_y := target.coord_y-2;
+               else
+                  new_target.coord_y := target.coord_y+2;
+               end if;
+               return Coordinate'(new_target.coord_x, new_target.coord_y);
+--                 new_target := Coordinate'(target.coord_x-2,target.coord_y+2);
          end case;
       end if;
    end Action_Outcome;
@@ -281,8 +530,8 @@ package body Soccer.PlayersPkg is
 
          -- Get player's number
          player_number := current_generic_status.number;
-         assert_number := To_Unbounded_String("number(") & I2S(player_number) & ").";
-        -- String'Write(Stream(output), To_String(assert_number) & Ada.Characters.Latin_1.CR);
+         assert_number := To_Unbounded_String("player_number(") & I2S(player_number) & ").";
+         String'Write(Stream(output), To_String(assert_number) & Ada.Characters.Latin_1.CR);
 
          -- Check if the player is the goalkeeper
          if player_number = Get_Goalkeeper_Number(player_team) then
@@ -584,31 +833,9 @@ package body Soccer.PlayersPkg is
 
          Close (file);
 
---           decision_x := 26;
---           decision_y := 17;
---           decision := To_Unbounded_String("move");
-
---           json := Read(Strm     => Load_File("DECISION" & I2S(id)),
---                        Filename => "");
-
---           Print("************JSON RESULT" & I2S(id) & "************");
---           Print(Get(Val   => json,
---                     Field => "X"));
---           Print(Get(Val   => json,
---                     Field => "Y"));
---           Print(Get(Val   => json,
---                     Field => "Decision"));
-
---           decision_x := Integer'Value(Get(Val   => json,
---                                           Field  => "X"));
          if decision_x = 1000 then
             decision_x := id;
          end if;
-
---           decision_y := Integer'Value(Get(Val   => json,
---                             	        Field  => "Y"));
---           decision := Get(Val   => json,
---                           Field => "Decision");
 
          if decision = "pass" then
             declare
@@ -628,23 +855,22 @@ package body Soccer.PlayersPkg is
 	       current_action.utility := 10;
             end;
          elsif decision = "shot" then
-               declare
-                  new_shot_event : Shot_Event_Ptr;
-               begin
-                  new_shot_event := new Shot_Event;
+            declare
+               new_shot_event : Shot_Event_Ptr;
+            begin
+               new_shot_event := new Shot_Event;
 
                new_shot_event.Initialize(id,
-                                         player_number,
-                                         player_team,
-                                         current_coord,
-                                         Action_Outcome(Coordinate'(decision_x,decision_y),
-                      					player_stats(1),
-				                        player_stats(4)));
-                  new_shot_event.Set_Shot_Power(15);
-                  current_action.event := Motion_Event_Ptr(new_shot_event);
-                  current_action.utility := 10;
-
-               end;
+                 player_number,
+                 player_team,
+                 current_coord,
+                 Action_Outcome(Coordinate'(decision_x,decision_y),
+                   player_stats(1),
+                   player_stats(4)));
+               new_shot_event.Set_Shot_Power(15);
+               current_action.event := Motion_Event_Ptr(new_shot_event);
+               current_action.utility := 10;
+            end;
          elsif decision = "catch" then
             declare
                new_catch_event : Catch_Event_Ptr;
