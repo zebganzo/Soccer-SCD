@@ -586,4 +586,49 @@ package body Soccer.TeamPkg is
       return tackle;
    end Get_Tackle;
 
+   procedure Update_Teams_Configuration (data : String) is
+--        team_one_players : Team_Players_List;
+--        team_two_players : Team_Players_List;
+--
+--        team_one_raw_players : JSON_Array;
+--        team_two_raw_players : JSON_Array;
+--
+--        team_one_formation : Formation_Scheme_Id;
+--        team_two_formation : Formation_Scheme_Id;
+--
+--        team_one_formation_string : String;
+--        team_two_formation_string : String;
+--
+--        one : JSON_Value := JSON.Get (data, "one");
+--        two : JSON_Value := JSON.Get (data, "two");
+   begin
+--        Put_Line ("Received data: " & data);
+--
+--        if JSON.Get (one, "team") = "Team_One" then
+--  	 team_one_raw_players := JSON.Get (one, "players");
+--  	 team_two_raw_players := JSON.Get (two, "players");
+--
+--  	 team_one_formation_string := JSON.Get (one, "formation");
+--  	 team_two_formation_string := JSON.Get (two, "formation");
+--
+--        else
+--  	 team_one_raw_players := JSON.Get (two, "players");
+--  	 team_two_raw_players := JSON.Get (one, "players");
+--
+--  	 team_one_formation_string := JSON.Get (two, "formation");
+--  	 team_two_formation_string := JSON.Get (one, "formation");
+--
+--        end if;
+--
+--        if team_one_formation_string = "3-5-2" then
+--  	 team_one_formation := O_352;
+--        elsif team_one_formation_string = "4-4-2" then
+--  	 team_one_formation := B_442;
+--        else
+--  	 team_one_formation := D_532;
+--        end if;
+
+      null;
+   end Update_Teams_Configuration;
+
 end Soccer.TeamPkg;

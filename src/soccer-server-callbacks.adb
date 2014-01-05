@@ -65,6 +65,8 @@ package body Soccer.Server.Callbacks is
 	 ControllerPkg.Controller.Notify;
 
 	 return AWS.Response.Build (MIME.Text_Plain, Get_Game_Status);
+      elsif URI = "/field/setTeamsConf" then
+	 TeamPkg.Update_Teams_Configuration (AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "conf")));
       elsif URI = "/field/getParams" then
 	 -- send players' params
 	 return AWS.Response.Build (MIME.Text_Plain, Get_Params);

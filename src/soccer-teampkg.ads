@@ -116,6 +116,8 @@ package Soccer.TeamPkg is
    function Get_Tackle(number : in Integer;
                        team   : Team_Id) return Integer;
 
+   procedure Update_Teams_Configuration (data : String);
+
 private
    --+ contengono TUTTI i giocatori di una squadra, non solo quelli in campo
    team_1 : Team_Ptr;

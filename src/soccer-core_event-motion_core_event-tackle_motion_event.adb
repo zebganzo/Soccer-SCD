@@ -1,4 +1,5 @@
 with Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event;
+with Soccer.ControllerPkg; use Soccer.ControllerPkg;
 
 package body Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event is
 
@@ -17,7 +18,9 @@ package body Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event is
       Serialized_Obj.Set_Field(Field_Name => "type_of_event",
                                Field      => "tackle");
       Serialized_Obj.Set_Field(Field_Name => "other_player_id",
-                               Field      => E.Other_Player_Id);
+			       Field      => E.Other_Player_Id);
+      Serialized_Obj.Set_Field (Field_Name => "other_player_number",
+				Field	   => I2S (ControllerPkg.Get_Number_From_Id (E.Other_Player_Id)));
    end;
 
 end Soccer.Core_Event.Motion_Core_Event.Tackle_Motion_Event;
