@@ -536,17 +536,17 @@ package body Soccer.PlayersPkg is
 
          Close (output);
 
---           if goalkeeper then
---              command := To_Unbounded_String("sh launch_keeper.sh");
---           else
---              command := To_Unbounded_String("sh launch_player.sh");
---           end if;
-
          if goalkeeper then
-            command := To_Unbounded_String("./exe_keeper " & To_String(output_name));
+            command := To_Unbounded_String("./launch_keeper.sh " & To_String(output_name) & " " & I2S(id));
          else
-            command := To_Unbounded_String("./exe_player " & To_String(output_name));
+            command := To_Unbounded_String("./launch_player.sh " & To_String(output_name) & " " & I2S(id));
          end if;
+
+--           if goalkeeper then
+--              command := To_Unbounded_String("./exe_keeper " & To_String(output_name));
+--           else
+--              command := To_Unbounded_String("./exe_player " & To_String(output_name));
+--           end if;
 
          -- Load Prolog engine and read output file
          arguments := Argument_String_To_List (To_String(command));

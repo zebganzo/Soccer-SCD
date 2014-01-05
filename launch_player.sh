@@ -1,2 +1,2 @@
 #!/bin/sh
-./exe_player $1 &
+./exe_player $1 > DECISION$2
