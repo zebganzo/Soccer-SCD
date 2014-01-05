@@ -581,6 +581,7 @@ package body Soccer.PlayersPkg is
                end if;
             end;
          end loop;
+
          Close (file);
 
 --           decision_x := 26;

@@ -13,7 +13,9 @@ go :-
     write(OS,D),
     close(OS).
 
-% swipl -O -t go --quiet --stand_alone=true -o exe_player -c exe_player.pl
+% swipl -t go --quiet --stand_alone=true -o exe_player -c exe_player.pl
 % ./exe STATUS2
 
 % swipl -O -g go,halt -t 'halt(1)' --quiet --stand_alone=true -o exe_player -c exe_player.pl
+
+% swipl --goal=go --quiet --stand_alone=true -o exe_player -c exe_player.pl
