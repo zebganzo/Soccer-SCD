@@ -37,6 +37,8 @@ package Soccer.TeamPkg is
 
    function Get_Formation_Id (number : Integer; team : Team_Id) return Integer;
 
+   function Get_Role (formation_id : Integer; formation_scheme : Formation_Scheme_Id) return String;
+
    function Get_Number_From_Formation (formation_id : Integer;
                                        team         : Team_Id) return Integer;
 

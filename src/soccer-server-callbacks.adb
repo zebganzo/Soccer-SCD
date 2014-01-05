@@ -117,14 +117,16 @@ package body Soccer.Server.Callbacks is
                number : Integer := ControllerPkg.Get_Number_From_Id (i);
             begin
                player := Create_Object;
-               player.Set_Field ("number"	, number);
-               player.Set_Field ("attack"	, TeamPkg.Get_Attack       (number, player_team));
-               player.Set_Field ("defense"	, TeamPkg.Get_Defense 	   (number, player_team));
-               player.Set_Field ("goal_keeping"	, TeamPkg.Get_Goal_Keeping (number, player_team));
-               player.Set_Field ("power"	, TeamPkg.Get_Power 	   (number, player_team));
-               player.Set_Field ("precision"	, TeamPkg.Get_Precision    (number, player_team));
-               player.Set_Field ("speed"	, TeamPkg.Get_Speed 	   (number, player_team));
-               player.Set_Field ("tackle"	, TeamPkg.Get_Tackle 	   (number, player_team));
+               player.Set_Field ("number", number);
+               player.Set_Field ("attack", TeamPkg.Get_Attack (number, player_team));
+               player.Set_Field ("defense", TeamPkg.Get_Defense (number, player_team));
+               player.Set_Field ("goal_keeping" , TeamPkg.Get_Goal_Keeping (number, player_team));
+               player.Set_Field ("power" , TeamPkg.Get_Power (number, player_team));
+               player.Set_Field ("precision" , TeamPkg.Get_Precision (number, player_team));
+               player.Set_Field ("speed" , TeamPkg.Get_Speed (number, player_team));
+               player.Set_Field ("tackle" , TeamPkg.Get_Tackle (number, player_team));
+               player.Set_Field ("role" , TeamPkg.Get_Role (TeamPkg.Get_Formation_Id (number, player_team),
+               						    TeamPkg.Get_Formation (player_team)));
                Append (team, player);
             end;
          end if;

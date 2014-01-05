@@ -19,7 +19,7 @@ package Soccer.Server.WebSockets is
 
    overriding procedure On_Close (Socket : in out Object; Message : String);
 
-   overriding procedure Send (Socket : in out Object; Message : String);
+--     overriding procedure Send (Socket : in out Object; Message : String);
 
 private
 

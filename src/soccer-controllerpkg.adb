@@ -180,7 +180,6 @@ package body Soccer.ControllerPkg is
    function Get_Id_From_Number(number : in Integer; team : in Team_Id) return Integer is
       player_id : Integer;
    begin
-      Print("[PADREPIOPORCODIO]:" & I2S(number) & " TEAM: " & Team_Id'Image(team));
       for i in current_status'Range loop
 	 --           Print("i: " & I2S(i) & " number: " & I2S(current_status(i).number) & " team: " & Team_Id'Image(current_status(i).team) &
 	 --                " id: " & I2S(current_status(i).id));
@@ -188,7 +187,6 @@ package body Soccer.ControllerPkg is
 	    player_id := current_status(i).id;
 	 end if;
       end loop;
-      Print("[PADREPIOPORCODIO]:" & I2S(player_id));
       return player_id;
    end Get_Id_From_Number;
 
