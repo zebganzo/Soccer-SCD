@@ -536,27 +536,27 @@ package body Soccer.PlayersPkg is
 
          Close (output);
 
-         if goalkeeper then
-            command := To_Unbounded_String("sh launch_keeper.sh");
-         else
-            command := To_Unbounded_String("sh launch_player.sh");
-         end if;
---
 --           if goalkeeper then
---              command := To_Unbounded_String("./exe_keeper");
+--              command := To_Unbounded_String("sh launch_keeper.sh");
 --           else
---              command := To_Unbounded_String("./exe_player");
+--              command := To_Unbounded_String("sh launch_player.sh");
 --           end if;
 
-         -- Load Prolog engine and read output file
---           arguments := Argument_String_To_List (To_String(command) & " " & To_String(output_name));
---           exit_status := Spawn (Program_Name => arguments(arguments'First).all,
---                                 Args         => arguments(arguments'First + 1 .. arguments'Last));
-         arguments := Argument_String_To_List (To_String(output_name));
-         exit_status := Spawn (Program_Name => To_String(command),
-                               Args         => arguments.all);
+         if goalkeeper then
+            command := To_Unbounded_String("./exe_keeper " & To_String(output_name));
+         else
+            command := To_Unbounded_String("./exe_player " & To_String(output_name));
+         end if;
 
-         Put_Line("PLAYER" & I2S(id) & "***************");
+         -- Load Prolog engine and read output file
+         arguments := Argument_String_To_List (To_String(command));
+         exit_status := Spawn (Program_Name => arguments(arguments'First).all,
+                               Args         => arguments(arguments'First + 1 .. arguments'Last));
+
+         --  Free memory
+         Free (arguments);
+
+--           Put_Line("PLAYER" & I2S(id) & "***************");
          Open (File => file,
                Mode => In_File,
                Name => "DECISION" & I2S(id));
@@ -566,18 +566,18 @@ package body Soccer.PlayersPkg is
             declare
                line  : String := Get_Line (file);
             begin
-               Put_Line("DECISION" & I2S(id) & ": " & line & "****************");
+--                 Put_Line("DECISION" & I2S(id) & ": " & line & "****************");
                if count = 0 then
                   decision_x := Integer'Value(line);
                   count := count + 1;
-                  Put_Line("DECISION" & I2S(id) & ": decision_x : " & I2S(decision_x) & "****************");
+--                    Put_Line("DECISION" & I2S(id) & ": decision_x : " & I2S(decision_x) & "****************");
                elsif count = 1 then
                   decision_y := Integer'Value(line);
                   count := count + 1;
-                  Put_Line("DECISION" & I2S(id) & ": decision_y : " & I2S(decision_y) & "****************");
+--                    Put_Line("DECISION" & I2S(id) & ": decision_y : " & I2S(decision_y) & "****************");
                else
                   decision := To_Unbounded_String(line);
-                  Put_Line("DECISION" & I2S(id) & ": decision : " & To_String(decision) & "****************");
+--                    Put_Line("DECISION" & I2S(id) & ": decision : " & To_String(decision) & "****************");
                end if;
             end;
          end loop;
