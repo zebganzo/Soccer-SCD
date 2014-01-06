@@ -29,19 +29,25 @@ procedure Soccer.Main is
 
 --     players_team_one : Team_Players_List := (12, 2, 7, 8, 60);
 --     players_team_two : Team_Players_List := (6, 56, 1, 4, 10);
+--     players_team_one : Team_Players_List := (12, 2, 7);
+--     players_team_two : Team_Players_List := (6, 56, 1);
    players_team_one : Team_Players_List := (12, 2, 7, 8, 60, 88, 13, 5, 91, 37, 15);
    players_team_two : Team_Players_List := (6, 56, 1, 4, 10, 32, 59, 9, 19, 72, 20);
 
    type Pos_Id is array (Positive range <>) of Integer;
 --        t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1,10,5);
    t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1,10,5,3,4,7,8,9,11);
+--        t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1);
 --     t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1,10,3);
    t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1,10,3,2,5,7,8,9,11);
+--        t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1);
 
 --        t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
    t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5,6,7,8,9,10,11);
+--     t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3);
 --        t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
    t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5,6,7,8,9,10,11);
+--     t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3);
 
    formation_id_t1 : Team_Number_Map(1 .. total_players/2);
    formation_id_t2 : Team_Number_Map(1 .. total_players/2);
@@ -51,7 +57,8 @@ procedure Soccer.Main is
    players_stats_team_1 : Team_Players_Statistics :=
      (1   => (30, 10, 0, 20, 60, 60, 80),
       2   => (30, 80, 0, 75, 60, 60, 80),
-      3   => (30, 80, 0, 75, 60, 60, 80),
+      3   => (30, 80, 0, 75, 60, 60, 80)
+     ,
       4   => (30, 80, 0, 75, 60, 60, 80),
       5   => (30, 80, 0, 75, 60, 60, 80),
       6   => (30, 80, 0, 75, 60, 60, 80),
@@ -66,7 +73,8 @@ procedure Soccer.Main is
    players_stats_team_2 : Team_Players_Statistics :=
      (1   => (40, 70, 0, 85, 50, 70, 70),
       2   => (40, 70, 0, 85, 50, 70, 70),
-      3   => (40, 70, 0, 85, 50, 70, 70),
+      3   => (40, 70, 0, 85, 50, 70, 70)
+     ,
       4   => (40, 10, 0, 20, 50, 70, 70),
       5   => (40, 10, 0, 20, 50, 70, 70),
       6   => (40, 10, 0, 20, 50, 70, 70),

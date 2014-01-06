@@ -63,6 +63,17 @@ package body Soccer.ControllerPkg is
 	 end if;
       end loop;
 
+      -- aggiungere l'iperperiodo potrebbe non essere sufficiente. per i casi in
+      -- cui il controllore non viene chiamato per parecchio tempo abbiamo bisogno
+      -- di calcolare il checkpoint vicino a me aggiungendo l'iperperiodo piu' volte
+      declare
+	 now : Time := Clock;
+      begin
+	 if now > checkpoint_time + hyperperiod_length then
+	    checkpoint_time := checkpoint_time + hyperperiod_length;
+	 end if;
+      end;
+
       gen_stat.coord := coord_result;
       gen_stat.number := number_result;
       gen_stat.team := Get_Player_Team_From_Id (id);
@@ -74,6 +85,7 @@ package body Soccer.ControllerPkg is
       gen_stat.holder_team := Get_Player_Team_From_Id(ball_holder_id);
       gen_stat.last_ball_holder_id := Referee.Get_Last_Ball_Holder;
       gen_stat.must_exit := must_exit;
+      gen_stat.last_checkpoint := checkpoint_time;
       --        Print ("[CONTROLLER] Generic Status for Player " & I2S (id));
       --          Print ("MAGLIA: " & I2S(gen_stat.number) &
       --            " TEAM: " & Team_Id'Image(gen_stat.team));
@@ -241,6 +253,19 @@ package body Soccer.ControllerPkg is
       return 0;
 
    end Check_For_Player_In_Cell;
+
+   procedure Refresh_Hyperperiod is
+      total_slots : Integer := 0;
+   begin
+      for i in current_status'Range loop
+	 if current_status (i).on_the_field then
+	    total_slots := total_slots + (current_status (i).id mod 5 + 1);
+	 end if;
+      end loop;
+
+      Soccer.hyperperiod_length := total_slots * 0.8;
+
+   end Refresh_Hyperperiod;
 
    function Is_Cell_Free (coord : Coordinate) return Boolean is
       occupied : Boolean := False;
@@ -434,13 +459,32 @@ package body Soccer.ControllerPkg is
       return ball_holder_id;
    end Get_Ball_Holder;
 
+   procedure Set_Checkpoint_Time is
+   begin
+      checkpoint_time := Clock;
+   end Set_Checkpoint_Time;
+
    function Get_Zone (coord : Coordinate) return Integer is
+      column : Integer;
+      row : Integer;
+      result : Integer;
    begin
       if Compare_Coordinates (coord, oblivium) then
 	 return 0;
       end if;
 
-      return (Integer (Float'Floor (Float (coord.coord_x - 1) / (Float (field_max_x) / Float (number_of_zones)))) + 1);
+      column := (Integer (Float'Floor (Float (coord.coord_x - 1) / (Float (field_max_x) / Float (number_of_zones - 3)))) + 1);
+
+      if coord.coord_y > field_max_y / 2 then
+	 row := 1;
+      else
+	 row := 0;
+      end if;
+
+      result := row * 3 + column;
+
+      return result;
+
    end Get_Zone;
 
    procedure Release (coord : Coordinate) is
@@ -834,6 +878,9 @@ package body Soccer.ControllerPkg is
       compute_result : Boolean;
       revaluate : Boolean;
 
+      t_write_start : Time;
+      t_write_end : Time;
+
    begin
 
       Reset_Game;
@@ -843,6 +890,8 @@ package body Soccer.ControllerPkg is
 	 select
 	    when not Game_Entity.Is_Paused =>
 	       accept Write (current_action : in out Action) do
+
+		  t_write_start := Clock;
 
 		  -- provo a soddisfare la richiesta del giocatore
 		  Compute (current_action.event, compute_result, revaluate);
@@ -886,14 +935,35 @@ package body Soccer.ControllerPkg is
 
 			   last_player_event := new_move;
 
-			   Referee.Pre_Check (last_player_event);
-			   Referee.Post_Check;
+			   declare
+			      t_check_start : Time := Clock;
+			      t_check_end : Time;
+			   begin
+			      Referee.Pre_Check (last_player_event);
+			      Referee.Post_Check;
+			      t_check_end := Clock;
+
+			      Put_Line ("[REFEREE-REVALUATE] " & Duration'Image (t_check_end - t_check_start));
+			   end;
+
 			end;
 		     end if;
 		  else
-		     Referee.Pre_Check (last_player_event);
-		     Referee.Post_Check;
+		     declare
+			t_check_start : Time := Clock;
+			t_check_end : Time;
+		     begin
+			Referee.Pre_Check (last_player_event);
+			Referee.Post_Check;
+			t_check_end := Clock;
+
+			Put_Line ("[REFEREE] " & Duration'Image (t_check_end - t_check_start));
+		     end;
+
 		  end if;
+
+		  t_write_end := Clock;
+		  Put_Line ("[WRITE] " & Duration'Image (t_write_end - t_write_start));
 
 	       end Write;
 	 or

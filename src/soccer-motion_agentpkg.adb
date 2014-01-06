@@ -49,6 +49,8 @@ package body Soccer.Motion_AgentPkg is
    end Motion_Enabler;
 
    task body Motion_Agent is
+      t_ma_start : Time;
+      t_ma_end : Time;
    begin
       loop
          Motion_Enabler.Enabled;
@@ -60,6 +62,8 @@ package body Soccer.Motion_AgentPkg is
 	    new_event : Motion_Event_Ptr;
 	 begin
 	    while start and actual_power > 0 and Ball.Get_Controlled = False loop
+
+	       t_ma_start := Clock;
 
 	       starting_coord := Ball.Get_Position;
 
@@ -80,6 +84,10 @@ package body Soccer.Motion_AgentPkg is
 		  Print ("[MOTION_AGENT] FIXME! Ramo else su -select-");
 		  exit;
 	       end select;
+
+	       t_ma_end := Clock;
+
+	       Print ("[MOTION_AGENT] MOTION TIME: " & Duration'Image (t_ma_end - t_ma_start));
 
 	       delay duration (ball_speed);-- TODO:: Utils.Get_Ball_Delay(power => actual_power);
 	       --              Print("[MOTION_AGENT] Delay scaduto, diminuisco la potenza");

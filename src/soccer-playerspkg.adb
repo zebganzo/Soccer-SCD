@@ -462,7 +462,28 @@ package body Soccer.PlayersPkg is
       file : File_Type;
       count : Integer;
 
+      -- Time measuring variables
+      t_start : Time;
+      t_end : Time;
+
+      t_ai_start : Time;
+      t_ai_end : Time;
+
+      t_controller_start : Time;
+      t_controller_end : Time;
+
+      t_prolog_start : Time;
+      t_prolog_end : Time;
+
+      t_decision_start : Time;
+      t_decision_end : Time;
+
+      previous_checkpoint : Time;
+      previous_release : Time;
+
    begin
+
+      previous_checkpoint := Clock;
 
 --        Set_Directory (ai_basedir);
 
@@ -475,10 +496,22 @@ package body Soccer.PlayersPkg is
       Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
 
       loop
+
+	 t_start := Clock;
+
 	 Print ("[PLAYER_" & I2S (id) & "] Leggo Generic Status");
 	 current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
      --    Print ("[PLAYER_" & I2S (id) & "] MAGLIA: " & I2S(current_generic_status.number) &
      --     " TEAM: " & Team_Id'Image(current_generic_status.team));
+
+	 if previous_checkpoint /= current_generic_status.last_checkpoint then
+	    previous_checkpoint := current_generic_status.last_checkpoint;
+	    previous_release := current_generic_status.last_checkpoint;
+	    if id = 4 then
+	       Print ("[PLAYER_" & I2S (id) & "] Nuovo checkpoint: " & Duration'Image (previous_checkpoint - t0));
+	    end if;
+	 end if;
+
 	 current_coord := current_generic_status.coord;
 	 current_game_status := current_generic_status.game_status;
 
@@ -797,6 +830,9 @@ package body Soccer.PlayersPkg is
 --              command := To_Unbounded_String("./exe_player " & To_String(output_name));
 --           end if;
 
+	 t_ai_start := Clock;
+	 t_prolog_start := Clock;
+
          -- Load Prolog engine and read output file
          arguments := Argument_String_To_List (To_String(command));
          exit_status := Spawn (Program_Name => arguments(arguments'First).all,
@@ -804,6 +840,9 @@ package body Soccer.PlayersPkg is
 
          --  Free memory
          Free (arguments);
+
+	 t_prolog_end := Clock;
+	 t_decision_start := Clock;
 
 --           Put_Line("PLAYER" & I2S(id) & "***************");
          Open (File => file,
@@ -832,6 +871,9 @@ package body Soccer.PlayersPkg is
          end loop;
 
          Close (file);
+
+	 t_decision_end := Clock;
+	 t_ai_end := Clock;
 
          if decision_x = 1000 then
             decision_x := id;
@@ -1001,6 +1043,8 @@ package body Soccer.PlayersPkg is
 --                    ") ] Target coord: " & Print_Coord (Coordinate'(decision_x, decision_y)) &
 --                 "Decision: " & Ada.Strings.Unbounded.To_String(decision));
 
+	 t_controller_start := Clock;
+
 	 if current_action.event /= null and not do_nothing then
 --  	    Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Start");
 --  	    Game_Entity.Start;
@@ -1015,10 +1059,35 @@ package body Soccer.PlayersPkg is
             end if;
          end if;
 
+	 t_controller_end := Clock;
+
          current_action.event := null;
          do_nothing := False;
 
-	 delay duration (players_delay); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+	 t_end := Clock;
+
+	 Print ("[PLAYER " & I2S (id) & "] TOTAL TIME: " & Duration'Image (t_end - t_start));
+	 Print ("[PLAYER " & I2S (id) & "] AI TIME: " & Duration'Image (t_ai_end - t_ai_start));
+	 Print ("[PLAYER " & I2S (id) & "] PROLOG TIME: " & Duration'Image (t_prolog_end - t_prolog_start));
+	 Print ("[PLAYER " & I2S (id) & "] DECISION TIME: " & Duration'Image (t_decision_end - t_decision_start));
+	 Print ("[PLAYER " & I2S (id) & "] CONTROLLER TIME: " & Duration'Image (t_controller_end - t_controller_start));
+
+--  	 if id = 4 then
+--  	    Print ("[PLAYER " & I2S (id) & "] RELEASE BEFORE: " & Duration'Image (previous_release - t0) & " (hyperperiod is " & Duration'Image (hyperperiod_length) & ")");
+--  	 end if;
+
+	 previous_release := previous_release + (hyperperiod_length / (id mod 5 + 1));
+
+--  	 if id = 4 then
+--  	    Print ("[PLAYER " & I2S (id) & "] RELEASE AFTER: " & Duration'Image (previous_release - t0) & " (hyperperiod is " & Duration'Image (hyperperiod_length) & ")");
+--  	 end if;
+
+--  	 delay until previous_release; -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+
+--  	 if t_end - t_start > 3.0 then
+--  	    raise Constraint_Error;
+--  	 end if;
+
       end loop;
 
    end Player;
