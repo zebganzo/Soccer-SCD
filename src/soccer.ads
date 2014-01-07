@@ -86,8 +86,17 @@ package Soccer is
 
    utility_constraint : Utility_Constraint_Type := 2;
 
-   num_of_players : Positive := 22;
-   total_players  : Positive := 22;
+   -- players
+   num_of_players     : Positive := 22;
+   total_players      : Positive := 22;
+   players_stats      : constant Positive := 7;
+   attack_index	      : constant Positive := 1;
+   defense_index      : constant Positive := 2;
+   power_index	      : constant Positive := 3;
+   precision_index    : constant Positive := 4;
+   speed_index	      : constant Positive := 5;
+   tackle_index	      : constant Positive := 6;
+   goal_keeping_index : constant Positive := 7;
 
    agent_movement_id : Integer := 0;
 

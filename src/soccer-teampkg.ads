@@ -27,7 +27,7 @@ package Soccer.TeamPkg is
       record
 	 id 	    : Team_Id;
 	 players    : Team_Players_List(1 .. total_players/2);
-         statistics : Team_Players_Statistics(1..total_players/2, 1..7);
+         statistics : Team_Players_Statistics(1..total_players/2, 1..players_stats);
          number_id  : Team_Number_Map(1..total_players/2);
 	 formation  : Formation_Scheme_Id;
       end record;
@@ -119,7 +119,7 @@ package Soccer.TeamPkg is
    procedure Update_Teams_Configuration (data : String);
 
 private
-   --+ contengono TUTTI i giocatori di una squadra, non solo quelli in campo
+   -- contengono TUTTI i giocatori di una squadra, non solo quelli in campo
    team_1 : Team_Ptr;
    team_2 : Team_Ptr;
 
