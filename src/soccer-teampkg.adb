@@ -611,98 +611,99 @@ package body Soccer.TeamPkg is
       one 	: JSON_Value := Get (json_team, "one");
       two 	: JSON_Value := Get (json_team, "two");
    begin
-      Put_Line ("Received data: " & data);
-
-      if To_String(Get (one, "team")) = "Team_One" then
-	 team_one_raw_players := Get (one, "players");
-	 team_two_raw_players := Get (two, "players");
-
-	 team_one_formation_string := Get (one, "formation");
-	 team_two_formation_string := Get (two, "formation");
-      else
-	 team_one_raw_players := Get (two, "players");
-	 team_two_raw_players := Get (one, "players");
-
-	 team_one_formation_string := Get (two, "formation");
-	 team_two_formation_string := Get (one, "formation");
-      end if;
-
-      for i in 1 .. total_players/2 loop
-         team_one_players(i) := Get( Get(team_one_raw_players, i), "number");
-         team_two_players(i) := Get( Get(team_two_raw_players, i), "number");
-         team_one_stats_id(i) := i;
-         team_two_stats_id(i) := i;
-         for stat in 1 .. players_stats loop
-            case stat is
-               when attack_index =>
-                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "attack");
-                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "attack");
-               when defense_index =>
-                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "defense");
-                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "defense");
-               when power_index =>
-                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "power");
-                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "power");
-               when precision_index =>
-                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "precision");
-                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "precision");
-               when speed_index =>
-                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "speed");
-                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "speed");
-               when tackle_index =>
-                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "tackle");
-                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "tackle");
-               when goal_keeping_index =>
-                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "goal_keeping");
-                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "goal_keeping");
-               when others => null;
-            end case;
-         end loop;
-
-         team_one_formation_id(i).number := team_one_players(i);
-         team_one_formation_id(i).statistics_id := team_one_stats_id(i);
-         if team_one_stats(i,goal_keeping_index) > 0 then
-            team_one_formation_id(i).formation_id := 1;
-         else
-            team_one_formation_id(i).formation_id := i;
-         end if;
-         team_two_formation_id(i).number := team_two_players(i);
-         team_two_formation_id(i).statistics_id := team_two_stats_id(i);
-         if team_two_stats(i,goal_keeping_index) > 0 then
-            team_two_formation_id(i).formation_id := 1;
-         else
-            team_two_formation_id(i).formation_id := i;
-         end if;
-      end loop;
-
-      if team_one_formation_string = "3-5-2" then
-	 team_one_formation := O_352;
-      elsif team_one_formation_string = "4-4-2" then
-	 team_one_formation := B_442;
-      else
-	 team_one_formation := D_532;
-      end if;
-
-      if team_two_formation_string = "3-5-2" then
-
-	 team_two_formation := O_352;
-      elsif team_two_formation_string = "4-4-2" then
-	 team_two_formation := B_442;
-      else
-	 team_two_formation := D_532;
-      end if;
-
-      team_1 := new Team'(id         => Team_One,
-                          players    => team_one_players,
-                          statistics => team_one_stats,
-                          number_id  => team_one_formation_id,
-                          formation  => team_one_formation);
-
-      team_2 := new Team'(id         => Team_Two,
-                          players    => team_two_players,
-                          statistics => team_two_stats,
-                          number_id  => team_two_formation_id,
-                          formation  => team_two_formation);
+--        Put_Line ("Received data: " & data);
+--
+--        if To_String(Get (one, "team")) = "Team_One" then
+--  	 team_one_raw_players := Get (one, "players");
+--  	 team_two_raw_players := Get (two, "players");
+--
+--  	 team_one_formation_string := Get (one, "formation");
+--  	 team_two_formation_string := Get (two, "formation");
+--        else
+--  	 team_one_raw_players := Get (two, "players");
+--  	 team_two_raw_players := Get (one, "players");
+--
+--  	 team_one_formation_string := Get (two, "formation");
+--  	 team_two_formation_string := Get (one, "formation");
+--        end if;
+--
+--        for i in 1 .. total_players/2 loop
+--           team_one_players(i) := Get( Get(team_one_raw_players, i), "number");
+--           team_two_players(i) := Get( Get(team_two_raw_players, i), "number");
+--           team_one_stats_id(i) := i;
+--           team_two_stats_id(i) := i;
+--           for stat in 1 .. players_stats loop
+--              case stat is
+--                 when attack_index =>
+--                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "attack");
+--                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "attack");
+--                 when defense_index =>
+--                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "defense");
+--                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "defense");
+--                 when power_index =>
+--                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "power");
+--                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "power");
+--                 when precision_index =>
+--                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "precision");
+--                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "precision");
+--                 when speed_index =>
+--                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "speed");
+--                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "speed");
+--                 when tackle_index =>
+--                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "tackle");
+--                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "tackle");
+--                 when goal_keeping_index =>
+--                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "goal_keeping");
+--                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "goal_keeping");
+--                 when others => null;
+--              end case;
+--           end loop;
+--
+--           team_one_formation_id(i).number := team_one_players(i);
+--           team_one_formation_id(i).statistics_id := team_one_stats_id(i);
+--           if team_one_stats(i,goal_keeping_index) > 0 then
+--              team_one_formation_id(i).formation_id := 1;
+--           else
+--              team_one_formation_id(i).formation_id := i;
+--           end if;
+--           team_two_formation_id(i).number := team_two_players(i);
+--           team_two_formation_id(i).statistics_id := team_two_stats_id(i);
+--           if team_two_stats(i,goal_keeping_index) > 0 then
+--              team_two_formation_id(i).formation_id := 1;
+--           else
+--              team_two_formation_id(i).formation_id := i;
+--           end if;
+--        end loop;
+--
+--        if team_one_formation_string = "3-5-2" then
+--  	 team_one_formation := O_352;
+--        elsif team_one_formation_string = "4-4-2" then
+--  	 team_one_formation := B_442;
+--        else
+--  	 team_one_formation := D_532;
+--        end if;
+--
+--        if team_two_formation_string = "3-5-2" then
+--
+--  	 team_two_formation := O_352;
+--        elsif team_two_formation_string = "4-4-2" then
+--  	 team_two_formation := B_442;
+--        else
+--  	 team_two_formation := D_532;
+--        end if;
+--
+--        team_1 := new Team'(id         => Team_One,
+--                            players    => team_one_players,
+--                            statistics => team_one_stats,
+--                            number_id  => team_one_formation_id,
+--                            formation  => team_one_formation);
+--
+--        team_2 := new Team'(id         => Team_Two,
+--                            players    => team_two_players,
+--                            statistics => team_two_stats,
+--                            number_id  => team_two_formation_id,
+--                            formation  => team_two_formation);
+      null;
    end Update_Teams_Configuration;
 
 end Soccer.TeamPkg;
