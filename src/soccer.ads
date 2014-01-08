@@ -72,11 +72,13 @@ package Soccer is
    send_buffer_delay : Integer := 500;
    t0 : Time := Clock;
 
-   number_of_zones : Integer := 4;
+   number_of_zones : Integer := 7;
 
-   ball_speed : Float := 0.7;
+   ball_speed : Float := 0.2;
    players_delay : Float := 0.2;
    print_delay : Float := 0.5;
+
+   hyperperiod_length : Duration;
 
    type Power_Range is range 0 .. 15;
 

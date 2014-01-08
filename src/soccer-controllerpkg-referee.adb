@@ -32,7 +32,11 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Soccer.Bridge.Output.Start_Timer;
-      Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
+
+      Set_Checkpoint_Time;
+      Refresh_Hyperperiod;
+
+--        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_1T;
 
    procedure Simulate_End_Of_1T is
@@ -56,6 +60,10 @@ package body Soccer.ControllerPkg.Referee is
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
       Ball.Set_Position (middle_field_coord);
       Soccer.Bridge.Output.Start_Timer;
+
+      Set_Checkpoint_Time;
+      Refresh_Hyperperiod;
+
 --        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_2T;
 
@@ -176,7 +184,8 @@ package body Soccer.ControllerPkg.Referee is
                      -- ha battuto, il gioco puo' partire
                      Set_Last_Game_Event (null);
                      Set_Game_Status (Game_Running);
-                     Print ("[PRE_CHECK] Inizio primo tempo!");
+		     Print ("[PRE_CHECK] Inizio primo tempo!");
+		     Put_Line ("[PRE_CHECK] Inizio primo tempo! --------------------------------------------------------- ");
 		     -- faccio partire i timer del primo tempo
 		     -- (tempo partita e buffer eventi)
 		     Game_Timer_Second_Half.Start; ----------------------------------------------------------- DIOPOROCOCOOCOCOOCOC

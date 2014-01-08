@@ -89,6 +89,9 @@ package body Soccer.Game is
       procedure Set_Paused is
       begin
 	 paused := not paused;
+	 if not paused then
+	    ControllerPkg.Set_Checkpoint_Time;
+	 end if;
       end Set_Paused;
 
       function Is_Paused return Boolean is

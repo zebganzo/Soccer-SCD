@@ -4,7 +4,7 @@ with Soccer.Generic_Timers;
 package Soccer.Bridge.Output is
 
    --+-------------
-   debug : Boolean := True;
+   debug : Boolean := False;
    --+-------------
 
    pragma Suppress (Elaboration_Check);

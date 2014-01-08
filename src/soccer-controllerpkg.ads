@@ -56,6 +56,7 @@ package Soccer.ControllerPkg is
          holder_team : Team_Id;
 	 last_ball_holder_id : Integer;
 	 must_exit : Boolean;
+	 last_checkpoint : Time;
       end record;
    type Generic_Status_Ptr is access Generic_Status;
 
@@ -106,6 +107,10 @@ package Soccer.ControllerPkg is
    -- Returns the player number from id
    function Get_Number_From_Id (id : in Integer) return Integer;
 
+   procedure Set_Checkpoint_Time;
+
+   procedure Refresh_Hyperperiod;
+
 --     task Field_Printer;
 
    procedure Print_Status;
@@ -145,5 +150,7 @@ private
    initialized : Boolean;
 
    first_time : Boolean;
+
+   checkpoint_time : Time;
 
 end Soccer.ControllerPkg;
