@@ -61,7 +61,10 @@ package body Soccer.Motion_AgentPkg is
 	    starting_coord : Coordinate;
 	    new_event : Motion_Event_Ptr;
 	 begin
-	    while start and actual_power > 0 and Ball.Get_Controlled = False loop
+	    while start
+	      and actual_power > 0
+	      and Ball.Get_Controlled = False
+	      and not Compare_Coordinates (Ball.Get_Position, real_target) loop
 
 	       t_ma_start := Clock;
 

@@ -63,7 +63,7 @@ package body Soccer.Server.Callbacks is
 	 Game_Entity.Notify;
       elsif URI = "/field/secondHalf" then
 	 -- continue with second half
-	 Soccer.ControllerPkg.Referee.Simulate_Begin_Of_2T;
+	 ControllerPkg.Referee.Simulate_Begin_Of_2T;
 	 Game_Entity.Notify;
       elsif URI = "/field/pauseGame" then
 	 -- pause the current game

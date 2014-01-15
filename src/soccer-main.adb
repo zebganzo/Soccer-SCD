@@ -24,6 +24,14 @@ with GNATCOLL; use GNATCOLL;
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 with Ada.Calendar.Formatting;
 with Ada.Unchecked_Conversion;
+with GNAT.OS_Lib; use GNAT.OS_Lib;
+
+with Util.Processes;
+with Util.Streams.Pipes;
+with Util.Streams.Buffered;
+
+with GNAT.String_Split; use GNAT.String_Split;
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 
 procedure Soccer.Main is
 
@@ -135,87 +143,70 @@ begin
 
       --        char : Character;
 
+--        command : Unbounded_String;
+--        arguments : Argument_List_Access;
+--        exit_status : Integer;
+--        Standard_Output : constant File_Descriptor := -1;
+
+--        status_string : Unbounded_String := To_Unbounded_String ("player(position(8,17),has_not,team1,not_last_holder),player_number(7),starting_position(1,17),defense_position(1,17),attack_position(8,17),ball(position(21,17),team1),game(running),goal_position(position(51,15),position(51,19)),radius(8)");
+
+--        BufferSize : constant := 5;
+--        Retval     : Unbounded_String := Null_Unbounded_String;
+--        Item       : String (1 .. BufferSize);
+--        Last       : Natural;
+
+--        Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
+--        Buffer  : Util.Streams.Buffered.Buffered_Stream;
+--
+--        Content : Unbounded_String;
+--
+--        Subs : Slice_Set;
+--        Seps : constant String := "" & Comma;
+--
+--        t_start : Time;
+--        t_end : Time;
    begin
 
---        declare
---        begin
-	 Soccer.Server.WebServer.Start;
---        exception
---  	 when
---  	      Constraint_Error => Put_Line ("DIOBOIA!");
---  	    when others => Put_Line ("DIOCANE!");
---        end;
+      Server.WebServer.Start;
 
---        declare
---  	 obj : JSON_Value := Create_Object;
---  	 arr_1 : JSON_Array := Empty_Array;
---  	 arr_2 : JSON_Array := Empty_Array;
---        begin
---           Append (arr_1, Create(arr_2));
---        end;
-
---        while True loop
---  	 delay 10.0;
-
-
---        end loop;
-
---        loop
-
---  	 null;
---  	 Soccer.Server.WebServer.PublishTestUpdate;
---  	 delay 1.0;
-
---  	 delay 10.0;
---  	 Referee.Simulate_Begin_Of_1T;
---  	 Game_Entity.Notify;
-
---  	 Get (Item => char);
+--        t_start := Clock;
 --
---  	 if char = 'p' then
---  	    -- metti in pausa il gioco
---  	    if Get_Game_Status = Game_Paused then
---  	       Set_Game_Status (Game_Blocked);
---  	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
---  	    else
---  	       Set_Game_Status (Game_Paused);
---  	       pragma Debug (Put_Line ("[MAIN] New status is " & Game_State'Image (Get_Game_Status)));
---  	    end if;
---  	 elsif char = 'n' then
---  	    -- chiama notify
---  	    Set_Game_Status (Game_Paused);
---  	    Game_Entity.Notify;
---  	 elsif char = 'b' then
---  	    pragma Debug (Put_Line ("[MAIN] Simulating begin of 1st half"));
---  	    Referee.Simulate_Begin_Of_1T;
---  	    Game_Entity.Notify;
---  	 elsif char = '1' then
---  	    pragma Debug (Put_Line ("[MAIN] Simulating end of 1st half"));
---  	    Referee.Simulate_End_Of_1T;
---  	 elsif char = '2' then
---  	    pragma Debug (Put_Line ("[MAIN] Simulating start of 2nd half"));
---  	    Referee.Simulate_Begin_Of_2T;
---  	    Game_Entity.Notify;
---  	 elsif char = 'e' then
---  	    pragma Debug (Put_Line ("[MAIN] Simulating end of 2nd half"));
---  	    Referee.Simulate_End_Of_Match;
---  	 elsif char = 's' then
---  	    pragma Debug (Put_Line ("[MAIN] Substitution"));
---  	    Referee.Simulate_Substitution;
---  	 elsif char = 't' then
---  	    pragma Debug (Put_Line ("[MAIN] Sending test message"));
---  	    Soccer.Server.WebServer.PublishTestUpdate;
---  	 end if;
+--        Buffer.Initialize (null, Pipe'Unchecked_Access, 1024);
+--        Pipe.Open ("./launch_player.sh " & To_String(status_string), Util.Processes.READ);
 --
+--        Buffer.Read (Content);
+--        Pipe.Close;
 --
+--        t_end := Clock;
+--
+--        Put_Line ("Elapsed: " & Duration'Image (t_end - t_start));
+--
+--        Create (S          => Subs,
+--  	      From       => To_String (Content),
+--  	      Separators => Seps,
+--  	      Mode       => Multiple);
+--
+--        Put_Line ("Got" & Slice_Number'Image (Slice_Count (Subs)) & " substrings:");
+--        --  Report results, starting with the count of substrings created.
+--
+--        for I in 1 .. Slice_Count (Subs) loop
+--  	 --  Loop though the substrings.
+--  	 declare
+--  	    Sub : constant String := Slice (Subs, I);
+--  	    --  Pull the next substring out into a string object for easy handling.
+--  	 begin
+--  	    Put_Line (Slice_Number'Image (I) &
+--  		 " -> " &
+--  		 Sub &
+--  		 " (length" & Positive'Image (Sub'Length) &
+--  		 ")");
+--  	    --  Output the individual substrings, and their length.
+--
+--  	 end;
 --        end loop;
 
 
    end;
-
-
---     delay 10.0;
---     Soccer.Server.WebServer.PublishFieldUpdate;
 
 end Soccer.Main;
 

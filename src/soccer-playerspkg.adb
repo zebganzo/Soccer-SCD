@@ -2,8 +2,13 @@ with Ada.Directories; use Ada.Directories;
 with Soccer.Manager_Event.Substitution; use Soccer.Manager_Event.Substitution;
 with Ada.Containers.Vectors; use Ada.Containers;
 with GNATCOLL.JSON; use GNATCOLL.JSON;
-with Ada.Characters;
-with Ada.Characters.Latin_1;
+
+with Util.Processes;
+with Util.Streams.Pipes;
+with Util.Streams.Buffered;
+
+with GNAT.String_Split; use GNAT.String_Split;
+with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 
 package body Soccer.PlayersPkg is
 
@@ -457,14 +462,43 @@ package body Soccer.PlayersPkg is
 
       -- Variables needed to launch the Prolog engine
       command : Unbounded_String;
-      arguments : Argument_List_Access;
-      exit_status : Integer;
+--        arguments : Argument_List_Access;
+--        exit_status : Integer;
       file : File_Type;
-      count : Integer;
+--        count : Integer;
 
       status_string : Unbounded_String;
 
+--        Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
+--        Buffer  : Util.Streams.Buffered.Buffered_Stream;
+
+--        Content : Unbounded_String;
+
+      Subs : Slice_Set;
+      Seps : constant String := "" & Comma;
+
+      -- Time measuring variables
+      t_start : Time;
+      t_end : Time;
+
+      t_ai_start : Time;
+      t_ai_end : Time;
+
+      t_controller_start : Time;
+      t_controller_end : Time;
+
+--        t_prolog_start : Time;
+--        t_prolog_end : Time;
+
+--        t_decision_start : Time;
+--        t_decision_end : Time;
+
+      previous_checkpoint : Time;
+      previous_release : Time;
+
    begin
+
+      previous_checkpoint := Clock;
 
 --        Set_Directory (ai_basedir);
 
@@ -474,15 +508,33 @@ package body Soccer.PlayersPkg is
       Game_Entity.Start_1T;
 
       -- chiedo il mio ID al controllore
-      Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
+--        Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
 
       loop
-	 Print ("[PLAYER_" & I2S (id) & "] Leggo Generic Status");
+
+	 t_start := Clock;
+
+--  	 Print ("[PLAYER_" & I2S (id) & "] Leggo Generic Status");
 	 current_generic_status := ControllerPkg.Get_Generic_Status(id => id);
      --    Print ("[PLAYER_" & I2S (id) & "] MAGLIA: " & I2S(current_generic_status.number) &
      --     " TEAM: " & Team_Id'Image(current_generic_status.team));
+
+	 if previous_checkpoint /= current_generic_status.last_checkpoint then
+	    previous_checkpoint := current_generic_status.last_checkpoint;
+	    previous_release := current_generic_status.last_checkpoint;
+--  	    if id = 4 then
+--  	       Print ("[PLAYER_" & I2S (id) & "] Nuovo checkpoint: " & Duration'Image (previous_checkpoint - t0));
+--  	    end if;
+	 end if;
+
+
 	 current_coord := current_generic_status.coord;
 	 current_game_status := current_generic_status.game_status;
+
+	 if current_generic_status.must_exit then
+	    ControllerPkg.Controller.Must_Exit;
+	    exit;
+	 end if;
 
          -- Json file name : STATUS<PlayerID>
          output_name := To_Unbounded_String("STATUS") & I2S(id);
@@ -821,53 +873,47 @@ package body Soccer.PlayersPkg is
 --           Put_Line(To_String(status_string));
 --           Close (output);
 
+	 t_ai_start := Clock;
+
          if goalkeeper then
-            command := To_Unbounded_String("./launch_keeper.sh " & To_String(status_string) & " " & I2S(id));
+            command := To_Unbounded_String("./launch_keeper.sh " & To_String(status_string));
          else
-            command := To_Unbounded_String("./launch_player.sh " & To_String(status_string) & " " & I2S(id));
+            command := To_Unbounded_String("./launch_player.sh " & To_String(status_string));
          end if;
---           Put_Line(To_String(command));
---           if goalkeeper then
---              command := To_Unbounded_String("./exe_keeper " & To_String(status_string) & " > DECISION" & I2S(id));
---           else
---              command := To_Unbounded_String("./exe_player " & To_String(status_string) & " > DECISION" & I2S(id));
---           end if;
 
-         -- Load Prolog engine and read output file
-         arguments := Argument_String_To_List (To_String(command));
-         exit_status := Spawn (Program_Name => arguments(arguments'First).all,
-                               Args         => arguments(arguments'First + 1 .. arguments'Last));
+	 declare
+	    Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
+	    Buffer  : Util.Streams.Buffered.Buffered_Stream;
 
-         --  Free memory
-         Free (arguments);
+	    Content : Unbounded_String;
+	 begin
+	    Buffer.Initialize (null, Pipe'Unchecked_Access, 1024);
+	    Pipe.Open (To_String (command), Util.Processes.READ);
 
---           Put_Line("PLAYER" & I2S(id) & "***************");
-         Open (File => file,
-               Mode => In_File,
-               Name => "DECISION" & I2S(id));
+	    Buffer.Read (Content);
+	    Pipe.Close;
 
-         count := 0;
-         while not End_Of_File (file) loop
-            declare
-               line  : String := Get_Line (file);
-            begin
---                 Put_Line("DECISION" & I2S(id) & ": " & line & "****************");
-               if count = 0 then
-                  decision_x := Integer'Value(line);
-                  count := count + 1;
---                    Put_Line("DECISION" & I2S(id) & ": decision_x : " & I2S(decision_x) & "****************");
-               elsif count = 1 then
-                  decision_y := Integer'Value(line);
-                  count := count + 1;
---                    Put_Line("DECISION" & I2S(id) & ": decision_y : " & I2S(decision_y) & "****************");
-               else
-                  decision := To_Unbounded_String(line);
---                    Put_Line("DECISION" & I2S(id) & ": decision : " & To_String(decision) & "****************");
-               end if;
-            end;
-         end loop;
+	    Create (S   => Subs,
+	     From       => To_String (Content),
+	     Separators => Seps,
+	     Mode       => Multiple);
 
-         Close (file);
+	    for I in 1 .. Slice_Count (Subs) loop
+	       declare
+		  Sub : constant String := Slice (Subs, I);
+	       begin
+		  if I = 1 then
+		     decision_x := Integer'Value (Sub);
+		  elsif I = 2 then
+		     decision_y := Integer'Value (Sub);
+		  else
+		     decision := To_Unbounded_String (Sub);
+		  end if;
+	       end;
+	    end loop;
+	 end;
+
+	 t_ai_end := Clock;
 
          if decision_x = 1000 then
             decision_x := id;
@@ -1000,7 +1046,7 @@ package body Soccer.PlayersPkg is
                else
                   current_action.utility := Get_Move_Utility(current_coord, Coordinate'(ball_x,ball_y));
                end if;
-               --                 Print ("[PLAYER_" & I2S (id) & " UTILITY: " & I2S(current_action.utility));
+
                if current_coord.coord_x = decision_x and
                  current_coord.coord_y = decision_y then
                   do_nothing := True;
@@ -1016,7 +1062,6 @@ package body Soccer.PlayersPkg is
 
                            -- aspetto l'inizio del secondo tempo
                            Game_Entity.Rest;
-                           delay duration (id / 5); -- TODO:: change delay!
                            Game_Entity.Start_2T;
                         end if;
                      elsif Get_Match_Event_Id(m_event) = End_Of_Match then
@@ -1030,17 +1075,9 @@ package body Soccer.PlayersPkg is
             end;
          end if;
 
---           Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
---                    ") ] Starting coord: " & Print_Coord (current_coord));
-
---           Print ("[PLAYER_" & I2S (id) & " (" & I2S (player_number) &
---                    ") ] Target coord: " & Print_Coord (Coordinate'(decision_x, decision_y)) &
---                 "Decision: " & Ada.Strings.Unbounded.To_String(decision));
+	 t_controller_start := Clock;
 
 	 if current_action.event /= null and not do_nothing then
---  	    Put_Line ("[PLAYER_" & I2S (id) & "] Chiamo la Start");
---  	    Game_Entity.Start;
---  	    Print ("[PLAYER_" & I2S (id) & "] Chiamo la Write");
             ControllerPkg.Controller.Write(current_action);
 
 	    if subbed and player_position.coord_x = 26 and player_position.coord_y = 0 then
@@ -1051,10 +1088,37 @@ package body Soccer.PlayersPkg is
             end if;
          end if;
 
+	 t_controller_end := Clock;
+
          current_action.event := null;
          do_nothing := False;
-         status_string := Null_Unbounded_String;
-	 delay duration (players_delay); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+	 status_string := Null_Unbounded_String;
+
+	 t_end := Clock;
+
+--  	 Print ("[PLAYER " & I2S (id) & "] TOTAL TIME: " & Duration'Image (t_end - t_start));
+--  	 Print ("[PLAYER " & I2S (id) & "] AI TIME: " & Duration'Image (t_ai_end - t_ai_start));
+--  	 Print ("[PLAYER " & I2S (id) & "] PROLOG TIME: " & Duration'Image (t_prolog_end - t_prolog_start));
+--  	 Print ("[PLAYER " & I2S (id) & "] DECISION TIME: " & Duration'Image (t_decision_end - t_decision_start));
+--  	 Print ("[PLAYER " & I2S (id) & "] CONTROLLER TIME: " & Duration'Image (t_controller_end - t_controller_start));
+
+	 --  	 if id = 4 then
+--  	    Print ("[PLAYER " & I2S (id) & "] RELEASE BEFORE: " & Duration'Image (previous_release - t0) & " (hyperperiod is " & Duration'Image (hyperperiod_length) & ")");
+--  	 end if;
+
+	 previous_release := previous_release + (hyperperiod_length / (id mod 5 + 1));
+
+--  	 if id = 4 then
+--  	    Print ("[PLAYER " & I2S (id) & "] RELEASE AFTER: " & Duration'Image (previous_release - t0) & " (hyperperiod is " & Duration'Image (hyperperiod_length) & ")");
+--  	 end if;
+
+--  	 delay until previous_release; -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+
+--  	 if t_end - t_start > 3.0 then
+--  	    raise Constraint_Error;
+--  	 end if;
+
+--  	 delay duration (players_delay); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
       end loop;
 
    end Player;

@@ -99,7 +99,11 @@ package body Soccer.Bridge.Output is
          manager_events : JSON_Array;
       begin
 
-	 Reset_Timer;
+	 if is_first_half then
+	    Reset_Timer_First_Half;
+	 else
+	    Reset_Timer_Second_Half;
+	 end if;
 
 	 if size > 0 then
 	    for event in 1 .. size loop
@@ -133,21 +137,40 @@ package body Soccer.Bridge.Output is
 	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
 	 end if;
 
-	 Start_Timer;
+	 if is_first_half then
+	    Start_Timer_First_Half;
+	 else
+	    Start_Timer_Second_Half;
+	 end if;
 
       end Send;
 
    end Buffer_Wrapper;
 
-   procedure Start_Timer is
+   procedure Start_Timer_First_Half is
    begin
-      Buffer_Timer.Start;
-   end Start_Timer;
+      Buffer_Timer_First_Half.Start;
+   end Start_Timer_First_Half;
 
-   procedure Reset_Timer is
+   procedure Reset_Timer_First_Half is
    begin
-      Buffer_Timer.Cancel;
-   end Reset_Timer;
+      Buffer_Timer_First_Half.Cancel;
+   end Reset_Timer_First_Half;
+
+      procedure Start_Timer_Second_Half is
+   begin
+      Buffer_Timer_Second_Half.Start;
+   end Start_Timer_Second_Half;
+
+   procedure Reset_Timer_Second_Half is
+   begin
+      Buffer_Timer_Second_Half.Cancel;
+   end Reset_Timer_Second_Half;
+
+   procedure Set_Is_First_Half (first_half : Boolean) is
+   begin
+      is_first_half := first_half;
+   end Set_Is_First_Half;
 
    procedure Print (input : String) is
    begin

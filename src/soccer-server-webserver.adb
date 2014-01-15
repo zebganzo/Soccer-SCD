@@ -16,7 +16,6 @@ package body Soccer.Server.WebServer is
 		       Config     => Web_Config,
 		       Callback   => Soccer.Server.Callbacks.Services'Unrestricted_Access);
 
-
       Net.WebSocket.Registry.Control.Start;
 
       Net.WebSocket.Registry.Register ("/managerVisitors/registerForStatistics", Soccer.Server.WebSockets.Create'Access);

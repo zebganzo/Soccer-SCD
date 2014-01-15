@@ -96,6 +96,8 @@ package Soccer.ControllerPkg is
 
    function Get_Player_Position (id : Integer) return Coordinate;
 
+   procedure Set_Ball_Holder_Id (id : Integer);
+
    function Read_Status (x : in Integer; y : in Integer; r : in Integer) return Read_Result;
 
    -- Returns the player's team, given the player's id

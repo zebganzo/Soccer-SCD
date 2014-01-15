@@ -118,6 +118,11 @@ package body Soccer.ControllerPkg is
       return current_status (id).on_the_field;
    end Is_On_The_Field;
 
+   procedure Set_Ball_Holder_Id (id : Integer) is
+   begin
+      ball_holder_id := id;
+   end Set_Ball_Holder_Id;
+
    procedure Reset_Game is
    begin
       init_players_count := 1;
@@ -414,13 +419,13 @@ package body Soccer.ControllerPkg is
       Put_Line("");
    end Print_Field;
 
-   --     task body Field_Printer is
-   --     begin
-   --        loop
-   --           Print_Field;
-   --           delay duration (print_delay);
-   --        end loop;
-   --     end Field_Printer;
+--     task body Field_Printer is
+--     begin
+--        loop
+--  	 Print_Field;
+--  	 delay duration (print_delay);
+--        end loop;
+--     end Field_Printer;
 
    --     procedure Set_Paused is
    --     begin
@@ -447,6 +452,12 @@ package body Soccer.ControllerPkg is
    procedure Set_Must_Exit is
    begin
       must_exit := True;
+      if last_game_event.all in Match_Event'Class then
+	 if Get_Match_Event_Id (Match_Event_Ptr (last_game_event)) = End_Of_First_Half or
+	   Get_Match_Event_Id (Match_Event_Ptr (last_game_event)) = End_Of_Match then
+	    Exit_Program (E_Success);
+	 end if;
+      end if;
    end Set_Must_Exit;
 
    function Get_Player_Position (id : Integer) return Coordinate is
@@ -943,7 +954,7 @@ package body Soccer.ControllerPkg is
 			      Referee.Post_Check;
 			      t_check_end := Clock;
 
-			      Put_Line ("[REFEREE-REVALUATE] " & Duration'Image (t_check_end - t_check_start));
+--  			      Put_Line ("[REFEREE-REVALUATE] " & Duration'Image (t_check_end - t_check_start));
 			   end;
 
 			end;
@@ -957,13 +968,13 @@ package body Soccer.ControllerPkg is
 			Referee.Post_Check;
 			t_check_end := Clock;
 
-			Put_Line ("[REFEREE] " & Duration'Image (t_check_end - t_check_start));
+--  			Put_Line ("[REFEREE] " & Duration'Image (t_check_end - t_check_start));
 		     end;
 
 		  end if;
 
 		  t_write_end := Clock;
-		  Put_Line ("[WRITE] " & Duration'Image (t_write_end - t_write_start));
+--  		  Put_Line ("[WRITE] " & Duration'Image (t_write_end - t_write_start));
 
 	       end Write;
 	 or

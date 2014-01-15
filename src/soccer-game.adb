@@ -45,6 +45,7 @@ package body Soccer.Game is
       entry Start_2T when Start_2T'Count = num_of_players or open_2T is
       begin
 	 open_2T := True;
+	 Set_Game_Status (Game_Blocked);
 	 -- manca sincronizzazione dei giocatori
       end Start_2T;
 

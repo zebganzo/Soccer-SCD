@@ -1,5 +1,6 @@
 with "gnatcoll";
 with "aws";
+with "util";
 
 project Scd is
 
