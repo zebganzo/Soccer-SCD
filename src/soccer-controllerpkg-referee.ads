@@ -61,7 +61,7 @@ private
    -- Timer
    half_time_span : constant Time_Span := Seconds (half_game_duration);
    id : constant String := "[TIMER] Half game timer";
-   package Game_Timer_First_Half is new Generic_Timers (True, id, half_time_span, End_Of_First_Half);
-   package Game_Timer_Second_Half is new Generic_Timers (True, id, half_time_span, End_Of_Second_Half);
+   package Game_Timer_First_Half is new Generic_Timers (True, id, half_time_span, Simulate_End_Of_1T);
+   package Game_Timer_Second_Half is new Generic_Timers (True, id, half_time_span, Simulate_End_Of_Match);
 
 end Soccer.ControllerPkg.Referee;

@@ -31,12 +31,13 @@ package body Soccer.ControllerPkg.Referee is
 			    Get_Nearest_Player(Ball.Get_Position, Team_One));
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
-      Soccer.Bridge.Output.Start_Timer;
+
+      Soccer.Bridge.Output.Set_Is_First_Half (True);
+      Soccer.Bridge.Output.Start_Timer_First_Half;
 
       Set_Checkpoint_Time;
       Refresh_Hyperperiod;
 
---        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_1T;
 
    procedure Simulate_End_Of_1T is
@@ -46,25 +47,28 @@ package body Soccer.ControllerPkg.Referee is
       new_event.Initialize (End_Of_First_Half, 0);
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
-      Soccer.Bridge.Output.Reset_Timer;
+      Soccer.Bridge.Output.Reset_Timer_First_Half;
+
       Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_1T;
 
    procedure Simulate_Begin_Of_2T is
       new_event : Match_Event_Ptr;
    begin
+      Ball.Set_Position (middle_field_coord);
+
       new_event := new Match_Event;
       new_event.Initialize (Begin_Of_Second_Half,
 			    Get_Nearest_Player (Ball.Get_Position, Team_One));
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
-      Ball.Set_Position (middle_field_coord);
-      Soccer.Bridge.Output.Start_Timer;
+
+      Soccer.Bridge.Output.Set_Is_First_Half (False);
+      Soccer.Bridge.Output.Start_Timer_Second_Half;
 
       Set_Checkpoint_Time;
       Refresh_Hyperperiod;
 
---        Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_Begin_Of_2T;
 
    procedure Simulate_End_Of_Match is
@@ -74,7 +78,7 @@ package body Soccer.ControllerPkg.Referee is
       new_event.Initialize (End_Of_Match, 0);
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
-      Soccer.Bridge.Output.Reset_Timer;
+      Soccer.Bridge.Output.Reset_Timer_Second_Half;
       Buffer_Wrapper.Put (Core_Event.Event_Ptr (new_event));
    end Simulate_End_Of_Match;
 
@@ -188,7 +192,7 @@ package body Soccer.ControllerPkg.Referee is
 		     Put_Line ("[PRE_CHECK] Inizio primo tempo! --------------------------------------------------------- ");
 		     -- faccio partire i timer del primo tempo
 		     -- (tempo partita e buffer eventi)
-		     Game_Timer_Second_Half.Start; ----------------------------------------------------------- DIOPOROCOCOOCOCOOCOC
+		     Game_Timer_First_Half.Start; ----------------------------------------------------------- DIOPOROCOCOOCOCOOCOC
 		     -- mando l'evento alla distribuzione
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr(e));
@@ -241,7 +245,6 @@ package body Soccer.ControllerPkg.Referee is
          elsif Get_Match_Event_Id (current_match_status) = End_Of_First_Half then
 	    --
 	    null;
---              Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
          elsif Get_Match_Event_Id (current_match_status) = Begin_Of_Second_Half then
             -- controllo se il gioco puo' partire
             Print ("[PRE_CHECK] Controllo se il gioco puo' ripartire");
@@ -255,10 +258,10 @@ package body Soccer.ControllerPkg.Referee is
 		     -- faccio partire i timer del secondo tempo
 		     -- (tempo partita e buffer eventi)
 		     Game_Timer_Second_Half.Start;
-		     Soccer.Bridge.Output.Start_Timer;
 		     -- mando l'evento alla distribuzione
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+
                      return; -- TODO:: controlla se serve!
                   end if;
                end if;
@@ -308,8 +311,7 @@ package body Soccer.ControllerPkg.Referee is
 	 else
 	    -- fine gioco
 	    null;
---  	    Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
-         end if;
+	 end if;
          -- controllo il game event (dovrebbe essere settato)
       elsif current_game_status /= null then
          -- inizializzo i valori
