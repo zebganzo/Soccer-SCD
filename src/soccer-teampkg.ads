@@ -118,6 +118,8 @@ package Soccer.TeamPkg is
 
    procedure Update_Teams_Configuration (data : String);
 
+   procedure Manager_Updates (updates : String);
+
 private
    -- contengono TUTTI i giocatori di una squadra, non solo quelli in campo
    team_1 : Team_Ptr;

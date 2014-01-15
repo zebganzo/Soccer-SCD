@@ -40,6 +40,13 @@ package body Soccer.Server.Callbacks is
       elsif URI = "/manager/substitutePlayer" then
 	 -- substitute player (id_out, id_in)
          null;
+      elsif URI = "/manager/updates" then
+         declare
+            updates : String := AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "data"));
+         begin
+            Put_Line(updates);
+            TeamPkg.Manager_Updates (updates);
+         end;
       elsif URI = "/manager/getStats" then
          declare
             t_manager : String := AWS.Parameters.Get(PARAMS,"team");
@@ -63,10 +70,9 @@ package body Soccer.Server.Callbacks is
 	 Game_Entity.Set_Paused;
 	 Game_Entity.Notify;
 	 ControllerPkg.Controller.Notify;
-
 	 return AWS.Response.Build (MIME.Text_Plain, Get_Game_Status);
       elsif URI = "/field/setTeamsConf" then
-	 TeamPkg.Update_Teams_Configuration (AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "conf")));
+         TeamPkg.Update_Teams_Configuration (AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "conf")));
       elsif URI = "/field/getParams" then
 	 -- send players' params
 	 return AWS.Response.Build (MIME.Text_Plain, Get_Params);
