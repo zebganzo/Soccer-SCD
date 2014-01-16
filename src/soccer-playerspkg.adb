@@ -1067,7 +1067,10 @@ package body Soccer.PlayersPkg is
                      elsif Get_Match_Event_Id(m_event) = End_Of_Match then
                         if current_coord = Coordinate'(id, 0) then
                            current_action.event := null;
-                           Game_Entity.End_Match;
+			   Game_Entity.End_Match;
+			   Controller.Get_Id (id);
+			   Game_Entity.Rest;
+			   Game_Entity.Start_1T;
                         end if;
                      end if;
                   end if;
