@@ -19,9 +19,11 @@ go :-
     %writeln(ArgList),
     split(ArgList),
     action(X,Y,D),
-    writeln(X),
-    writeln(Y),
-    writeln(D).
+	write(X),
+	write(,),
+	write(Y),
+	write(,),
+	write(D).
 %   sub_atom(File, 6, _, 0, N), 
 %   string_concat('DECISION', N, Output),
 %   open(Output, write, OS),
