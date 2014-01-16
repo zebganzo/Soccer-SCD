@@ -1070,7 +1070,9 @@ package body Soccer.PlayersPkg is
 			   Game_Entity.End_Match;
 			   Controller.Get_Id (id);
 			   Game_Entity.Rest;
-			   Game_Entity.Start_1T;
+                           Game_Entity.Start_1T;
+                            -- chiedo il mio ID al controllore
+                           Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
                         end if;
                      end if;
                   end if;

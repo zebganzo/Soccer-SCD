@@ -707,47 +707,47 @@ package body Soccer.TeamPkg is
       null;
    end Update_Teams_Configuration;
 
-   procedure Manager_Updates (updates : String) is
-      json_update : JSON_Value := Read (updates,"");
-      json_team	  : JSON_Value := Get (json_update, "TEAM");
-      team_name   : Unbounded_String := Get (json_team, "name");
-      formation   : Unbounded_String := Get (json_team, "formation");
-   begin
-      if To_String (team_name) = "TEAM_ONE" then
-         if Formation_Scheme_Id'Image (team_1.formation) /= To_String (formation) then
-            Set_Formation (team_1, Formation_Scheme_Id'Value (To_String (formation)));
-         end if;
-
-         if Has_Field (json_team, "substitution") then
-            declare
-               new_event   : Substitution_Event_Ptr;
-               sub_players : JSON_Array := Get (json_team, "substitution");
-               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
-               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
-            begin
-               new_event := new Substitution_Event;
-               Initialize (new_event, Team_One, out_player, in_player);
---                 manager_events.Append (Manager_Event.Event_Ptr (new_event));
-            end;
-         end if;
-      else
-         if Formation_Scheme_Id'Image (team_2.formation) /= To_String (formation) then
-            Set_Formation (team_2, Formation_Scheme_Id'Value (To_String (formation)));
-         end if;
-
-         if Has_Field (json_team, "substitution") then
-            declare
-               new_event   : Substitution_Event_Ptr;
-               sub_players : JSON_Array := Get (json_team, "substitution");
-               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
-               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
-            begin
-               new_event := new Substitution_Event;
-               Initialize (new_event, Team_Two, out_player, in_player);
---                 manager_events.Append (Manager_Event.Event_Ptr (new_event));
-            end;
-         end if;
-      end if;
-   end;
+--     procedure Manager_Updates (updates : String) is
+--        json_update : JSON_Value := Read (updates,"");
+--        json_team	  : JSON_Value := Get (json_update, "TEAM");
+--        team_name   : Unbounded_String := Get (json_team, "name");
+--        formation   : Unbounded_String := Get (json_team, "formation");
+--     begin
+--        if To_String (team_name) = "TEAM_ONE" then
+--           if Formation_Scheme_Id'Image (team_1.formation) /= To_String (formation) then
+--              Set_Formation (team_1, Formation_Scheme_Id'Value (To_String (formation)));
+--           end if;
+--
+--           if Has_Field (json_team, "substitution") then
+--              declare
+--                 new_event   : Substitution_Event_Ptr;
+--                 sub_players : JSON_Array := Get (json_team, "substitution");
+--                 in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
+--                 out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
+--              begin
+--                 new_event := new Substitution_Event;
+--                 Initialize (new_event, Team_One, out_player, in_player);
+--  --                 manager_events.Append (Manager_Event.Event_Ptr (new_event));
+--              end;
+--           end if;
+--        else
+--           if Formation_Scheme_Id'Image (team_2.formation) /= To_String (formation) then
+--              Set_Formation (team_2, Formation_Scheme_Id'Value (To_String (formation)));
+--           end if;
+--
+--           if Has_Field (json_team, "substitution") then
+--              declare
+--                 new_event   : Substitution_Event_Ptr;
+--                 sub_players : JSON_Array := Get (json_team, "substitution");
+--                 in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
+--                 out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
+--              begin
+--                 new_event := new Substitution_Event;
+--                 Initialize (new_event, Team_Two, out_player, in_player);
+--  --                 manager_events.Append (Manager_Event.Event_Ptr (new_event));
+--              end;
+--           end if;
+--        end if;
+--     end;
 
 end Soccer.TeamPkg;

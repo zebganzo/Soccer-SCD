@@ -45,7 +45,7 @@ package body Soccer.Server.Callbacks is
             updates : String := AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "data"));
          begin
             Put_Line(updates);
-            TeamPkg.Manager_Updates (updates);
+            Apply_Manager_Updates (updates);
          end;
       elsif URI = "/manager/getStats" then
          declare
@@ -92,6 +92,37 @@ package body Soccer.Server.Callbacks is
       return AWS.Response.Build (MIME.Text_HTML, "Hello WebServer!");
 
    end Services;
+
+   procedure Apply_Manager_Updates (updates : String) is
+      json_update : JSON_Value := Read (updates,"");
+      json_team	  : JSON_Value := Get (json_update, "TEAM");
+      team_name   : Unbounded_String := Get (json_team, "name");
+      formation   : Unbounded_String := Get (json_team, "formation");
+   begin
+      if To_String (team_name) = "TEAM_ONE" then
+         TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_One), Formation_Scheme_Id'Value (To_String (formation)));
+         if Has_Field (json_team, "substitution") then
+            declare
+               sub_players : JSON_Array := Get (json_team, "substitution");
+               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
+               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
+            begin
+               Queue_Substitution (Team_One, out_player, in_player);
+            end;
+         end if;
+      else
+         TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_Two), Formation_Scheme_Id'Value (To_String (formation)));
+         if Has_Field (json_team, "substitution") then
+            declare
+               sub_players : JSON_Array := Get (json_team, "substitution");
+               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
+               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
+            begin
+               Queue_Substitution (Team_One, out_player, in_player);
+            end;
+         end if;
+      end if;
+   end;
 
    function Get_Params return String is
       result : JSON_Array;

@@ -19,6 +19,16 @@ package body Soccer.ControllerPkg.Referee is
       return pending_substitutions;
    end TEMP_Get_Substitutions;
 
+   procedure Queue_Substitution (team       : Team_Id;
+                                 out_player : Integer;
+                                 in_player  : Integer) is
+      new_event : Substitution_Event_Ptr;
+   begin
+      new_event := new Substitution_Event;
+      Initialize (new_event, team, out_player, in_player);
+      manager_events.Append (Manager_Event.Event_Ptr (new_event));
+   end;
+
    procedure Notify_Game_Event (event : Game_Event_Ptr) is begin
       game_event := event;
    end Notify_Game_Event;
