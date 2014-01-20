@@ -80,7 +80,7 @@ package Soccer is
 
    hyperperiod_length : Duration;
 
-   type Power_Range is range 0 .. 15;
+   type Power_Range is range 1 .. 10;
 
    --+ Utility di una mossa x/10
    subtype Utility_Range is Integer range 1 .. 10;

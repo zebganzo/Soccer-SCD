@@ -363,6 +363,23 @@ package body Soccer.PlayersPkg is
       end if;
    end Action_Outcome;
 
+   function Get_Shot_Power (player_power : in Integer) return Power_Range is
+      power_range : Integer range 1..100 := player_power;
+   begin
+      case power_range is
+         when 1..10  => return 1;
+         when 11..20 => return 2;
+         when 21..30 => return 3;
+         when 31..40 => return 4;
+         when 41..50 => return 5;
+         when 51..60 => return 6;
+         when 61..70 => return 7;
+         when 71..80 => return 8;
+         when 81..90 => return 9;
+         when 91..100 => return 10;
+      end case;
+   end Get_Shot_Power;
+
    procedure Print (input : String) is
    begin
       if debug then
@@ -932,9 +949,9 @@ package body Soccer.PlayersPkg is
                                          Action_Outcome(Coordinate'(decision_x,decision_y),
                    					player_stats(4),
                    					player_stats(5)));
-               new_shot_event.Set_Shot_Power(15);
+               new_shot_event.Set_Shot_Power(Get_Shot_Power(player_stats(3)));
                current_action.event := Motion_Event_Ptr(new_shot_event);
-	       current_action.utility := 10;
+	       current_action.utility := Get_Move_Utility(current_coord, Coordinate'(ball_x,ball_y));
             end;
          elsif decision = "shot" then
             declare
@@ -949,9 +966,9 @@ package body Soccer.PlayersPkg is
                  Action_Outcome(Coordinate'(decision_x,decision_y),
                    player_stats(1),
                    player_stats(4)));
-               new_shot_event.Set_Shot_Power(15);
+               new_shot_event.Set_Shot_Power(Get_Shot_Power(player_stats(3)));
                current_action.event := Motion_Event_Ptr(new_shot_event);
-               current_action.utility := 10;
+               current_action.utility := Get_Move_Utility(current_coord, Coordinate'(ball_x,ball_y));
             end;
          elsif decision = "catch" then
             declare
@@ -981,7 +998,7 @@ package body Soccer.PlayersPkg is
                                           current_coord,
                                           target);
                current_action.event := Motion_Event_Ptr(new_catch_event);
-               current_action.utility := 10;
+               current_action.utility := Get_Move_Utility(current_coord, Coordinate'(ball_x,ball_y));
             end;
          elsif decision = "tackle" then
             declare
@@ -1009,7 +1026,7 @@ package body Soccer.PlayersPkg is
                      end if;
                   end loop;
                   current_action.event := Motion_Event_Ptr(new_tackle_event);
-                  current_action.utility := 10;
+                  current_action.utility := Get_Move_Utility(current_coord, Coordinate'(ball_x,ball_y));
                else
                   -- altrimenti la tackle non viene eseguita
                   -- faccio eseguire una move al giocatore sulle coordinate
