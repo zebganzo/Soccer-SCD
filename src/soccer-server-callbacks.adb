@@ -14,11 +14,7 @@ with Ada.Directories;
 use Ada.Directories;
 with Ada.Direct_IO;
 with Soccer.Server.Callbacks; use Soccer.Server.Callbacks;
-with Soccer.Game; use Soccer.Game;
-with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
-with Soccer.ControllerPkg; use Soccer.ControllerPkg;
-with Soccer.TeamPkg; use Soccer.TeamPkg;
-
+with Soccer.Bridge.Input;
 
 package body Soccer.Server.Callbacks is
 
@@ -34,51 +30,48 @@ package body Soccer.Server.Callbacks is
       -- AWS.Parameters.Get(PARAMS,nome);
 
    begin
-      if URI = "/manager/setFormation" then
-	 -- set formation (enum_formation)
-	 null;
-      elsif URI = "/manager/substitutePlayer" then
-	 -- substitute player (id_out, id_in)
-         null;
-      elsif URI = "/manager/updates" then
+      if URI = "/manager/updates" then
          declare
             updates : String := AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "data"));
-         begin
-            Put_Line(updates);
-            Apply_Manager_Updates (updates);
+	 begin
+	    Bridge.Input.Apply_Manager_Updates (updates);
          end;
       elsif URI = "/manager/getStats" then
-         declare
-            t_manager : String := AWS.Parameters.Get(PARAMS,"team");
+	 -- send players stats
+	 declare
+	    t_manager : String := AWS.Parameters.Get(PARAMS,"team");
+	    result : Unbounded_String;
          begin
-            -- send players stats
-            return AWS.Response.Build (MIME.Text_Plain, Get_Stats (t_manager));
+	    Bridge.Input.Get_Players_Stats (t_manager, result);
+	    return AWS.Response.Build (MIME.Text_Plain, To_String (result));
          end;
       elsif URI = "/field/newGame" then
 	 -- start new game
-	 ControllerPkg.Reset_Game;
-	 ControllerPkg.Set_Game_Status (Game_Paused);
-	 Game_Entity.Notify;
-	 ControllerPkg.Referee.Simulate_Begin_Of_1T;
-	 Game_Entity.Notify;
+	 Bridge.Input.New_Game;
       elsif URI = "/field/secondHalf" then
 	 -- continue with second half
-	 ControllerPkg.Referee.Simulate_Begin_Of_2T;
-	 Game_Entity.Notify;
+	 Bridge.Input.Second_Half;
       elsif URI = "/field/pauseGame" then
 	 -- pause the current game
-	 Game_Entity.Set_Paused;
-	 Game_Entity.Notify;
-	 ControllerPkg.Controller.Notify;
-	 return AWS.Response.Build (MIME.Text_Plain, Get_Game_Status);
-      elsif URI = "/field/setTeamsConf" then
-         TeamPkg.Update_Teams_Configuration (AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "conf")));
-      elsif URI = "/field/getParams" then
-	 -- send players' params
-	 return AWS.Response.Build (MIME.Text_Plain, Get_Params);
+	 declare
+	    new_status : Unbounded_String;
+	 begin
+	    Bridge.Input.Pause_Game (new_status);
+	    return AWS.Response.Build (MIME.Text_Plain, To_String (new_status));
+	 end;
       elsif URI = "/field/quit" then
 	 -- quit everything!
-	 ControllerPkg.Set_Must_Exit;
+	 Bridge.Input.Quit;
+      elsif URI = "/field/setTeamsConf" then
+	 Bridge.Input.Update_Teams_Configuration (AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "conf")));
+      elsif URI = "/field/getParams" then
+	 -- send players' params
+	 declare
+	    params : Unbounded_String;
+	 begin
+	    Bridge.Input.Get_Players_Params (params);
+	    return AWS.Response.Build (MIME.Text_Plain, To_String (params));
+	 end;
       end if;
 
 --        Put_Line (AWS.Parameters.Get (PARAMS, "a"));
@@ -92,108 +85,6 @@ package body Soccer.Server.Callbacks is
       return AWS.Response.Build (MIME.Text_HTML, "Hello WebServer!");
 
    end Services;
-
-   procedure Apply_Manager_Updates (updates : String) is
-      json_update : JSON_Value := Read (updates,"");
-      json_team	  : JSON_Value := Get (json_update, "TEAM");
-      team_name   : Unbounded_String := Get (json_team, "name");
-      formation   : Unbounded_String := Get (json_team, "formation");
-   begin
-      if To_String (team_name) = "TEAM_ONE" then
-         TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_One), Formation_Scheme_Id'Value (To_String (formation)));
-         if Has_Field (json_team, "substitution") then
-            declare
-               sub_players : JSON_Array := Get (json_team, "substitution");
-               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
-               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
-            begin
-               Queue_Substitution (Team_One, out_player, in_player);
-            end;
-         end if;
-      else
-         TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_Two), Formation_Scheme_Id'Value (To_String (formation)));
-         if Has_Field (json_team, "substitution") then
-            declare
-               sub_players : JSON_Array := Get (json_team, "substitution");
-               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
-               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
-            begin
-               Queue_Substitution (Team_One, out_player, in_player);
-            end;
-         end if;
-      end if;
-   end;
-
-   function Get_Params return String is
-      result : JSON_Array;
-      current : JSON_Value;
-      container : JSON_Value;
-   begin
-      for player in 1 .. total_players loop
-	 current := Create_Object;
-	 Set_Field (current, "id", player);
-	 Set_Field (current, "number", ControllerPkg.Get_Number_From_Id (player));
-	 Set_Field (current, "on_the_field", ControllerPkg.Is_On_The_Field (player));
-	 Set_Field (current, "team", Team_Id'Image (ControllerPkg.Get_Player_Team_From_Id (player)));
-	 Append (result, current);
-      end loop;
-
-      container := Create_Object;
-      Set_Field (container, "players", result);
-      return Write (container);
-   end Get_Params;
-
-   function Get_Stats (manager : in String) return String is
-      json_obj     : JSON_Value;
-      player       : JSON_Value;
-      team     	   : JSON_Array;
-      player_team  : Team_Id;
-   begin
-      for i in 1 .. total_players loop
-         player_team := ControllerPkg.Get_Player_Team_From_Id (i);
-         if manager = Team_Id'Image (player_team) then
-            declare
-               number : Integer := ControllerPkg.Get_Number_From_Id (i);
-            begin
-               player := Create_Object;
-               player.Set_Field ("number", number);
-               player.Set_Field ("attack", TeamPkg.Get_Attack (number, player_team));
-               player.Set_Field ("defense", TeamPkg.Get_Defense (number, player_team));
-               player.Set_Field ("goal_keeping" , TeamPkg.Get_Goal_Keeping (number, player_team));
-               player.Set_Field ("power" , TeamPkg.Get_Power (number, player_team));
-               player.Set_Field ("precision" , TeamPkg.Get_Precision (number, player_team));
-               player.Set_Field ("speed" , TeamPkg.Get_Speed (number, player_team));
-               player.Set_Field ("tackle" , TeamPkg.Get_Tackle (number, player_team));
-               player.Set_Field ("role" , TeamPkg.Get_Role (TeamPkg.Get_Formation_Id (number, player_team),
-               						    TeamPkg.Get_Formation (player_team)));
-               Append (team, player);
-            end;
-         end if;
-      end loop;
-
-      json_obj := Create_Object;
-      json_obj.Set_Field("formation",Formation_Scheme_Id'Image(TeamPkg.Get_Formation(Team_Id'Value(manager))));
-      json_obj.Set_Field ("stats", Create(team));
-      --json_obj.Set_Field ("in", manager);
-      return Write (json_obj);
-   end Get_Stats;
-
-   function Get_Game_Status return String is
-      is_controller_paused : Boolean;
-      state_string : Unbounded_String;
-      response : JSON_Value;
-   begin
-      is_controller_paused := Game_Entity.Is_Paused;
-      if is_controller_paused then
-	 state_string := To_Unbounded_String ("paused");
-      else
-	 state_string := To_Unbounded_String ("playing");
-      end if;
-
-      response := Create_Object;
-      response.Set_Field ("status", state_string);
-      return Write (response);
-   end Get_Game_Status;
 
    ----------------
    --  Iterator  --
