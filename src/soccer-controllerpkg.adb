@@ -304,7 +304,7 @@ package body Soccer.ControllerPkg is
             role := To_Unbounded_String (Get_Role (Get_Formation_Id (current_player, Team_One),
               				           team_one_ptr.formation));
             if (role /= "Backup") then
-               Put_Line (To_String (role) & " " & Integer'Image (current_player));
+--                 Put_Line (To_String (role) & " " & Integer'Image (current_player));
                current_status (counter).on_the_field := true;
             else
                current_status (counter).on_the_field := false;
@@ -330,7 +330,7 @@ package body Soccer.ControllerPkg is
             role := To_Unbounded_String (Get_Role (Get_Formation_Id (current_player, Team_Two),
               					   team_two_ptr.formation));
             if (role /= "Backup") then
-               Put_Line (To_String (role) & " " & Integer'Image (current_player));
+--                 Put_Line (To_String (role) & " " & Integer'Image (current_player));
                current_status (counter).on_the_field := true;
             else
                current_status (counter).on_the_field := false;
@@ -348,6 +348,13 @@ package body Soccer.ControllerPkg is
 	 end;
       end loop;
 
+--        for j in current_status'Range loop
+--           Put_Line("*** current_stasus(" & Integer'Image(j) & ") ***");
+--           Put_Line("*** id: " & Integer'Image(current_status(j).id) & " ***");
+--           Put_Line("*** number: " & Integer'Image(current_status(j).number) & " ***");
+--           Put_Line("*** team: " & Team_Id'Image(current_status(j).team) & " ***");
+--           Put_Line("*** on the field: " & Boolean'Image(current_status(j).on_the_field) & " ***");
+--        end loop;
    end Initialize;
 
    procedure Get_Id (id : out Integer) is
@@ -999,7 +1006,7 @@ package body Soccer.ControllerPkg is
 	       declare
 		  team_one_ptr : Team_Ptr := Get_Team (Team_One);
 		  team_two_ptr : Team_Ptr := Get_Team (Team_Two);
-		  result : Integer := 0;
+                  result : Integer := 0;
 	       begin
 
 		  if not initialized then
@@ -1008,12 +1015,12 @@ package body Soccer.ControllerPkg is
 		  end if;
 
 		  if team_one_players_count <= num_of_players/2 then
-		     result := team_one_players_count;
+		     result := current_status(team_one_players_count).id;
 --  		     current_status(result).on_the_field := True;
 		     team_one_players_count := team_one_players_count + 1;
 		  else
 		     if team_two_players_count < num_of_players/2 then
-			result := team_one_players_count + team_two_players_count;
+			result := current_status(team_one_players_count + backup_players + team_two_players_count).id;
 --  			current_status(result).on_the_field := True;
 			team_two_players_count := team_two_players_count + 1;
 		     end if;

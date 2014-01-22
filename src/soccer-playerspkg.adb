@@ -519,10 +519,10 @@ package body Soccer.PlayersPkg is
 
 --        Set_Directory (ai_basedir);
 
-      Controller.Get_Id (id);
       --        Print ("[PLAYER_" & I2S (id) & "] Chiamato Start_1T");
       Game_Entity.Rest;
       Game_Entity.Start_1T;
+      Controller.Get_Id (id);
 
       -- chiedo il mio ID al controllore
 --        Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");

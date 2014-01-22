@@ -65,7 +65,7 @@ package body Soccer.Server.Callbacks is
 	 Bridge.Input.Quit;
       elsif URI = "/field/setTeamsConf" then
          Bridge.Input.Update_Teams_Configuration (AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "conf")));
-         ControllerPkg.Initialize;
+--           ControllerPkg.Initialize;
       elsif URI = "/field/getParams" then
 	 -- send players' params
 	 declare
