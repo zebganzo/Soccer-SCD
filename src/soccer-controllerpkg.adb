@@ -1010,7 +1010,7 @@ package body Soccer.ControllerPkg is
 	       begin
 
 		  if not initialized then
-		     Initialize;
+--  		     Initialize;
 		     initialized := True;
 		  end if;
 
