@@ -39,22 +39,22 @@ procedure Soccer.Main is
 --     players_team_two : Team_Players_List := (6, 56, 1, 4, 10);
 --     players_team_one : Team_Players_List := (12, 2, 7);
 --     players_team_two : Team_Players_List := (6, 56, 1);
-   players_team_one : Team_Players_List := (12, 2, 7, 8, 60, 88, 13, 5, 91, 37, 15);
-   players_team_two : Team_Players_List := (6, 56, 1, 4, 10, 32, 59, 9, 19, 72, 20);
+   players_team_one : Team_Players_List := (12, 2, 7, 8, 60, 88, 13, 5, 91, 37, 15, 1, 3, 4, 6, 9, 10, 11);
+   players_team_two : Team_Players_List := (6, 56, 1, 4, 10, 32, 59, 9, 19, 72, 20, 2, 3, 5, 7, 8, 11, 12);
 
    type Pos_Id is array (Positive range <>) of Integer;
 --        t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1,10,5);
-   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1,10,5,3,4,7,8,9,11);
+   t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1,10,5,3,4,7,8,9,11,12,13,14,15,16,17,18);
 --        t1_pos_id : Pos_Id(1 .. total_players/2) := (2,6,1);
 --     t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1,10,3);
-   t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1,10,3,2,5,7,8,9,11);
+   t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1,10,3,2,5,7,8,9,11,12,13,14,15,16,17,18);
 --        t2_pos_id : Pos_Id(1 .. total_players/2) := (4,6,1);
 
 --        t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
-   t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5,6,7,8,9,10,11);
+   t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
 --     t1_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3);
 --        t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5);
-   t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5,6,7,8,9,10,11);
+   t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
 --     t2_stat_id : Pos_Id(1 .. total_players/2) := (1,2,3);
 
    formation_id_t1 : Team_Number_Map(1 .. total_players/2);
@@ -73,7 +73,14 @@ procedure Soccer.Main is
       8  => (30, 80, 75, 60, 60, 80, 0),
       9  => (30, 80, 75, 60, 60, 80, 0),
       10 => (30, 80, 75, 60, 60, 80, 0),
-      11 => (30, 80, 75, 60, 60, 80, 0));
+      11 => (30, 80, 75, 60, 60, 80, 0),
+      12 => (30, 80, 75, 60, 60, 80, 0),
+      13 => (30, 80, 75, 60, 60, 80, 0),
+      14 => (30, 80, 75, 60, 60, 80, 0),
+      15 => (30, 80, 75, 60, 60, 80, 0),
+      16 => (30, 80, 75, 60, 60, 80, 0),
+      17 => (30, 80, 75, 60, 60, 80, 0),
+      18 => (30, 80, 75, 60, 60, 80, 0));
 
    -- players statistics for team 2
    -- (attack, defense, power, precision, speed, tackle, goal_keeping)
@@ -88,7 +95,14 @@ procedure Soccer.Main is
       8  => (40, 10, 20, 50, 70, 70, 0),
       9  => (40, 10, 20, 50, 70, 70, 0),
       10 => (40, 10, 20, 50, 70, 70, 0),
-      11 => (40, 70, 85, 50, 70, 70, 0));
+      11 => (40, 70, 85, 50, 70, 70, 0),
+      12 => (30, 80, 75, 60, 60, 80, 0),
+      13 => (30, 80, 75, 60, 60, 80, 0),
+      14 => (30, 80, 75, 60, 60, 80, 0),
+      15 => (30, 80, 75, 60, 60, 80, 0),
+      16 => (30, 80, 75, 60, 60, 80, 0),
+      17 => (30, 80, 75, 60, 60, 80, 0),
+      18 => (30, 80, 75, 60, 60, 80, 0));
 
    t1 : Team_Ptr;
    t2 : Team_Ptr;
@@ -112,6 +126,7 @@ begin
                    statistics => players_stats_team_2,
                    number_id  => formation_id_t2,
                    formation  => B_442);
+--     Put_Line("******** SET TEAMS ***********");
    Set_Teams (first_team  => t1,
               second_team => t2);
 

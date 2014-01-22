@@ -100,10 +100,15 @@ package body Soccer.Bridge.Input is
       json_update : JSON_Value := Read (updates,"");
       json_team	  : JSON_Value := Get (json_update, "TEAM");
       team_name   : Unbounded_String := Get (json_team, "name");
-      formation   : Unbounded_String := Get (json_team, "formation");
    begin
       if To_String (team_name) = "TEAM_ONE" then
-         TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_One), Formation_Scheme_Id'Value (To_String (formation)));
+         if Has_Field (json_team, "formation") then
+            declare
+               formation : Unbounded_String := Get (json_team, "formation");
+            begin
+               TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_One), Formation_Scheme_Id'Value (To_String (formation)));
+            end;
+         end if;
          if Has_Field (json_team, "substitution") then
             declare
                sub_players : JSON_Array := Get (json_team, "substitution");
@@ -114,7 +119,13 @@ package body Soccer.Bridge.Input is
             end;
          end if;
       else
-         TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_Two), Formation_Scheme_Id'Value (To_String (formation)));
+         if Has_Field (json_team, "formation") then
+            declare
+               formation : Unbounded_String := Get (json_team, "formation");
+            begin
+               TeamPkg.Set_Formation (TeamPkg.Get_Team (Team_Two), Formation_Scheme_Id'Value (To_String (formation)));
+            end;
+         end if;
          if Has_Field (json_team, "substitution") then
             declare
                sub_players : JSON_Array := Get (json_team, "substitution");

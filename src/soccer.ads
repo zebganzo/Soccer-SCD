@@ -90,7 +90,7 @@ package Soccer is
 
    -- players
    num_of_players     : Positive := 22;
-   total_players      : Positive := 22;
+   total_players      : Positive := 36;
    players_stats      : constant Positive := 7;
    attack_index	      : constant Positive := 1;
    defense_index      : constant Positive := 2;

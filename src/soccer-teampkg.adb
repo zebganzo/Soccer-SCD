@@ -42,7 +42,7 @@ package body Soccer.TeamPkg is
    end Get_Formation_Id;
 
    function Get_Role (formation_id : Integer; formation_scheme : Formation_Scheme_Id) return String is
-      player_role : Integer range 1..11;
+      player_role : Integer range 1..18;
    begin
       player_role := formation_id;
       case formation_scheme is
@@ -52,6 +52,7 @@ package body Soccer.TeamPkg is
                when 2..4    => return "Defender";
                when 5..9    => return "Midfielder";
                when 10 | 11 => return "Forward";
+               when others  => return "Backup";
             end case;
          when B_442 =>
             case player_role is
@@ -59,6 +60,7 @@ package body Soccer.TeamPkg is
                when 2..5    => return "Defender";
                when 6..9    => return "Midfielder";
                when 10 | 11 => return "Forward";
+               when others  => return "Backup";
             end case;
          when D_532 =>
             case player_role is
@@ -66,6 +68,7 @@ package body Soccer.TeamPkg is
                when 2..6    => return "Defender";
                when 7..9    => return "Midfielder";
                when 10 | 11 => return "Forward";
+               when others  => return "Backup";
             end case;
       end case;
    end Get_Role;
@@ -590,164 +593,125 @@ package body Soccer.TeamPkg is
    end Get_Tackle;
 
    procedure Update_Teams_Configuration (data : String) is
---        team_one_players     : Team_Players_List(1 .. total_players/2);
---        team_two_players 	   : Team_Players_List(1 .. total_players/2);
---        team_one_raw_players : JSON_Array;
---        team_two_raw_players : JSON_Array;
---
---        team_one_formation_string : Unbounded_String;
---        team_two_formation_string : Unbounded_String;
---        team_one_formation        : Formation_Scheme_Id;
---        team_two_formation        : Formation_Scheme_Id;
---
---        team_one_stats_id : Team_Players_List(1 .. total_players/2);
---        team_two_stats_id : Team_Players_List(1 .. total_players/2);
---        team_one_stats    : Team_Players_Statistics(1..total_players/2, 1..players_stats);
---        team_two_stats    : Team_Players_Statistics(1..total_players/2, 1..players_stats);
---
---        team_one_formation_id : Team_Number_Map(1 .. total_players/2);
---        team_two_formation_id : Team_Number_Map(1 .. total_players/2);
+      team_one_players     : Team_Players_List(1 .. total_players/2);
+      team_two_players 	   : Team_Players_List(1 .. total_players/2);
+      team_one_raw_players : JSON_Array;
+      team_two_raw_players : JSON_Array;
+
+      team_one_formation_string : Unbounded_String;
+      team_two_formation_string : Unbounded_String;
+      team_one_formation        : Formation_Scheme_Id;
+      team_two_formation        : Formation_Scheme_Id;
+
+      team_one_stats_id : Team_Players_List(1 .. total_players/2);
+      team_two_stats_id : Team_Players_List(1 .. total_players/2);
+      team_one_stats    : Team_Players_Statistics(1..total_players/2, 1..players_stats);
+      team_two_stats    : Team_Players_Statistics(1..total_players/2, 1..players_stats);
+
+      team_one_formation_id : Team_Number_Map(1 .. total_players/2);
+      team_two_formation_id : Team_Number_Map(1 .. total_players/2);
 
       json_team : JSON_Value := Read(data,"");
       one 	: JSON_Value := Get (json_team, "one");
       two 	: JSON_Value := Get (json_team, "two");
    begin
---        Put_Line ("Received data: " & data);
---
---        if To_String(Get (one, "team")) = "Team_One" then
---  	 team_one_raw_players := Get (one, "players");
---  	 team_two_raw_players := Get (two, "players");
---
---  	 team_one_formation_string := Get (one, "formation");
---  	 team_two_formation_string := Get (two, "formation");
---        else
---  	 team_one_raw_players := Get (two, "players");
---  	 team_two_raw_players := Get (one, "players");
---
---  	 team_one_formation_string := Get (two, "formation");
---  	 team_two_formation_string := Get (one, "formation");
---        end if;
---
---        for i in 1 .. total_players/2 loop
---           team_one_players(i) := Get( Get(team_one_raw_players, i), "number");
---           team_two_players(i) := Get( Get(team_two_raw_players, i), "number");
---           team_one_stats_id(i) := i;
---           team_two_stats_id(i) := i;
---           for stat in 1 .. players_stats loop
---              case stat is
---                 when attack_index =>
---                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "attack");
---                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "attack");
---                 when defense_index =>
---                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "defense");
---                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "defense");
---                 when power_index =>
---                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "power");
---                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "power");
---                 when precision_index =>
---                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "precision");
---                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "precision");
---                 when speed_index =>
---                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "speed");
---                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "speed");
---                 when tackle_index =>
---                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "tackle");
---                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "tackle");
---                 when goal_keeping_index =>
---                    team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "goal_keeping");
---                    team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "goal_keeping");
---                 when others => null;
---              end case;
---           end loop;
---
---           team_one_formation_id(i).number := team_one_players(i);
---           team_one_formation_id(i).statistics_id := team_one_stats_id(i);
---           if team_one_stats(i,goal_keeping_index) > 0 then
---              team_one_formation_id(i).formation_id := 1;
---           else
---              team_one_formation_id(i).formation_id := i;
---           end if;
---           team_two_formation_id(i).number := team_two_players(i);
---           team_two_formation_id(i).statistics_id := team_two_stats_id(i);
---           if team_two_stats(i,goal_keeping_index) > 0 then
---              team_two_formation_id(i).formation_id := 1;
---           else
---              team_two_formation_id(i).formation_id := i;
---           end if;
+      Put_Line ("Received data: " & data);
+--        Put_Line("****** INIZIO UPDATE CONFIGURATION **********");
+      if To_String(Get (one, "team")) = "Team_One" then
+	 team_one_raw_players := Get (one, "players");
+	 team_two_raw_players := Get (two, "players");
+
+	 team_one_formation_string := Get (one, "formation");
+	 team_two_formation_string := Get (two, "formation");
+      else
+	 team_one_raw_players := Get (two, "players");
+	 team_two_raw_players := Get (one, "players");
+
+	 team_one_formation_string := Get (two, "formation");
+	 team_two_formation_string := Get (one, "formation");
+      end if;
+
+      for i in 1 .. total_players/2 loop
+         team_one_players(i) := Get( Get(team_one_raw_players, i), "number");
+         team_two_players(i) := Get( Get(team_two_raw_players, i), "number");
+         team_one_stats_id(i) := i;
+         team_two_stats_id(i) := i;
+         for stat in 1 .. players_stats loop
+            case stat is
+               when attack_index =>
+                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "attack");
+                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "attack");
+               when defense_index =>
+                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "defense");
+                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "defense");
+               when power_index =>
+                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "power");
+                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "power");
+               when precision_index =>
+                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "precision");
+                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "precision");
+               when speed_index =>
+                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "speed");
+                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "speed");
+               when tackle_index =>
+                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "tackle");
+                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "tackle");
+               when goal_keeping_index =>
+                  team_one_stats(i,stat) := Get( Get(team_one_raw_players, i), "goal_keeping");
+                  team_two_stats(i,stat) := Get( Get(team_two_raw_players, i), "goal_keeping");
+               when others => null;
+            end case;
+         end loop;
+
+         team_one_formation_id(i).number := team_one_players(i);
+         team_one_formation_id(i).statistics_id := team_one_stats_id(i);
+         if team_one_stats(i,goal_keeping_index) > 0 then
+            team_one_formation_id(i).formation_id := 1;
+         else
+            team_one_formation_id(i).formation_id := i;
+         end if;
+         team_two_formation_id(i).number := team_two_players(i);
+         team_two_formation_id(i).statistics_id := team_two_stats_id(i);
+         if team_two_stats(i,goal_keeping_index) > 0 then
+            team_two_formation_id(i).formation_id := 1;
+         else
+            team_two_formation_id(i).formation_id := i;
+         end if;
+      end loop;
+
+      if team_one_formation_string = "3-5-2" then
+	 team_one_formation := O_352;
+      elsif team_one_formation_string = "4-4-2" then
+	 team_one_formation := B_442;
+      else
+	 team_one_formation := D_532;
+      end if;
+
+      if team_two_formation_string = "3-5-2" then
+
+	 team_two_formation := O_352;
+      elsif team_two_formation_string = "4-4-2" then
+	 team_two_formation := B_442;
+      else
+	 team_two_formation := D_532;
+      end if;
+
+      team_1 := new Team'(id         => Team_One,
+                          players    => team_one_players,
+                          statistics => team_one_stats,
+                          number_id  => team_one_formation_id,
+                          formation  => team_one_formation);
+
+      team_2 := new Team'(id         => Team_Two,
+                          players    => team_two_players,
+                          statistics => team_two_stats,
+                          number_id  => team_two_formation_id,
+                          formation  => team_two_formation);
+
+--        for i in team_2.players'Range loop
+--           Put_Line (Integer'Image(team_2.players(i)));
 --        end loop;
 --
---        if team_one_formation_string = "3-5-2" then
---  	 team_one_formation := O_352;
---        elsif team_one_formation_string = "4-4-2" then
---  	 team_one_formation := B_442;
---        else
---  	 team_one_formation := D_532;
---        end if;
---
---        if team_two_formation_string = "3-5-2" then
---
---  	 team_two_formation := O_352;
---        elsif team_two_formation_string = "4-4-2" then
---  	 team_two_formation := B_442;
---        else
---  	 team_two_formation := D_532;
---        end if;
---
---        team_1 := new Team'(id         => Team_One,
---                            players    => team_one_players,
---                            statistics => team_one_stats,
---                            number_id  => team_one_formation_id,
---                            formation  => team_one_formation);
---
---        team_2 := new Team'(id         => Team_Two,
---                            players    => team_two_players,
---                            statistics => team_two_stats,
---                            number_id  => team_two_formation_id,
---                            formation  => team_two_formation);
-      null;
+--        Put_Line("****** FINE UPDATE CONFIGURATION **********");
    end Update_Teams_Configuration;
-
---     procedure Manager_Updates (updates : String) is
---        json_update : JSON_Value := Read (updates,"");
---        json_team	  : JSON_Value := Get (json_update, "TEAM");
---        team_name   : Unbounded_String := Get (json_team, "name");
---        formation   : Unbounded_String := Get (json_team, "formation");
---     begin
---        if To_String (team_name) = "TEAM_ONE" then
---           if Formation_Scheme_Id'Image (team_1.formation) /= To_String (formation) then
---              Set_Formation (team_1, Formation_Scheme_Id'Value (To_String (formation)));
---           end if;
---
---           if Has_Field (json_team, "substitution") then
---              declare
---                 new_event   : Substitution_Event_Ptr;
---                 sub_players : JSON_Array := Get (json_team, "substitution");
---                 in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
---                 out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
---              begin
---                 new_event := new Substitution_Event;
---                 Initialize (new_event, Team_One, out_player, in_player);
---  --                 manager_events.Append (Manager_Event.Event_Ptr (new_event));
---              end;
---           end if;
---        else
---           if Formation_Scheme_Id'Image (team_2.formation) /= To_String (formation) then
---              Set_Formation (team_2, Formation_Scheme_Id'Value (To_String (formation)));
---           end if;
---
---           if Has_Field (json_team, "substitution") then
---              declare
---                 new_event   : Substitution_Event_Ptr;
---                 sub_players : JSON_Array := Get (json_team, "substitution");
---                 in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
---                 out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
---              begin
---                 new_event := new Substitution_Event;
---                 Initialize (new_event, Team_Two, out_player, in_player);
---  --                 manager_events.Append (Manager_Event.Event_Ptr (new_event));
---              end;
---           end if;
---        end if;
---     end;
-
 end Soccer.TeamPkg;

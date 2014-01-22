@@ -119,6 +119,8 @@ package Soccer.ControllerPkg is
 
    procedure Print_Zones;
 
+   procedure Initialize;
+
    type Field_Zones is new Integer range 0 .. number_of_zones; -- anche la zona fuori dal campo!
    type Released_Zones is array (0 .. number_of_zones) of Boolean;
 

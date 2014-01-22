@@ -291,6 +291,7 @@ package body Soccer.ControllerPkg is
       team_one_ptr : Team_Ptr := Get_Team (Team_One);
       team_two_ptr : Team_Ptr := Get_Team (Team_Two);
       counter : Integer := 1;
+      role : Unbounded_String;
    begin
       --    Print ("TEAM ONE:" & Boolean'Image(team_one_ptr = null));
       --    Print ("TEAM ONE:" & I2S(team_one_ptr.players'Length));
@@ -299,7 +300,15 @@ package body Soccer.ControllerPkg is
 	 declare
 	    current_player : Integer;
 	 begin
-	    current_player := team_one_ptr.players (i);
+            current_player := team_one_ptr.players (i);
+            role := To_Unbounded_String (Get_Role (Get_Formation_Id (current_player, Team_One),
+              				           team_one_ptr.formation));
+            if (role /= "Backup") then
+               Put_Line (To_String (role) & " " & Integer'Image (current_player));
+               current_status (counter).on_the_field := true;
+            else
+               current_status (counter).on_the_field := false;
+            end if;
 
 	    current_status (counter).id := counter;
 	    Print ("ID: " & I2S(counter));
@@ -318,6 +327,14 @@ package body Soccer.ControllerPkg is
 	    current_player : Integer;
 	 begin
 	    current_player := team_two_ptr.players (i);
+            role := To_Unbounded_String (Get_Role (Get_Formation_Id (current_player, Team_Two),
+              					   team_two_ptr.formation));
+            if (role /= "Backup") then
+               Put_Line (To_String (role) & " " & Integer'Image (current_player));
+               current_status (counter).on_the_field := true;
+            else
+               current_status (counter).on_the_field := false;
+            end if;
 
 	    current_status (counter).id := counter;
 	    Print ("ID: " & I2S(counter));
@@ -991,13 +1008,13 @@ package body Soccer.ControllerPkg is
 		  end if;
 
 		  if team_one_players_count <= num_of_players/2 then
-		     result := current_status(team_one_players_count).id;
-		     current_status(result).on_the_field := True;
+		     result := team_one_players_count;
+--  		     current_status(result).on_the_field := True;
 		     team_one_players_count := team_one_players_count + 1;
 		  else
 		     if team_two_players_count < num_of_players/2 then
-			result := current_status(team_one_players_count + team_two_players_count).id;
-			current_status(result).on_the_field := True;
+			result := team_one_players_count + team_two_players_count;
+--  			current_status(result).on_the_field := True;
 			team_two_players_count := team_two_players_count + 1;
 		     end if;
 		  end if;
