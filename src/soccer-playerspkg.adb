@@ -683,7 +683,7 @@ package body Soccer.PlayersPkg is
            		   player_stats(4) +
            		   player_stats(5) +
            		   player_stats(6) +
-                             player_stats(7)) / factor;
+                           player_stats(7)) / factor;
          assert_radius := To_Unbounded_String("radius(") & I2S(player_radius) & ")";
 --           String'Write(Stream(output), To_String(assert_radius) & Ada.Characters.Latin_1.CR);
          status_string := status_string & assert_radius & ",";

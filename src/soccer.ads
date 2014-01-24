@@ -24,7 +24,7 @@ package Soccer is
 
    function I2S (Num: in Integer) return String;
 
-   half_game_duration : Positive := 2;
+   half_game_duration : Positive := 180;
 
    team_one_score : Integer := 0;
    team_two_score : Integer := 0;
