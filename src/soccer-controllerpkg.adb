@@ -443,13 +443,13 @@ package body Soccer.ControllerPkg is
       Put_Line("");
    end Print_Field;
 
---     task body Field_Printer is
---     begin
---        loop
---  	 Print_Field;
---  	 delay duration (print_delay);
---        end loop;
---     end Field_Printer;
+   task body Field_Printer is
+   begin
+      loop
+	 Print_Field;
+	 delay duration (print_delay);
+      end loop;
+   end Field_Printer;
 
    --     procedure Set_Paused is
    --     begin

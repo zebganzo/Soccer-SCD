@@ -123,7 +123,7 @@ package body Soccer.Bridge.Input is
                out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
             begin
 	       Put_Line ("[BRIDGE] Received substitution request for Team_One");
-               Queue_Substitution (Team_One, in_player, out_player);
+               Queue_Substitution (Team_One, out_player, in_player);
             end;
          end if;
       else
@@ -141,7 +141,7 @@ package body Soccer.Bridge.Input is
                out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
 	    begin
 	       Put_Line ("[BRIDGE] Received substitution request for Team_One");
-               Queue_Substitution (Team_Two, in_player, out_player);
+               Queue_Substitution (Team_Two, out_player, in_player);
             end;
          end if;
       end if;

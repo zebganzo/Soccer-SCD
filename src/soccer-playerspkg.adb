@@ -765,7 +765,7 @@ package body Soccer.PlayersPkg is
                   if current_generic_status.substitutions.Length > 0 then
                      declare
                         id_1 : Integer;
-                        id_2 : Integer;
+			id_2 : Integer;
                      begin
                         if subbed and (player_position.coord_y = 0)  then
                            subbed := False;
@@ -784,7 +784,15 @@ package body Soccer.PlayersPkg is
                            end loop;
                         end if;
 --                          String'Write(Stream(output), To_String(assert_sub) & Ada.Characters.Latin_1.CR);
-                        status_string := status_string & assert_sub & ",";
+
+			declare
+			   assert_sub_fixed_string : String := To_String (assert_sub);
+			begin
+			   if assert_sub_fixed_string'Size /= 0 or assert_sub /= "" then
+			      status_string := status_string & assert_sub & ",";
+			      Put_Line ("[SUBSTITUTION] " & To_String (assert_sub));
+			   end if;
+			end;
                      end;
                   end if;
 
