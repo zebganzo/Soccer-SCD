@@ -32,6 +32,7 @@ with Util.Streams.Buffered;
 
 with GNAT.String_Split; use GNAT.String_Split;
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
+with Soccer.Utils; use Soccer.Utils;
 
 procedure Soccer.Main is
 
@@ -180,7 +181,21 @@ begin
 --
 --        t_start : Time;
 --        t_end : Time;
+
+--        deltat : Duration;
+--        deltat_string : Unbounded_String;
+
+--        deltat_float : Float;
+--        deltat_int : Integer;
    begin
+
+--        t_start := Clock;
+
+--        delay Duration (4.5);
+
+--        t_end := Clock;
+
+--        Put_Line ("Value: " & I2S (Duration_To_Integer (t_end - t_start)));
 
       Server.WebServer.Start;
 

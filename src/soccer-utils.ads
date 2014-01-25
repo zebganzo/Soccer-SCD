@@ -24,6 +24,8 @@ package Soccer.Utils is
 
    procedure CLS;
 
+   function Duration_To_Integer (dur : Duration) return Integer;
+
    function Check_Inside_Field (coord: Coordinate) return Boolean;
 
    function Is_In_Penalty_Area (team : Team_Id; coord : Coordinate) return Boolean;
@@ -32,7 +34,7 @@ package Soccer.Utils is
 
    function Is_Match_Event (event : Game_Event_Ptr) return Boolean;
 
---     function Time_Image_Two (Item : in Ada.Calendar.Time) return String;
+   function Time_Image_Two (Item : in Ada.Calendar.Time) return String;
 
 --     function Get_Nearest_Player (point_coord : Coordinate; team : Team_Id) return Integer;
 

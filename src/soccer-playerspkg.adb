@@ -364,8 +364,16 @@ package body Soccer.PlayersPkg is
    end Action_Outcome;
 
    function Get_Shot_Power (player_power : in Integer) return Power_Range is
-      power_range : Integer range 1..100 := player_power;
+      power : Integer;
+      power_range : Integer range 1 .. 100;
    begin
+      power := player_power;
+      if power = 0 then
+	 power := 1;
+      end if;
+
+      power_range := power;
+
       case power_range is
          when 1..10  => return 1;
          when 11..20 => return 2;
@@ -526,6 +534,9 @@ package body Soccer.PlayersPkg is
 
       -- chiedo il mio ID al controllore
 --        Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
+--        Put_Line ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
+
+--        ControllerPkg.Print_Status;
 
       loop
 

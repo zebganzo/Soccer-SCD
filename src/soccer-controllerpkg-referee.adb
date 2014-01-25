@@ -14,14 +14,63 @@ package body Soccer.ControllerPkg.Referee is
       end if;
    end Print;
 
+   procedure Start_Game_Timer is
+   begin
+      if is_first_half then
+	 if elapsed_time > 0 then
+	    Game_Timer_First_Half.Start (half_game_duration - elapsed_time, False);
+	 else
+	    Game_Timer_First_Half.Start (half_game_duration, False);
+	 end if;
+      else
+	 if elapsed_time > 0 then
+	    Game_Timer_Second_Half.Start (half_game_duration - elapsed_time, False);
+	 else
+	    Game_Timer_Second_Half.Start (half_game_duration, False);
+	 end if;
+      end if;
+
+      half_time_start_time := Clock;
+      Put_Line ("[PAUSE] Start_Time: " & Time_Image_Two (half_time_start_time));
+   end Start_Game_Timer;
+
+   procedure Pause_Game_Timer is
+      time_delta : Duration;
+   begin
+      half_time_pause_time := Clock;
+      Put_Line ("[PAUSE] Pause_Time: " & Time_Image_Two (half_time_pause_time));
+      time_delta := half_time_pause_time - half_time_start_time;
+      Put_Line ("[PAUSE] Delta " & Duration'Image (time_delta));
+      Put_Line ("[PAUSE] Calculated delta time: " & I2S (Duration_To_Integer (time_delta)));
+
+      if is_first_half then
+	 Game_Timer_First_Half.Stop;
+      else
+	 Game_Timer_Second_Half.Stop;
+      end if;
+
+      elapsed_time := elapsed_time + Duration_To_Integer (time_delta);
+   end Pause_Game_Timer;
+
+   procedure Stop_Game_Timer is
+   begin
+      if is_first_half then
+	 Game_Timer_First_Half.Stop;
+      else
+	 Game_Timer_Second_Half.Stop;
+      end if;
+
+      elapsed_time := 0;
+   end Stop_Game_Timer;
+
    function TEMP_Get_Substitutions return Substitutions_Container.Vector is
    begin
       return pending_substitutions;
    end TEMP_Get_Substitutions;
 
    procedure Queue_Substitution (team       : Team_Id;
-                                 out_player : Integer;
-                                 in_player  : Integer) is
+                                 in_player  : Integer;
+                                 out_player : Integer) is
       new_event : Substitution_Event_Ptr;
    begin
       Put_Line ("[REFEREE] Received substitution request, added to queue");
@@ -43,8 +92,9 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
 
+      is_first_half := True;
       Soccer.Bridge.Output.Set_Is_First_Half (True);
-      Soccer.Bridge.Output.Start_Timer_First_Half;
+      Soccer.Bridge.Output.Start_Timer_First_Half (send_buffer_delay);
 
       Set_Checkpoint_Time;
       Refresh_Hyperperiod;
@@ -74,8 +124,9 @@ package body Soccer.ControllerPkg.Referee is
       Set_Game_Status (Game_Blocked);
       Set_Last_Game_Event (Game_Event_Ptr (new_event));
 
+      is_first_half := False;
       Soccer.Bridge.Output.Set_Is_First_Half (False);
-      Soccer.Bridge.Output.Start_Timer_Second_Half;
+      Soccer.Bridge.Output.Start_Timer_Second_Half (send_buffer_delay);
 
       Set_Checkpoint_Time;
       Refresh_Hyperperiod;
@@ -148,43 +199,46 @@ package body Soccer.ControllerPkg.Referee is
 
       -- controllo se ci sono sostituzioni in atto
       if Get_Game_Status = Game_Blocked then
-	 declare
-	    current_substitution : Substitution_Event_Ptr;
-	    length : Integer;
-	    id_1 : Integer;
-	    id_2 : Integer;
-	 begin
+	 if pending_substitutions.Length > 0 then
+	    declare
+	       current_substitution : Substitution_Event_Ptr;
+	       length : Integer;
+	       id_1 : Integer;
+	       id_2 : Integer;
+	    begin
+	       length := Integer (pending_substitutions.Length);
 
-	    length := Integer (pending_substitutions.Length);
+	       -- controllo se i giocatori che devono entrare.. sono entrati
+	       if length > 0 then
+		  for i in pending_substitutions.Last_Index .. pending_substitutions.First_Index loop
+		     current_substitution := pending_substitutions.Element (i);
+		     Get_Numbers (current_substitution, id_1, id_2);
 
-	    -- controllo se i giocatori che devono entrare.. sono entrati
-	    if length > 0 then
-	       for i in pending_substitutions.Last_Index .. pending_substitutions.First_Index loop
-		  current_substitution := pending_substitutions.Element (i);
-		  Get_Numbers (current_substitution, id_1, id_2);
+		     Put_Line ("[SUBSTITUTION] ID1: " & I2S (id_1) & " ID2: " & I2S (id_2));
 
-		  if Get_Player_Position (id_2).coord_y >= 1 then
-		     current_status (id_1).on_the_field := False;
-		     current_status (id_2).on_the_field := True;
-		     pending_substitutions.Delete (i, 1);
+		     if Get_Player_Position (id_2).coord_y >= 1 then
+			current_status (id_1).on_the_field := False;
+			current_status (id_2).on_the_field := True;
+			pending_substitutions.Delete (i, 1);
 
-		  end if;
-	       end loop;
-	    end if;
+		     end if;
+		  end loop;
+	       end if;
 
-	    -- controllo se posso procedere con gli altri controlli (solo se
-	    -- non ci sono piu' sosituzioni in pending)
-	    length := Integer (pending_substitutions.Length);
-	    if length > 0 then
-	       -- non posso fare gli altri controlli
---  	       Print ("[PRE_CHECK] Still substituting");
-	       return;
-	    else
-	       null;
---  	       Print ("[PRE_CHECK] Substitution ended");
-	    end if;
+	       -- controllo se posso procedere con gli altri controlli (solo se
+	       -- non ci sono piu' sosituzioni in pending)
+	       length := Integer (pending_substitutions.Length);
+	       if length > 0 then
+		  -- non posso fare gli altri controlli
+		  Print ("[PRE_CHECK] Still substituting");
+		  return;
+	       else
+		  null;
+		  Print ("[PRE_CHECK] Substitution ended");
+	       end if;
 
-	 end;
+	    end;
+	 end if;
       end if;
 
       -- controllo lo stato della partita
@@ -203,7 +257,7 @@ package body Soccer.ControllerPkg.Referee is
 		     Put_Line ("[PRE_CHECK] Inizio primo tempo! --------------------------------------------------------- ");
 		     -- faccio partire i timer del primo tempo
 		     -- (tempo partita e buffer eventi)
-		     Game_Timer_First_Half.Start; ----------------------------------------------------------- DIOPOROCOCOOCOCOOCOC
+		     Start_Game_Timer;
 		     -- mando l'evento alla distribuzione
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr(e));
@@ -268,7 +322,7 @@ package body Soccer.ControllerPkg.Referee is
                      Print ("[PRE_CHECK] Inizio secondo tempo!");
 		     -- faccio partire i timer del secondo tempo
 		     -- (tempo partita e buffer eventi)
-		     Game_Timer_Second_Half.Start;
+		     Start_Game_Timer;
 		     -- mando l'evento alla distribuzione
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (current_match_status));
 		     Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));

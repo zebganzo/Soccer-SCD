@@ -476,12 +476,13 @@ package body Soccer.ControllerPkg is
    procedure Set_Must_Exit is
    begin
       must_exit := True;
-      if last_game_event.all in Match_Event'Class then
-	 if Get_Match_Event_Id (Match_Event_Ptr (last_game_event)) = End_Of_First_Half or
-	   Get_Match_Event_Id (Match_Event_Ptr (last_game_event)) = End_Of_Match then
-	    Exit_Program (E_Success);
-	 end if;
-      end if;
+      Exit_Program (E_Success);
+--        if last_game_event.all in Match_Event'Class then
+--  	 if Get_Match_Event_Id (Match_Event_Ptr (last_game_event)) = End_Of_First_Half or
+--  	   Get_Match_Event_Id (Match_Event_Ptr (last_game_event)) = End_Of_Match then
+--  	    Exit_Program (E_Success);
+--  	 end if;
+--        end if;
    end Set_Must_Exit;
 
    function Get_Player_Position (id : Integer) return Coordinate is
@@ -642,6 +643,10 @@ package body Soccer.ControllerPkg is
    begin
       for i in current_status'Range loop
 	 Print (I2S(current_status (i).id) & ": [" & Print_Coord (current_status (i).coord) & "]");
+	 Put_Line ("Player - ID: " & I2S (current_status (i).id) &
+	      " NUMBER: "& I2S (current_status (i).number) &
+	      " FIELD: " & Boolean'Image (current_status (i).on_the_field) &
+	      " TEAM: " & Team_Id'Image (current_status (i).team));
 	 null;
       end loop;
    end Print_Status;
@@ -928,18 +933,18 @@ package body Soccer.ControllerPkg is
 	       accept Write (current_action : in out Action) do
 
 		  if first_time then
-		     if current_action.event.Get_Player_Id = 2
+		     if current_action.event.Get_Player_Id mod 2 = 0
 		       and current_action.event.all in Shot_Event'Class then
 			declare
 			   new_shot_event : Shot_Event_Ptr := new Shot_Event;
 			begin
 			   first_time := False;
 
-			   new_shot_event.Initialize(2,
-				Get_Number_From_Id (2),
-				Get_Player_Team_From_Id (2),
-				current_status (2).coord,
-				Coordinate' (0,13));
+			   new_shot_event.Initialize(current_action.event.Get_Player_Id,
+				Get_Number_From_Id (current_action.event.Get_Player_Id),
+				Get_Player_Team_From_Id (current_action.event.Get_Player_Id),
+				current_status (current_action.event.Get_Player_Id).coord,
+				Coordinate' (current_status (current_action.event.Get_Player_Id).coord.coord_x,0));
 
 			   new_shot_event.Set_Shot_Power(10);
 

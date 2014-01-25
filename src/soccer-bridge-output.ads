@@ -30,10 +30,10 @@ package Soccer.Bridge.Output is
 
    end Buffer_Wrapper;
 
-   procedure Start_Timer_First_Half;
+   procedure Start_Timer_First_Half (time : Integer);
    procedure Reset_Timer_First_Half;
 
-   procedure Start_Timer_Second_Half;
+   procedure Start_Timer_Second_Half (time : Integer);
    procedure Reset_Timer_Second_Half;
 
    procedure Set_Is_First_Half (first_half : Boolean);
@@ -44,8 +44,8 @@ private
    -- Timer
    buffer_time_span : constant Time_Span := Milliseconds (send_buffer_delay);
    id : constant String := "[TIMER] Buffer timer";
-   package Buffer_Timer_First_Half is new Generic_Timers (True, id, buffer_time_span, Buffer_Wrapper.Send);
-   package Buffer_Timer_Second_Half is new Generic_Timers (True, id, buffer_time_span, Buffer_Wrapper.Send);
+   package Buffer_Timer_First_Half is new Generic_Timers (True, id, Buffer_Wrapper.Send);
+   package Buffer_Timer_Second_Half is new Generic_Timers (True, id, Buffer_Wrapper.Send);
 
    is_first_half : Boolean;
 

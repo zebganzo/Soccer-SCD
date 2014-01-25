@@ -41,8 +41,8 @@ package Soccer.ControllerPkg.Referee is
    function TEMP_Get_Substitutions return Substitutions_Container.Vector;
 
    procedure Queue_Substitution (team       : Team_Id;
-                                 out_player : Integer;
-                                 in_player  : Integer);
+                                 in_player  : Integer;
+                                 out_player : Integer);
 
    procedure Simulate_Begin_Of_1T;
    procedure Simulate_End_Of_1T;
@@ -53,7 +53,17 @@ package Soccer.ControllerPkg.Referee is
    procedure End_Of_First_Half;
    procedure End_Of_Second_Half;
 
+   procedure Start_Game_Timer;
+   procedure Pause_Game_Timer;
+   procedure Stop_Game_Timer;
+
 private
+
+   is_first_half : Boolean;
+
+   half_time_start_time : Ada.Calendar.Time;
+   half_time_pause_time : Ada.Calendar.Time;
+   elapsed_time : Integer := 0;
 
    game_event : Game_Event_Ptr;
    package Manager_Events_Container is new Vectors (Natural, Manager_Event.Event_Ptr);
@@ -65,7 +75,7 @@ private
    -- Timer
    half_time_span : constant Time_Span := Seconds (half_game_duration);
    id : constant String := "[TIMER] Half game timer";
-   package Game_Timer_First_Half is new Generic_Timers (True, id, half_time_span, Simulate_End_Of_1T);
-   package Game_Timer_Second_Half is new Generic_Timers (True, id, half_time_span, Simulate_End_Of_Match);
+   package Game_Timer_First_Half is new Generic_Timers (True, id, Simulate_End_Of_1T);
+   package Game_Timer_Second_Half is new Generic_Timers (True, id, Simulate_End_Of_Match);
 
 end Soccer.ControllerPkg.Referee;

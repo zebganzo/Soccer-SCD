@@ -138,18 +138,18 @@ package body Soccer.Bridge.Output is
 	 end if;
 
 	 if is_first_half then
-	    Start_Timer_First_Half;
+	    Start_Timer_First_Half (send_buffer_delay);
 	 else
-	    Start_Timer_Second_Half;
+	    Start_Timer_Second_Half (send_buffer_delay);
 	 end if;
 
       end Send;
 
    end Buffer_Wrapper;
 
-   procedure Start_Timer_First_Half is
+   procedure Start_Timer_First_Half (time : Integer) is
    begin
-      Buffer_Timer_First_Half.Start;
+      Buffer_Timer_First_Half.Start (time, true);
    end Start_Timer_First_Half;
 
    procedure Reset_Timer_First_Half is
@@ -157,9 +157,9 @@ package body Soccer.Bridge.Output is
       Buffer_Timer_First_Half.Cancel;
    end Reset_Timer_First_Half;
 
-      procedure Start_Timer_Second_Half is
+   procedure Start_Timer_Second_Half (time : Integer) is
    begin
-      Buffer_Timer_Second_Half.Start;
+      Buffer_Timer_Second_Half.Start (time, true);
    end Start_Timer_Second_Half;
 
    procedure Reset_Timer_Second_Half is

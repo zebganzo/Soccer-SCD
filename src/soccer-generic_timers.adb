@@ -1,3 +1,4 @@
+with Ada.Real_Time; use Ada.Real_Time;
 
 package body Soccer.Generic_Timers is
 
@@ -12,16 +13,25 @@ package body Soccer.Generic_Timers is
       begin
          Action;
          if not One_Shot then
-            Start;  -- periodic timer continues
+            Start (int_duration, using_millis);  -- periodic timer continues
          end if;
       end Handler;
    end Events;
 
-   procedure Start is
+   procedure Start (time : Integer; is_millis : Boolean) is
       use type Ada.Real_Time.Timing_Events.Timing_Event_Handler;
+      duration : Time_Span;
    begin
+      if is_millis then
+	 duration := Milliseconds (time);
+      else
+	 duration := Seconds (time);
+      end if;
+
+      int_duration := time;
+      using_millis := is_millis;
       if Real_Time.Timing_Events.Current_Handler (The_Event) = null then
-         Real_Time.Timing_Events.Set_Handler (The_Event, For_Duration, Events.Handler'access);
+         Real_Time.Timing_Events.Set_Handler (The_Event, duration, Events.Handler'access);
       else
          raise Timer_Error with Timer_Name & " started already";
       end if;
