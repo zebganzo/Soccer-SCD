@@ -916,15 +916,38 @@ package body Soccer.ControllerPkg is
       t_write_start : Time;
       t_write_end : Time;
 
+      first_time : Boolean := True;
+
    begin
 
       Reset_Game;
 
       loop
-	 -- aggiungere controllo su flag del gioco (per pausa, fine_gioco, ecc)
 	 select
 	    when not Game_Entity.Is_Paused =>
 	       accept Write (current_action : in out Action) do
+
+		  if first_time then
+		     if current_action.event.Get_Player_Id = 2
+		       and current_action.event.all in Shot_Event'Class then
+			declare
+			   new_shot_event : Shot_Event_Ptr := new Shot_Event;
+			begin
+			   first_time := False;
+
+			   new_shot_event.Initialize(2,
+				Get_Number_From_Id (2),
+				Get_Player_Team_From_Id (2),
+				current_status (2).coord,
+				Coordinate' (0,13));
+
+			   new_shot_event.Set_Shot_Power(10);
+
+			   current_action.event := Motion_Event_Ptr (new_shot_event);
+			   current_action.utility := 10;
+			end;
+		     end if;
+		  end if;
 
 		  t_write_start := Clock;
 

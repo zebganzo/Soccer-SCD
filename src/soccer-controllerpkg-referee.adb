@@ -24,6 +24,7 @@ package body Soccer.ControllerPkg.Referee is
                                  in_player  : Integer) is
       new_event : Substitution_Event_Ptr;
    begin
+      Put_Line ("[REFEREE] Received substitution request, added to queue");
       new_event := new Substitution_Event;
       Initialize (new_event, team, out_player, in_player);
       manager_events.Append (Manager_Event.Event_Ptr (new_event));
@@ -706,6 +707,7 @@ package body Soccer.ControllerPkg.Referee is
 		  end;
 	       elsif manager_events(i).all in Substitution_Event'Class then
 		  -- sostituzione di giocatore
+		  Print ("[REFEREE] We have some substitutions pending! Qt. " & I2S (Integer(manager_events.Length)));
 		  declare
 		     base_event : Manager_Event.Event_Ptr := manager_events(i);
 		     new_substitution_event : Substitution_Event_Ptr;

@@ -1,6 +1,7 @@
 with Soccer.ControllerPkg; use Soccer.ControllerPkg;
 with Soccer.Game; use Soccer.Game;
 with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Soccer.Bridge.Input is
 
@@ -115,6 +116,7 @@ package body Soccer.Bridge.Input is
                in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
                out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
             begin
+	       Put_Line ("[BRIDGE] Received substitution request for Team_One");
                Queue_Substitution (Team_One, out_player, in_player);
             end;
          end if;
@@ -131,8 +133,9 @@ package body Soccer.Bridge.Input is
                sub_players : JSON_Array := Get (json_team, "substitution");
                in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
                out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
-            begin
-               Queue_Substitution (Team_One, out_player, in_player);
+	    begin
+	       Put_Line ("[BRIDGE] Received substitution request for Team_One");
+               Queue_Substitution (Team_Two, out_player, in_player);
             end;
          end if;
       end if;
