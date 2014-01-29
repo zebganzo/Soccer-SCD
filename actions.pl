@@ -18,7 +18,7 @@ action(CellX, CellY, move) :-
 action(CellX, CellY, move) :-
 	game(blocked),
 	current_predicate(substitution/1), 
-	substitution(in), !,
+	substitution(in),
 	(
 		\+(player(position(26,0),_,_,_)),										% if the player is not in the field entrance 
 		(player(position(_,0),_,_,_)), !,										% but he is in his bench position

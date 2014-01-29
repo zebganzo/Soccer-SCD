@@ -119,10 +119,12 @@ package body Soccer.Bridge.Input is
          if Has_Field (json_team, "substitution") then
             declare
                sub_players : JSON_Array := Get (json_team, "substitution");
-               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
-               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
+               out_player  : Integer := Integer'Value (Get (sub_players, 1).Write);
+               in_player   : Integer := Integer'Value (Get (sub_players, 2).Write);
+               in_player_id : Integer := Get_Id_From_Number(in_player, Team_One);
             begin
-	       Put_Line ("[BRIDGE] Received substitution request for Team_One");
+               Put_Line ("[BRIDGE] Received substitution request for Team_One");
+               Put_Line ("NUMBER OUT: " & Integer'Image(out_player) & " NUMBER IN: " & Integer'Image(in_player));
                Queue_Substitution (Team_One, out_player, in_player);
             end;
          end if;
@@ -137,10 +139,12 @@ package body Soccer.Bridge.Input is
          if Has_Field (json_team, "substitution") then
             declare
                sub_players : JSON_Array := Get (json_team, "substitution");
-               in_player   : Integer := Integer'Value (Get (sub_players, 1).Write);
-               out_player  : Integer := Integer'Value (Get (sub_players, 2).Write);
+               out_player  : Integer := Integer'Value (Get (sub_players, 1).Write);
+               in_player   : Integer := Integer'Value (Get (sub_players, 2).Write);
+               in_player_id : Integer := Get_Id_From_Number(in_player, Team_Two);
 	    begin
 	       Put_Line ("[BRIDGE] Received substitution request for Team_One");
+               Put_Line ("NUMBER OUT: " & Integer'Image(out_player) & " NUMBER IN: " & Integer'Image(in_player));
                Queue_Substitution (Team_Two, out_player, in_player);
             end;
          end if;

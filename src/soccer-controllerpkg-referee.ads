@@ -41,8 +41,8 @@ package Soccer.ControllerPkg.Referee is
    function TEMP_Get_Substitutions return Substitutions_Container.Vector;
 
    procedure Queue_Substitution (team       : Team_Id;
-                                 in_player  : Integer;
-                                 out_player : Integer);
+                                 out_player  : Integer;
+                                 in_player : Integer);
 
    procedure Simulate_Begin_Of_1T;
    procedure Simulate_End_Of_1T;

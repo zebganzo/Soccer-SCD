@@ -5,19 +5,34 @@ with Soccer.Manager_Event.Substitution; use Soccer.Manager_Event.Substitution;
 package body Soccer.TeamPkg is
 
    procedure Update_Map (subbed_player : Integer; new_player : Integer; team : Team_Id) is
+      subbed_index : Integer;
+      new_index    : Integer;
+      swap         : Integer;
    begin
       if team = Team_One then
          for i in team_1.number_id'Range loop
             if team_1.number_id(i).number = subbed_player then
-               team_1.number_id(i).number := new_player;
+               subbed_index := i;
+            end if;
+            if team_1.number_id(i).number = new_player then
+               new_index := i;
             end if;
          end loop;
+         swap := team_1.number_id(subbed_index).number;
+         team_1.number_id(subbed_index).number := new_player;
+         team_1.number_id(new_player).number := swap;
       else
          for i in team_2.number_id'Range loop
             if team_2.number_id(i).number = subbed_player then
-               team_2.number_id(i).number := new_player;
+               subbed_index := i;
+            end if;
+            if team_2.number_id(i).number = new_player then
+               new_index := i;
             end if;
          end loop;
+         swap := team_2.number_id(subbed_index).number;
+         team_2.number_id(subbed_index).number := new_player;
+         team_2.number_id(new_player).number := swap;
       end if;
    end Update_Map;
 

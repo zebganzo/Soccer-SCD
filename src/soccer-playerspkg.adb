@@ -423,6 +423,8 @@ package body Soccer.PlayersPkg is
       do_nothing      : Boolean := False;
       formation_pos   : Coordinate;
       subbed          : Boolean := False;
+      change_id       : Boolean := False;
+      new_player_number : Integer;
       new_player_id   : Integer;			-- id of the player that will substitute the current player
 
       -- True if the player is the one assigned to resume the game after a
@@ -767,7 +769,7 @@ package body Soccer.PlayersPkg is
                         id_1 : Integer;
 			id_2 : Integer;
                      begin
-                        if subbed and (player_position.coord_y = 0)  then
+                        if subbed and (player_position.coord_x = id and player_position.coord_y = 0)  then
                            subbed := False;
                            assert_sub := To_Unbounded_String("substitution(in)");
                         elsif subbed then
@@ -776,6 +778,7 @@ package body Soccer.PlayersPkg is
                            for i in current_generic_status.substitutions.First_Index ..
                              current_generic_status.substitutions.Last_Index loop
                               Get_Numbers(current_generic_status.substitutions.Element(i), id_1, id_2);
+                              new_player_number := Get_Backup_Number(current_generic_status.substitutions.Element(i));
                               if id = id_1 then
                                  assert_sub := To_Unbounded_String("substitution(out)");
                                  subbed := True;
@@ -917,6 +920,9 @@ package body Soccer.PlayersPkg is
             command := To_Unbounded_String("./launch_player.sh " & To_String(status_string));
          end if;
 
+         if id = 12 then
+            Put_Line(To_String(status_string));
+         end if;
 	 declare
 	    Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
 	    Buffer  : Util.Streams.Buffered.Buffered_Stream;
@@ -950,6 +956,10 @@ package body Soccer.PlayersPkg is
 	 end;
 
 	 t_ai_end := Clock;
+
+         if decision_x = 1000 and subbed then
+            change_id := True;
+         end if;
 
          if decision_x = 1000 then
             decision_x := id;
@@ -1121,11 +1131,12 @@ package body Soccer.PlayersPkg is
 	 if current_action.event /= null and not do_nothing then
             ControllerPkg.Controller.Write(current_action);
 
-	    if subbed and player_position.coord_x = 26 and player_position.coord_y = 0 then
+	    if change_id then
 	       -- notifico alla squadra il cambiamento
-	       Update_Map (id, new_player_id, player_team);
+	       Update_Map (player_number, new_player_number, player_team);
 
                id := new_player_id;
+               change_id := False;
             end if;
          end if;
 

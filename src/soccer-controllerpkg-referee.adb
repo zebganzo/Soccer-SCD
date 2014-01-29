@@ -69,13 +69,14 @@ package body Soccer.ControllerPkg.Referee is
    end TEMP_Get_Substitutions;
 
    procedure Queue_Substitution (team       : Team_Id;
-                                 in_player  : Integer;
-                                 out_player : Integer) is
+                                 out_player  : Integer;
+                                 in_player : Integer) is
       new_event : Substitution_Event_Ptr;
    begin
       Put_Line ("[REFEREE] Received substitution request, added to queue");
       new_event := new Substitution_Event;
       Initialize (new_event, team, out_player, in_player);
+      Put_Line ("NUMBER OUT: " & Integer'Image(out_player) & " NUMBER IN: " & Integer'Image(in_player));
       manager_events.Append (Manager_Event.Event_Ptr (new_event));
    end;
 
@@ -211,7 +212,8 @@ package body Soccer.ControllerPkg.Referee is
 	       -- controllo se i giocatori che devono entrare.. sono entrati
 	       if length > 0 then
 		  for i in pending_substitutions.Last_Index .. pending_substitutions.First_Index loop
-		     current_substitution := pending_substitutions.Element (i);
+                     current_substitution := pending_substitutions.Element (i);
+                     					-- esce entra
 		     Get_Numbers (current_substitution, id_1, id_2);
 
 		     Put_Line ("[SUBSTITUTION] ID1: " & I2S (id_1) & " ID2: " & I2S (id_2));
@@ -771,17 +773,19 @@ package body Soccer.ControllerPkg.Referee is
                      id1 : Integer;
                      id2 : Integer;
 		  begin
-		     new_substitution_event := Substitution_Event_Ptr (base_event);
+                     new_substitution_event := Substitution_Event_Ptr (base_event);
+                     					-- esce			entra
 		     Get_Numbers (new_substitution_event, number_to_id_1, number_to_id_2);
+                     Put_Line ("NUMBER OUT: " & Integer'Image(number_to_id_1) & " NUMBER IN: " & Integer'Image(number_to_id_2));
 		     substitution_team := Get_Team(new_substitution_event);
 --                       Print("[MAGIMAGIADIOBOIA]:" & I2S(number_to_id_1) & " " & I2S(number_to_id_2));
 
 		     -- sostituisco i numeri di maglia con i rispettivi ID
-                     id1 := ControllerPkg.Get_Id_From_Number (number_to_id_1, substitution_team);
-                     id2 := ControllerPkg.Get_Id_From_Number (number_to_id_2, substitution_team);
+                     id1 := ControllerPkg.Get_Id_From_Number (number_to_id_1, substitution_team); -- esce
+                     id2 := ControllerPkg.Get_Id_From_Number (number_to_id_2, substitution_team); -- entra
 --                       Print("[MAGIMAGIADIOBOIA]:" & I2S(id1) & " " & I2S(id2));
-		     Set_Correct_Ids (new_substitution_event, id1, id2);
-
+		     Set_Correct_Ids (new_substitution_event, id1, id2, number_to_id_2);
+                     Put_Line ("ID OUT: " & Integer'Image(number_to_id_1) & " ID IN: " & Integer'Image(number_to_id_2));
 		     -- aggiungo in coda la sostituzione
 		     pending_substitutions.Append (new_substitution_event);
 		  end;
