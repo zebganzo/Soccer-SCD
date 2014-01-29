@@ -93,6 +93,12 @@ package body Soccer.Bridge.Output is
          end if;
       end Put;
 
+      procedure Buffer_Timer_Handler is
+      begin
+	 Put_Line ("Buffer Timer expired!");
+	 Send;
+      end;
+
       procedure Send is
          j_value : JSON_Value;
          field_events : JSON_Array;

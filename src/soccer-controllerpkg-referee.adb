@@ -31,17 +31,17 @@ package body Soccer.ControllerPkg.Referee is
       end if;
 
       half_time_start_time := Clock;
-      Put_Line ("[PAUSE] Start_Time: " & Time_Image_Two (half_time_start_time));
+--        Put_Line ("[PAUSE] Start_Time: " & Time_Image_Two (half_time_start_time));
    end Start_Game_Timer;
 
    procedure Pause_Game_Timer is
       time_delta : Duration;
    begin
       half_time_pause_time := Clock;
-      Put_Line ("[PAUSE] Pause_Time: " & Time_Image_Two (half_time_pause_time));
+--        Put_Line ("[PAUSE] Pause_Time: " & Time_Image_Two (half_time_pause_time));
       time_delta := half_time_pause_time - half_time_start_time;
-      Put_Line ("[PAUSE] Delta " & Duration'Image (time_delta));
-      Put_Line ("[PAUSE] Calculated delta time: " & I2S (Duration_To_Integer (time_delta)));
+--        Put_Line ("[PAUSE] Delta " & Duration'Image (time_delta));
+--        Put_Line ("[PAUSE] Calculated delta time: " & I2S (Duration_To_Integer (time_delta)));
 
       if is_first_half then
 	 Game_Timer_First_Half.Stop;
@@ -73,10 +73,10 @@ package body Soccer.ControllerPkg.Referee is
                                  in_player : Integer) is
       new_event : Substitution_Event_Ptr;
    begin
-      Put_Line ("[REFEREE] Received substitution request, added to queue");
+--        Put_Line ("[REFEREE] Received substitution request, added to queue");
       new_event := new Substitution_Event;
       Initialize (new_event, team, out_player, in_player);
-      Put_Line ("NUMBER OUT: " & Integer'Image(out_player) & " NUMBER IN: " & Integer'Image(in_player));
+--        Put_Line ("NUMBER OUT: " & Integer'Image(out_player) & " NUMBER IN: " & Integer'Image(in_player));
       manager_events.Append (Manager_Event.Event_Ptr (new_event));
    end;
 
@@ -216,7 +216,7 @@ package body Soccer.ControllerPkg.Referee is
                      					-- esce entra
 		     Get_Numbers (current_substitution, id_1, id_2);
 
-		     Put_Line ("[SUBSTITUTION] ID1: " & I2S (id_1) & " ID2: " & I2S (id_2));
+--  		     Put_Line ("[SUBSTITUTION] ID1: " & I2S (id_1) & " ID2: " & I2S (id_2));
 
 		     if Get_Player_Position (id_2).coord_y >= 1 then
 			current_status (id_1).on_the_field := False;
@@ -233,6 +233,10 @@ package body Soccer.ControllerPkg.Referee is
 	       if length > 0 then
 		  -- non posso fare gli altri controlli
 		  Print ("[PRE_CHECK] Still substituting");
+
+		  -- mando l'evento alla distribuzione
+		  Buffer_Wrapper.Put (Core_Event.Event_Ptr (e));
+
 		  return;
 	       else
 		  null;
@@ -776,7 +780,7 @@ package body Soccer.ControllerPkg.Referee is
                      new_substitution_event := Substitution_Event_Ptr (base_event);
                      					-- esce			entra
 		     Get_Numbers (new_substitution_event, number_to_id_1, number_to_id_2);
-                     Put_Line ("NUMBER OUT: " & Integer'Image(number_to_id_1) & " NUMBER IN: " & Integer'Image(number_to_id_2));
+--                       Put_Line ("NUMBER OUT: " & Integer'Image(number_to_id_1) & " NUMBER IN: " & Integer'Image(number_to_id_2));
 		     substitution_team := Get_Team(new_substitution_event);
 --                       Print("[MAGIMAGIADIOBOIA]:" & I2S(number_to_id_1) & " " & I2S(number_to_id_2));
 
@@ -785,7 +789,7 @@ package body Soccer.ControllerPkg.Referee is
                      id2 := ControllerPkg.Get_Id_From_Number (number_to_id_2, substitution_team); -- entra
 --                       Print("[MAGIMAGIADIOBOIA]:" & I2S(id1) & " " & I2S(id2));
 		     Set_Correct_Ids (new_substitution_event, id1, id2, number_to_id_2);
-                     Put_Line ("ID OUT: " & Integer'Image(number_to_id_1) & " ID IN: " & Integer'Image(number_to_id_2));
+--                       Put_Line ("ID OUT: " & Integer'Image(number_to_id_1) & " ID IN: " & Integer'Image(number_to_id_2));
 		     -- aggiungo in coda la sostituzione
 		     pending_substitutions.Append (new_substitution_event);
 		  end;
