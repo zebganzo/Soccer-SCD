@@ -113,7 +113,7 @@ package Soccer.ControllerPkg is
 
    procedure Refresh_Hyperperiod;
 
-   task Field_Printer;
+--     task Field_Printer;
 
    procedure Print_Status;
 

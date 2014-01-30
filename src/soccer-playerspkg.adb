@@ -793,7 +793,7 @@ package body Soccer.PlayersPkg is
 			begin
 			   if assert_sub_fixed_string'Size /= 0 or assert_sub /= "" then
 			      status_string := status_string & assert_sub & ",";
-			      Put_Line ("[SUBSTITUTION] " & To_String (assert_sub));
+--  			      Put_Line ("[SUBSTITUTION] " & To_String (assert_sub));
 			   end if;
 			end;
                      end;

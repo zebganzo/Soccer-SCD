@@ -21,6 +21,7 @@ package Soccer.Bridge.Output is
    protected Buffer_Wrapper is
 
       procedure Put (new_event : Soccer.Core_Event.Event_Ptr);
+      procedure Buffer_Timer_Handler;
       procedure Send;
 
    private
@@ -44,8 +45,8 @@ private
    -- Timer
    buffer_time_span : constant Time_Span := Milliseconds (send_buffer_delay);
    id : constant String := "[TIMER] Buffer timer";
-   package Buffer_Timer_First_Half is new Generic_Timers (True, id, Buffer_Wrapper.Send);
-   package Buffer_Timer_Second_Half is new Generic_Timers (True, id, Buffer_Wrapper.Send);
+   package Buffer_Timer_First_Half is new Generic_Timers (True, id, Buffer_Wrapper.Buffer_Timer_Handler);
+   package Buffer_Timer_Second_Half is new Generic_Timers (True, id, Buffer_Wrapper.Buffer_Timer_Handler);
 
    is_first_half : Boolean;
 

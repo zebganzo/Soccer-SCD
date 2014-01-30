@@ -30,6 +30,7 @@ package body Soccer.Server.WebServer is
       container.Set_Field (Field_Name => "events",
 			   Field      => events);
       Net.WebSocket.Registry.Send(ManagerHome, Write (Item => container));
+      Net.WebSocket.Registry.Send(ManagerVisitors, Write (Item => container));
    end PublishManagersUpdate;
 
    procedure PublishFieldUpdate (events : JSON_Array) is

@@ -69,7 +69,7 @@ package Soccer is
 
    buffer_dim : Positive := 30;
    nearby_distance : Integer := 3;
-   send_buffer_delay : Integer := 250;
+   send_buffer_delay : Integer := 250; -- era a 500
    t0 : Time := Clock;
 
    number_of_zones : Integer := 7;
