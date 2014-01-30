@@ -920,9 +920,6 @@ package body Soccer.PlayersPkg is
             command := To_Unbounded_String("./launch_player.sh " & To_String(status_string));
          end if;
 
-         if id = 12 then
-            Put_Line(To_String(status_string));
-         end if;
 	 declare
 	    Pipe    : aliased Util.Streams.Pipes.Pipe_Stream;
 	    Buffer  : Util.Streams.Buffered.Buffered_Stream;

@@ -133,7 +133,7 @@ package body Soccer.Bridge.Output is
 --  	    end loop;
 
 	    -- Server
---  	    Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
+  	    Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
 	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
 	 end if;
 
