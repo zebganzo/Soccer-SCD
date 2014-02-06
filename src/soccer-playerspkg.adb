@@ -433,7 +433,7 @@ package body Soccer.PlayersPkg is
 
       -- width of the "influence bubble" of the player. It is computed by
       -- dividing the sum of the player's statistics by a factor
-      player_radius : Integer;
+      player_radius : Integer := 0;
       radius_offset : Integer := 0;
 
       -- factor by which divide the sum of the statistics
@@ -601,7 +601,11 @@ package body Soccer.PlayersPkg is
 
          -- Checks if the player was the last ball holder
          if current_generic_status.last_ball_holder_id = id then
-            assert_last_holder := To_Unbounded_String("last_holder");
+            if Distance(current_coord, ball_coord) > player_radius then
+               assert_last_holder := To_Unbounded_String("not_last_holder");
+            else
+               assert_last_holder := To_Unbounded_String("last_holder");
+            end if;
          else
             assert_last_holder := To_Unbounded_String("not_last_holder");
          end if;
