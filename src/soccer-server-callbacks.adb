@@ -15,6 +15,7 @@ use Ada.Directories;
 with Ada.Direct_IO;
 with Soccer.Server.Callbacks; use Soccer.Server.Callbacks;
 with Soccer.Bridge.Input;
+with Soccer.Bridge.Output;
 with Soccer.ControllerPkg; use Soccer.ControllerPkg;
 
 package body Soccer.Server.Callbacks is
@@ -66,6 +67,7 @@ package body Soccer.Server.Callbacks is
       elsif URI = "/field/setTeamsConf" then
          Bridge.Input.Update_Teams_Configuration (AWS.URL.Decode (AWS.Parameters.Get (PARAMS, "conf")));
          ControllerPkg.Initialize;
+         Bridge.Output.Set_Teams_Ready(True);
       elsif URI = "/field/getParams" then
 	 -- send players' params
 	 declare

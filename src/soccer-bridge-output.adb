@@ -10,6 +10,9 @@ use Soccer.Core_Event.Motion_Core_Event.Move_Motion_Event;
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 with Soccer.Utils; use Soccer.Utils;
+with Soccer.ControllerPkg; use Soccer.ControllerPkg;
+with Soccer.TeamPkg; use Soccer.TeamPkg;
+
 
 package body Soccer.Bridge.Output is
 
@@ -123,7 +126,7 @@ package body Soccer.Bridge.Output is
 			     Val => j_value);
 	       if event_buffer(event).event.all in Game_Event'Class then
 		  GNATCOLL.JSON.Append(Arr => manager_events,
-			 Val => j_value);
+                         Val => j_value);
 	       end if;
 	    end loop;
 
@@ -138,8 +141,20 @@ package body Soccer.Bridge.Output is
 --  	       end;
 --  	    end loop;
 
+            if not sent_teams and teams_ready  then
+               declare
+                  team1 : Unbounded_String;
+                  team2 : Unbounded_String;
+               begin
+                  sent_teams := True;
+                  Get_Players_Stats("TEAM_ONE", team1);
+                  Get_Players_Stats("TEAM_TWO", team2);
+                  Soccer.Server.WebServer.PublishManagerTeams(To_String(team1), To_String(team2));
+               end;
+            end if;
+
 	    -- Server
-  	    Soccer.Server.WebServer.PublishManagersUpdate (manager_events); -- TODO aggiornare
+  	    Soccer.Server.WebServer.PublishManagersUpdate (field_events); -- TODO aggiornare
 	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
 	 end if;
 
@@ -186,4 +201,46 @@ package body Soccer.Bridge.Output is
       end if;
    end Print;
 
+   procedure Get_Players_Stats (manager : String; result : out Unbounded_String) is
+      json_obj     : JSON_Value;
+      player       : JSON_Value;
+      team     	   : JSON_Array;
+      player_team  : Team_Id;
+   begin
+--        Put_Line ("Get_Players_Stats BRIDGE: " & manager);
+      for i in 1 .. total_players loop
+         player_team := ControllerPkg.Get_Player_Team_From_Id (i);
+         if manager = Team_Id'Image (player_team) then
+            declare
+               number : Integer := ControllerPkg.Get_Number_From_Id (i);
+            begin
+--                 Put_Line ("Get_Players_Stats BRIDGE: dentro If");
+               player := Create_Object;
+               player.Set_Field ("number", number);
+               player.Set_Field ("attack", TeamPkg.Get_Attack (number, player_team));
+               player.Set_Field ("defense", TeamPkg.Get_Defense (number, player_team));
+               player.Set_Field ("goal_keeping" , TeamPkg.Get_Goal_Keeping (number, player_team));
+               player.Set_Field ("power" , TeamPkg.Get_Power (number, player_team));
+               player.Set_Field ("precision" , TeamPkg.Get_Precision (number, player_team));
+               player.Set_Field ("speed" , TeamPkg.Get_Speed (number, player_team));
+               player.Set_Field ("tackle" , TeamPkg.Get_Tackle (number, player_team));
+               player.Set_Field ("role" , TeamPkg.Get_Role (TeamPkg.Get_Formation_Id (number, player_team),
+               						    TeamPkg.Get_Formation (player_team)));
+               Append (team, player);
+            end;
+         end if;
+      end loop;
+
+      json_obj := Create_Object;
+      json_obj.Set_Field("formation",Formation_Scheme_Id'Image(TeamPkg.Get_Formation(Team_Id'Value(manager))));
+      json_obj.Set_Field ("stats", Create(team));
+      --json_obj.Set_Field ("in", manager);
+      result := To_Unbounded_String (Write (json_obj));
+--        Put_Line ("Get_Players_Stats BRIDGE: " & To_String(result));
+   end Get_Players_Stats;
+
+   procedure Set_Teams_Ready (ready : in Boolean) is
+   begin
+      teams_ready := ready;
+   end Set_Teams_Ready;
 end Soccer.Bridge.Output;

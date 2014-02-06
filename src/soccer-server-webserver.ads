@@ -41,6 +41,9 @@ package Soccer.Server.WebServer is
 
    procedure PublishManagersUpdate (events : JSON_Array);
 
+   -- Send team stats to both managers
+   procedure PublishManagerTeams (team1 : String; team2 : String);
+
    -- Updates the field
 
    procedure PublishFieldUpdate (events : JSON_Array);

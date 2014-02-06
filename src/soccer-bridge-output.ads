@@ -41,6 +41,10 @@ package Soccer.Bridge.Output is
 
    procedure Print (input : String);
 
+   procedure Get_Players_Stats (manager : String; result : out Unbounded_String);
+
+   procedure Set_Teams_Ready (ready : in Boolean);
+
 private
    -- Timer
    buffer_time_span : constant Time_Span := Milliseconds (send_buffer_delay);
@@ -49,5 +53,7 @@ private
    package Buffer_Timer_Second_Half is new Generic_Timers (True, id, Buffer_Wrapper.Buffer_Timer_Handler);
 
    is_first_half : Boolean;
+   sent_teams : Boolean := False;
+   teams_ready : Boolean := False;
 
 end Soccer.Bridge.Output;

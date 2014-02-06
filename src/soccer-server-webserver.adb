@@ -33,6 +33,12 @@ package body Soccer.Server.WebServer is
       Net.WebSocket.Registry.Send(ManagerVisitors, Write (Item => container));
    end PublishManagersUpdate;
 
+   procedure PublishManagerTeams (team1 : String; team2 : String) is
+   begin
+      Net.WebSocket.Registry.Send(ManagerHome, team1);
+      Net.WebSocket.Registry.Send(ManagerVisitors, team2);
+   end PublishManagerTeams;
+
    procedure PublishFieldUpdate (events : JSON_Array) is
       container : JSON_Value := Create_Object;
    begin
