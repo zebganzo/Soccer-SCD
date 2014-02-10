@@ -31,6 +31,8 @@ package Soccer.Bridge.Output is
 
    end Buffer_Wrapper;
 
+   procedure Notify_Field (payload : String);
+
    procedure Start_Timer_First_Half (time : Integer);
    procedure Reset_Timer_First_Half;
 

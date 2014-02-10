@@ -47,6 +47,14 @@ package body Soccer.Server.WebServer is
       Net.WebSocket.Registry.Send(Field, Write (Item => container));
    end PublishFieldUpdate;
 
+   procedure Notify_Field_With_Params (payload : String) is
+      container : JSON_Value := Create_Object;
+   begin
+      container.Set_Field (Field_Name => "players_params",
+			   Field      => payload);
+      Net.WebSocket.Registry.Send (Field, Write (container));
+   end Notify_Field_With_Params;
+
    procedure PublishTestUpdate is
    begin
       Net.WebSocket.Registry.Send(Field, "test!");

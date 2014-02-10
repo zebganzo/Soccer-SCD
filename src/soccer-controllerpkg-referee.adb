@@ -1,6 +1,7 @@
 with Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 use Soccer.Core_Event.Game_Core_Event.Match_Game_Event;
 with Soccer.Motion_AgentPkg; use Soccer.Motion_AgentPkg;
+with Soccer.Bridge.Input; use Soccer.Bridge.Input;
 with Soccer.Bridge.Output; use Soccer.Bridge.Output;
 with Soccer.Server.WebServer;
 
@@ -206,6 +207,8 @@ package body Soccer.ControllerPkg.Referee is
 	       length : Integer;
 	       id_1 : Integer;
 	       id_2 : Integer;
+
+	       players_params : Unbounded_String;
 	    begin
 	       length := Integer (pending_substitutions.Length);
 
@@ -222,6 +225,9 @@ package body Soccer.ControllerPkg.Referee is
 			current_status (id_1).on_the_field := False;
 			current_status (id_2).on_the_field := True;
 			pending_substitutions.Delete (i, 1);
+
+			Bridge.Input.Get_Players_Params (players_params);
+			Bridge.Output.Notify_Field (To_String (players_params));
 
 		     end if;
 		  end loop;

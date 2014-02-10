@@ -98,7 +98,7 @@ package body Soccer.Bridge.Output is
 
       procedure Buffer_Timer_Handler is
       begin
-	 Put_Line ("Buffer Timer expired!");
+--  	 Put_Line ("Buffer Timer expired!");
 	 Send;
       end;
 
@@ -167,6 +167,11 @@ package body Soccer.Bridge.Output is
       end Send;
 
    end Buffer_Wrapper;
+
+   procedure Notify_Field (payload : String) is
+   begin
+      Soccer.Server.WebServer.Notify_Field_With_Params (payload);
+   end Notify_Field;
 
    procedure Start_Timer_First_Half (time : Integer) is
    begin
