@@ -243,4 +243,9 @@ package body Soccer.Bridge.Output is
    begin
       teams_ready := ready;
    end Set_Teams_Ready;
+
+   function Get_Teams_Ready return Boolean is
+   begin
+      return teams_ready;
+   end Get_Teams_Ready;
 end Soccer.Bridge.Output;

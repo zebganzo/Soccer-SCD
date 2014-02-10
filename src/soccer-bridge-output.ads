@@ -45,6 +45,8 @@ package Soccer.Bridge.Output is
 
    procedure Set_Teams_Ready (ready : in Boolean);
 
+   function Get_Teams_Ready return Boolean;
+
 private
    -- Timer
    buffer_time_span : constant Time_Span := Milliseconds (send_buffer_delay);

@@ -44,8 +44,13 @@ package body Soccer.Server.Callbacks is
 	    t_manager : String := AWS.Parameters.Get(PARAMS,"team");
 	    result : Unbounded_String;
          begin
-	    Bridge.Input.Get_Players_Stats (t_manager, result);
-	    return AWS.Response.Build (MIME.Text_Plain, To_String (result));
+--              Bridge.Input.Get_Players_Stats (t_manager, result);
+            if Bridge.Output.Get_Teams_Ready then
+               Bridge.Input.Get_Players_Stats (t_manager, result);
+               return AWS.Response.Build (MIME.Text_Plain, To_String (result));
+            else
+               return AWS.Response.Build (MIME.Text_Plain, "null");
+            end if;
          end;
       elsif URI = "/field/newGame" then
 	 -- start new game
