@@ -56,6 +56,8 @@ package Soccer is
    team_two_penalty_coord : Coordinate := Coordinate'(46,17);
 
    middle_field_coord : Coordinate := Coordinate'(26,17);
+   middle_field_x : Integer := 26;
+   middle_field_y : Integer := 17;
 
    free_kick_area : Positive := 4;
 

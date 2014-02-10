@@ -409,8 +409,8 @@ package body Soccer.PlayersPkg is
       -- Artificial Intelligence Related Variables
       event           : Game_Event_Ptr;			-- generic Game Event ptr
       ball_team       : Team_Id;			-- team holding the ball
-      ball_x          : Integer;
-      ball_y          : Integer;
+      ball_x          : Integer := middle_field_x;
+      ball_y          : Integer := middle_field_y;
       player_team     : Team_Id;			-- player's team
       player_number   : Integer;			-- player's number
       player_position : Coordinate;			-- player's current position
@@ -599,6 +599,21 @@ package body Soccer.PlayersPkg is
             assert_possession := To_Unbounded_String("has_not");
          end if;
 
+         -- Checks if the player was the last ball holder
+         if current_generic_status.last_ball_holder_id = id then
+            declare
+               ball_coord : Coordinate := Coordinate'(ball_x, ball_y);
+            begin
+               if Distance(current_coord, ball_coord) > player_radius then
+                  assert_last_holder := To_Unbounded_String("not_last_holder");
+               else
+                  assert_last_holder := To_Unbounded_String("last_holder");
+               end if;
+            end;
+         else
+            assert_last_holder := To_Unbounded_String("not_last_holder");
+         end if;
+
          -- Create player clause
          assert_player := "player(" & assert_position & "," & assert_possession & "," &
            assert_team & "," & assert_last_holder & ")";
@@ -644,21 +659,6 @@ package body Soccer.PlayersPkg is
          ball_x := Ball.Get_Position.coord_x;
          ball_y := Ball.Get_Position.coord_y;
          assert_ball_pos := To_Unbounded_String("position(") & I2S(ball_x) & "," & I2S(ball_y) & ")";
-
-         -- Checks if the player was the last ball holder
-         if current_generic_status.last_ball_holder_id = id then
-            declare
-               ball_coord : Coordinate := Coordinate'(ball_x, ball_y);
-            begin
-               if Distance(current_coord, ball_coord) > player_radius then
-                  assert_last_holder := To_Unbounded_String("not_last_holder");
-               else
-                  assert_last_holder := To_Unbounded_String("last_holder");
-               end if;
-            end;
-         else
-            assert_last_holder := To_Unbounded_String("not_last_holder");
-         end if;
 
          -- Get the team with ball possession
          ball_team := current_generic_status.holder_team;
