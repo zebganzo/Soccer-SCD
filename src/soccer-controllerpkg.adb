@@ -932,27 +932,27 @@ package body Soccer.ControllerPkg is
 	    when not Game_Entity.Is_Paused =>
 	       accept Write (current_action : in out Action) do
 
-		  if first_time then
-		     if current_action.event.Get_Player_Id mod 2 = 0
-		       and current_action.event.all in Shot_Event'Class then
-			declare
-			   new_shot_event : Shot_Event_Ptr := new Shot_Event;
-			begin
-			   first_time := False;
-
-			   new_shot_event.Initialize(current_action.event.Get_Player_Id,
-				Get_Number_From_Id (current_action.event.Get_Player_Id),
-				Get_Player_Team_From_Id (current_action.event.Get_Player_Id),
-				current_status (current_action.event.Get_Player_Id).coord,
-				Coordinate' (current_status (current_action.event.Get_Player_Id).coord.coord_x,0));
-
-			   new_shot_event.Set_Shot_Power(10);
-
-			   current_action.event := Motion_Event_Ptr (new_shot_event);
-			   current_action.utility := 10;
-			end;
-		     end if;
-		  end if;
+--  		  if first_time then
+--  		     if current_action.event.Get_Player_Id mod 2 = 0
+--  		       and current_action.event.all in Shot_Event'Class then
+--  			declare
+--  			   new_shot_event : Shot_Event_Ptr := new Shot_Event;
+--  			begin
+--  			   first_time := False;
+--
+--  			   new_shot_event.Initialize(current_action.event.Get_Player_Id,
+--  				Get_Number_From_Id (current_action.event.Get_Player_Id),
+--  				Get_Player_Team_From_Id (current_action.event.Get_Player_Id),
+--  				current_status (current_action.event.Get_Player_Id).coord,
+--  				Coordinate' (current_status (current_action.event.Get_Player_Id).coord.coord_x,0));
+--
+--  			   new_shot_event.Set_Shot_Power(10);
+--
+--  			   current_action.event := Motion_Event_Ptr (new_shot_event);
+--  			   current_action.utility := 10;
+--  			end;
+--  		     end if;
+--  		  end if;
 
 		  t_write_start := Clock;
 

@@ -602,12 +602,18 @@ package body Soccer.PlayersPkg is
          -- Checks if the player was the last ball holder
          if current_generic_status.last_ball_holder_id = id then
             declare
-               ball_coord : Coordinate := Coordinate'(ball_x, ball_y);
+               ball_coord   : Coordinate := Coordinate'(ball_x, ball_y);
+               number       : Integer := current_generic_status.number;
+               formation_id : Integer := Get_Formation_Id(number, player_team);
             begin
-               if Distance(current_coord, ball_coord) > player_radius then
+               if formation_id = 1 then
                   assert_last_holder := To_Unbounded_String("not_last_holder");
                else
-                  assert_last_holder := To_Unbounded_String("last_holder");
+                  if Distance(current_coord, ball_coord) > player_radius then
+                     assert_last_holder := To_Unbounded_String("not_last_holder");
+                  else
+                     assert_last_holder := To_Unbounded_String("last_holder");
+                  end if;
                end if;
             end;
          else
