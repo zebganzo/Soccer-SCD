@@ -33,6 +33,15 @@ package body Soccer.Server.WebServer is
       Net.WebSocket.Registry.Send(ManagerVisitors, Write (Item => container));
    end PublishManagersUpdate;
 
+   procedure SendQuitSignalsToManagers is
+      container : JSON_Value := Create_Object;
+   begin
+      container.Set_Field (Field_Name => "command",
+			   Field      => "quit");
+      Net.WebSocket.Registry.Send(ManagerHome, Write (Item => container));
+      Net.WebSocket.Registry.Send(ManagerVisitors, Write (Item => container));
+   end SendQuitSignalsToManagers;
+
    procedure PublishManagerTeams (team1 : String; team2 : String) is
    begin
       Net.WebSocket.Registry.Send(ManagerHome, team1);

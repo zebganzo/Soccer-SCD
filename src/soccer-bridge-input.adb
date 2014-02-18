@@ -1,7 +1,9 @@
 with Soccer.ControllerPkg; use Soccer.ControllerPkg;
+with Soccer.Server; use Soccer.Server;
 with Soccer.Game; use Soccer.Game;
 with Soccer.ControllerPkg.Referee; use Soccer.ControllerPkg.Referee;
 with Ada.Text_IO; use Ada.Text_IO;
+with Soccer.Server.WebServer; use Soccer.Server.WebServer;
 
 package body Soccer.Bridge.Input is
 
@@ -40,6 +42,11 @@ package body Soccer.Bridge.Input is
    procedure Quit is
    begin
       -- quit everything!
+
+      -- since the command is issued by the field GUI,
+      -- send a termination signal to the two managers
+      WebServer.SendQuitSignalsToManagers;
+
       ControllerPkg.Set_Must_Exit;
    end Quit;
 

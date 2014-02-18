@@ -44,6 +44,9 @@ package Soccer.Server.WebServer is
    -- Send team stats to both managers
    procedure PublishManagerTeams (team1 : String; team2 : String);
 
+   -- Sends quit signal to both managers
+   procedure SendQuitSignalsToManagers;
+
    -- Updates the field
 
    procedure PublishFieldUpdate (events : JSON_Array);
