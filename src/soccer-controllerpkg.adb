@@ -261,14 +261,23 @@ package body Soccer.ControllerPkg is
 
    procedure Refresh_Hyperperiod is
       total_slots : Integer := 0;
+      player_speed : Integer;
    begin
       for i in current_status'Range loop
 	 if current_status (i).on_the_field then
-	    total_slots := total_slots + (current_status (i).id mod 5 + 1);
+            --  	    total_slots := total_slots + (current_status (i).id mod 5 + 1);
+            player_speed := Get_Statistics(current_status(i).number, current_status(i).team)(5);
+--              Put_Line("PLAYER SPEED: " & Integer'Image(player_speed));
+            if player_speed = 100 then
+               total_slots := total_slots + 5;
+            else
+               total_slots := total_slots + ((player_speed/20) + 1);
+            end if;
+--              Put_Line("PLAYER SLOTS: " & Integer'Image((player_speed/20) + 1));
 	 end if;
       end loop;
 
-      Soccer.hyperperiod_length := total_slots * 0.8;
+      Soccer.hyperperiod_length := total_slots * 0.4;
 
    end Refresh_Hyperperiod;
 

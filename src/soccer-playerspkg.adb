@@ -1169,7 +1169,11 @@ package body Soccer.PlayersPkg is
 --  	    Print ("[PLAYER " & I2S (id) & "] RELEASE BEFORE: " & Duration'Image (previous_release - t0) & " (hyperperiod is " & Duration'Image (hyperperiod_length) & ")");
 --  	 end if;
 
-	 previous_release := previous_release + (hyperperiod_length / (id mod 5 + 1));
+         if player_stats(5) = 100 then
+            previous_release := previous_release + (hyperperiod_length / 5);
+         else
+            previous_release := previous_release + (hyperperiod_length / ((player_stats(5)/20) + 1));
+         end if;
 
 --  	 if id = 4 then
 --  	    Print ("[PLAYER " & I2S (id) & "] RELEASE AFTER: " & Duration'Image (previous_release - t0) & " (hyperperiod is " & Duration'Image (hyperperiod_length) & ")");
