@@ -207,7 +207,8 @@ action(TargetX, TargetY, pass) :-
 	% finds the target of the pass action
 	current_predicate(nearby_player/3),
 	bagof(Position, nearby_player(Position, _,Team), TargetList),				% find all nearby team mates 
- 	max_distance_from_me(TargetList, TargetCell, _),							% return the closest to the goal
+ 	%max_distance_from_me(TargetList, TargetCell, _),							% return the closest to the goal
+ 	min_distance_from_me(TargetList, TargetCell, _),
 	TargetCell =.. [_, TargetX, TargetY], !.
 
 % Shot action for a penalty kick. 
