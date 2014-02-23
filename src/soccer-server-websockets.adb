@@ -25,7 +25,7 @@ package body Soccer.Server.WebSockets is
 
    overriding procedure On_Open (Socket : in out Object; Message : String) is
    begin
-      Put_Line ("Aperta connessione. ");
+      Put_Line ("Aperta connessione. " & Message);
    end On_Open;
 
 --     overriding procedure Send (Socket : in out Object; Message : String) is
