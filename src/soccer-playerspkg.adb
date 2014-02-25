@@ -968,13 +968,13 @@ package body Soccer.PlayersPkg is
 
 	 t_ai_end := Clock;
 
-         if decision_x = 1000 and subbed then
+         if decision_x = oblivium_decision and subbed then
             change_id := True;
          end if;
 
-         if decision_x = 1000 then
+         if decision_x = oblivium_decision then
             if player_team = Team_Two then
-               decision_x := id + 10;
+               decision_x := id + team_two_offset;
             else
                decision_x := id;
             end if;

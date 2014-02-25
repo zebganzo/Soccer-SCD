@@ -102,6 +102,8 @@ package Soccer is
    speed_index	      : constant Positive := 5;
    tackle_index	      : constant Positive := 6;
    goal_keeping_index : constant Positive := 7;
+   oblivium_decision  : constant Positive := 1000;
+   team_two_offset    : constant Positive := 10;
 
    agent_movement_id : Integer := 0;
 
