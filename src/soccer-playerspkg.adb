@@ -973,7 +973,11 @@ package body Soccer.PlayersPkg is
          end if;
 
          if decision_x = 1000 then
-            decision_x := id;
+            if player_team = Team_Two then
+               decision_x := id + 10;
+            else
+               decision_x := id;
+            end if;
          end if;
 
          if decision = "pass" then
