@@ -71,6 +71,7 @@ package body Soccer.ControllerPkg is
       begin
 	 if now > checkpoint_time + hyperperiod_length then
 	    checkpoint_time := checkpoint_time + hyperperiod_length;
+		Put_Line("=========================================================================");
 	 end if;
       end;
 
