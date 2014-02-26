@@ -427,6 +427,8 @@ package body Soccer.PlayersPkg is
       new_player_number : Integer;
       new_player_id   : Integer;			-- id of the player that will substitute the current player
 
+	counter : Integer := 0;
+	
       -- True if the player is the one assigned to resume the game after a
       -- game event
       resume_player : Boolean := False;
@@ -549,7 +551,13 @@ package body Soccer.PlayersPkg is
      --    Print ("[PLAYER_" & I2S (id) & "] MAGLIA: " & I2S(current_generic_status.number) &
      --     " TEAM: " & Team_Id'Image(current_generic_status.team));
 
-	 if previous_checkpoint /= current_generic_status.last_checkpoint then
+	 if previous_checkpoint /= 
+current_generic_status.last_checkpoint then
+
+		Put_Line ("[PLAYER_" & I2S (id) & "] counter " & I2S(counter) & " should be " & I2S(((player_stats(5)/20) + 1) ) );
+--  & Time'Image(previous_checkpoint)
+		counter := 0;
+
 	    previous_checkpoint := current_generic_status.last_checkpoint;
 	    previous_release := current_generic_status.last_checkpoint;
 --  	    if id = 4 then
@@ -972,13 +980,13 @@ package body Soccer.PlayersPkg is
             change_id := True;
          end if;
 
-         if decision_x = oblivium_decision then
-            if player_team = Team_Two then
-               decision_x := id + team_two_offset;
-            else
-               decision_x := id;
-            end if;
-         end if;
+--         if decision_x = oblivium_decision then
+--            if player_team = Team_Two then
+--               decision_x := id + team_two_offset;
+--            else
+--               decision_x := id;
+--            end if;
+--         end if;
 
          if decision = "pass" then
             declare
@@ -1183,9 +1191,11 @@ package body Soccer.PlayersPkg is
 --  	    Print ("[PLAYER " & I2S (id) & "] RELEASE AFTER: " & Duration'Image (previous_release - t0) & " (hyperperiod is " & Duration'Image (hyperperiod_length) & ")");
 --  	 end if;
 
---  	 delay until previous_release; -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+	counter := counter + 1;
 
---  	 if t_end - t_start > 3.0 then
+  	 delay until previous_release; -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+
+--  	 if t_end - t_start > 4.0 then
 --  	    raise Constraint_Error;
 --  	 end if;
 
