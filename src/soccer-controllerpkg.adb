@@ -350,7 +350,7 @@ package body Soccer.ControllerPkg is
 	    Print ("ID: " & I2S(counter));
 	    current_status (counter).number := current_player;
 	    Print ("MAGLIA: " & I2S(current_player));
-	    current_status (counter).coord := Coordinate'(counter,0);
+	    current_status (counter).coord := Coordinate'(counter + team_two_offset,0);
 	    current_status (counter).team := Team_Two;
 	    Print ("TEAM: " & "TEAM_TWO");
 

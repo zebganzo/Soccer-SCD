@@ -428,7 +428,7 @@ package body Soccer.PlayersPkg is
       new_player_id   : Integer;			-- id of the player that will substitute the current player
 
 	counter : Integer := 0;
-	
+
       -- True if the player is the one assigned to resume the game after a
       -- game event
       resume_player : Boolean := False;
@@ -551,10 +551,10 @@ package body Soccer.PlayersPkg is
      --    Print ("[PLAYER_" & I2S (id) & "] MAGLIA: " & I2S(current_generic_status.number) &
      --     " TEAM: " & Team_Id'Image(current_generic_status.team));
 
-	 if previous_checkpoint /= 
+	 if previous_checkpoint /=
 current_generic_status.last_checkpoint then
 
-		Put_Line ("[PLAYER_" & I2S (id) & "] counter " & I2S(counter) & " should be " & I2S(((player_stats(5)/20) + 1) ) );
+--  		Put_Line ("[PLAYER_" & I2S (id) & "] counter " & I2S(counter) & " should be " & I2S(((player_stats(5)/20) + 1) ) );
 --  & Time'Image(previous_checkpoint)
 		counter := 0;
 
@@ -980,13 +980,13 @@ current_generic_status.last_checkpoint then
             change_id := True;
          end if;
 
---         if decision_x = oblivium_decision then
---            if player_team = Team_Two then
---               decision_x := id + team_two_offset;
---            else
---               decision_x := id;
---            end if;
---         end if;
+       if decision_x = oblivium_decision then
+          if player_team = Team_Two then
+             decision_x := id + team_two_offset;
+          else
+             decision_x := id;
+          end if;
+       end if;
 
          if decision = "pass" then
             declare
@@ -1126,22 +1126,44 @@ current_generic_status.last_checkpoint then
                   if event.all in Match_Event'Class then
                      m_event := Match_Event_Ptr(event);
                      if Get_Match_Event_Id(m_event) = End_Of_First_Half then
-                        if current_coord = Coordinate'(id, 0) then
-                           current_action.event := null;
+                        if player_team = Team_One then
+                           if current_coord = Coordinate'(id, 0) then
+                              current_action.event := null;
 
-                           -- aspetto l'inizio del secondo tempo
-                           Game_Entity.Rest;
-                           Game_Entity.Start_2T;
+                              -- aspetto l'inizio del secondo tempo
+                              Game_Entity.Rest;
+                              Game_Entity.Start_2T;
+                           end if;
+                        else
+                           if current_coord = Coordinate'(id+team_two_offset, 0) then
+                              current_action.event := null;
+
+                              -- aspetto l'inizio del secondo tempo
+                              Game_Entity.Rest;
+                              Game_Entity.Start_2T;
+                           end if;
                         end if;
                      elsif Get_Match_Event_Id(m_event) = End_Of_Match then
-                        if current_coord = Coordinate'(id, 0) then
-                           current_action.event := null;
-			   Game_Entity.End_Match;
-			   Controller.Get_Id (id);
-			   Game_Entity.Rest;
-                           Game_Entity.Start_1T;
-                            -- chiedo il mio ID al controllore
-                           Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
+                        if player_team = Team_One then
+                           if current_coord = Coordinate'(id, 0) then
+                              current_action.event := null;
+                              Game_Entity.End_Match;
+                              Controller.Get_Id (id);
+                              Game_Entity.Rest;
+                              Game_Entity.Start_1T;
+                              -- chiedo il mio ID al controllore
+                              Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
+                           end if;
+                        else
+                           if current_coord = Coordinate'(id+team_two_offset, 0) then
+                              current_action.event := null;
+                              Game_Entity.End_Match;
+                              Controller.Get_Id (id);
+                              Game_Entity.Rest;
+                              Game_Entity.Start_1T;
+                              -- chiedo il mio ID al controllore
+                              Print ("[PLAYER_" & I2S (id) & "] Ho il mio nuovo ID!");
+                           end if;
                         end if;
                      end if;
                   end if;
@@ -1193,13 +1215,13 @@ current_generic_status.last_checkpoint then
 
 	counter := counter + 1;
 
-  	 delay until previous_release; -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+--    	 delay until previous_release;
 
 --  	 if t_end - t_start > 4.0 then
 --  	    raise Constraint_Error;
 --  	 end if;
 
---  	 delay duration (players_delay); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+	 delay duration (players_delay); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
       end loop;
 
    end Player;
