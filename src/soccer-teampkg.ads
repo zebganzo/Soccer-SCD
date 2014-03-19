@@ -788,7 +788,7 @@ private
       4  => Coordinate'(33,22),				-- back 3
       5  => Coordinate'(36,9),				-- back 4
       6  => Coordinate'(36,25),				-- back 5
-      7  => Coordinate'(41,17),				-- midfielder 1
+      7  => Coordinate'(42,17),				-- midfielder 1
       8  => Coordinate'(43,14),				-- midfielder 2
       9  => Coordinate'(43,20),				-- midfielder 3
       10 => Coordinate'(43,16),				-- forward 1
@@ -803,7 +803,7 @@ private
       4  => Coordinate'(19,12),				-- back 3
       5  => Coordinate'(16,25),				-- back 4
       6  => Coordinate'(16,9),				-- back 5
-      7  => Coordinate'(11,17),				-- midfielder 1
+      7  => Coordinate'(11,15),				-- midfielder 1
       8  => Coordinate'(9,20),				-- midfielder 2
       9  => Coordinate'(9,14),				-- midfielder 3
       10 => Coordinate'(9,18),				-- forward 1
@@ -818,9 +818,9 @@ private
       4  => Coordinate'(9,17),				-- back 3
       5  => Coordinate'(9,19),				-- back 4
       6  => Coordinate'(9,21),				-- back 5
-      7  => Coordinate'(9,12),				-- midfielder 1
-      8  => Coordinate'(9,22),				-- midfielder 2
-      9  => Coordinate'(11,16),				-- midfielder 3
+      7  => Coordinate'(9,11),				-- midfielder 1
+      8  => Coordinate'(9,23),				-- midfielder 2
+      9  => Coordinate'(12,16),				-- midfielder 3
       10 => Coordinate'(16,16),				-- forward 1
       11 => Coordinate'(16,19));			-- forward 2
 
@@ -833,9 +833,9 @@ private
       4  => Coordinate'(43,17),				-- back 3
       5  => Coordinate'(43,15),				-- back 4
       6  => Coordinate'(43,13),				-- back 5
-      7  => Coordinate'(43,22),				-- midfielder 1
-      8  => Coordinate'(43,12),				-- midfielder 2
-      9  => Coordinate'(41,16),				-- midfielder 3
+      7  => Coordinate'(43,23),				-- midfielder 1
+      8  => Coordinate'(44,12),				-- midfielder 2
+      9  => Coordinate'(42,16),				-- midfielder 3
       10 => Coordinate'(36,19),				-- forward 1
       11 => Coordinate'(36,16));			-- forward 2
 end Soccer.TeamPkg;

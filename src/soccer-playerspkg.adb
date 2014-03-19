@@ -791,7 +791,11 @@ current_generic_status.last_checkpoint then
                         id_1 : Integer;
 			id_2 : Integer;
                      begin
-                        if subbed and (player_position.coord_x = id and player_position.coord_y = 0)  then
+                        if subbed and player_team = Team_One and (player_position.coord_x = id and player_position.coord_y = 0) then
+                           subbed := False;
+                           assert_sub := To_Unbounded_String("substitution(in)");
+                        elsif subbed and player_team = Team_Two and (player_position.coord_x = id + team_two_offset
+                                                                     and player_position.coord_y = 0) then
                            subbed := False;
                            assert_sub := To_Unbounded_String("substitution(in)");
                         elsif subbed then
