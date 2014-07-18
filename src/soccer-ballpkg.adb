@@ -64,7 +64,6 @@ package body Soccer.BallPkg is
          current_position := new_coord;
       end Move_Agent;
 
-      --+ potenzialmente inutile
       procedure Release is
       begin
          controlled := False;

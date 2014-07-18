@@ -154,7 +154,6 @@ package body Soccer.ControllerPkg.Referee is
       new_event := new Substitution_Event;
       Initialize (new_event, Team_One, 12, 60);
 --        Get_Numbers (new_event, id1, id2);
---        Print("[MAGIMAGIADIOBOIA]:" & I2S(id1) & " " & I2S(id2));
       manager_events.Append (Manager_Event.Event_Ptr (new_event));
    end Simulate_Substitution;
 
@@ -788,12 +787,10 @@ package body Soccer.ControllerPkg.Referee is
 		     Get_Numbers (new_substitution_event, number_to_id_1, number_to_id_2);
 --                       Put_Line ("NUMBER OUT: " & Integer'Image(number_to_id_1) & " NUMBER IN: " & Integer'Image(number_to_id_2));
 		     substitution_team := Get_Team(new_substitution_event);
---                       Print("[MAGIMAGIADIOBOIA]:" & I2S(number_to_id_1) & " " & I2S(number_to_id_2));
 
 		     -- sostituisco i numeri di maglia con i rispettivi ID
                      id1 := ControllerPkg.Get_Id_From_Number (number_to_id_1, substitution_team); -- esce
                      id2 := ControllerPkg.Get_Id_From_Number (number_to_id_2, substitution_team); -- entra
---                       Print("[MAGIMAGIADIOBOIA]:" & I2S(id1) & " " & I2S(id2));
 		     Set_Correct_Ids (new_substitution_event, id1, id2, number_to_id_2);
 --                       Put_Line ("ID OUT: " & Integer'Image(number_to_id_1) & " ID IN: " & Integer'Image(number_to_id_2));
 		     -- aggiungo in coda la sostituzione

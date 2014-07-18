@@ -1224,7 +1224,7 @@ current_generic_status.last_checkpoint then
 --  	    raise Constraint_Error;
 --  	 end if;
 
-	 delay duration (players_delay); -- TODO:: metterla proporzionale alle statistiche e all'iperperiodo
+	 delay duration (players_delay); 
       end loop;
 
    end Player;

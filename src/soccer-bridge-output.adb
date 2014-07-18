@@ -34,7 +34,7 @@ package body Soccer.Bridge.Output is
    -- Esempio pratico: ho 5 mosse da gestire, attribuite a 5 task che partiranno in
    -- ordine in base al timestamp di inizio. Ognuno di essi spostera' il giocatore
    -- indicato dall'id da From a To impiegando un tempo pari a (fine - inizio)
-   -- avendo cura di evitare che i giocatori si incaprettino fra di loro!
+   -- avendo cura di evitare che i giocatori si sovrappongano
 
    protected body Buffer_Wrapper is
 
@@ -154,8 +154,8 @@ package body Soccer.Bridge.Output is
             end if;
 
 	    -- Server
-  	    Soccer.Server.WebServer.PublishManagersUpdate (field_events); -- TODO aggiornare
-	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); -- TODO aggiornare
+  	    Soccer.Server.WebServer.PublishManagersUpdate (field_events); 
+	    Soccer.Server.WebServer.PublishFieldUpdate (field_events); 
 	 end if;
 
 	 if is_first_half then

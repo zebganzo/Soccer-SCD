@@ -27,7 +27,7 @@ package Soccer.ControllerPkg is
          team : Team_Id;
          running : Boolean := False;
          on_the_field : Boolean := False;
-	 coord : Coordinate; -- := Coordinate'(coord_x => 0, coord_y => 0); -- FIXME:: se ci sono problemi, rimettilo!
+	 coord : Coordinate; -- := Coordinate'(coord_x => 0, coord_y => 0); 
 	 reference_coord : Coordinate;
 	 distance : Integer;
       end record;

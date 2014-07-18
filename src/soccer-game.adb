@@ -39,14 +39,12 @@ package body Soccer.Game is
       begin
 	 open_1T := True;
 	 Set_Game_Status (Game_Blocked);
-	 -- manca sincronizzazione dei giocatori
       end Start_1T;
 
       entry Start_2T when Start_2T'Count = num_of_players or open_2T is
       begin
 	 open_2T := True;
 	 Set_Game_Status (Game_Blocked);
-	 -- manca sincronizzazione dei giocatori
       end Start_2T;
 
       function Evaluate_Rest return Boolean is

@@ -834,7 +834,7 @@ package body Soccer.ControllerPkg is
 
 		  Referee.Notify_Game_Event(event => Game_Event_Ptr (foul_event));
 	       else
-		  -- hell yeah! Mi prendo la palla
+		  -- yeah! Mi prendo la palla
 		  Print ("[CONTROLLER] Giocatore " & I2S (action.Get_Player_Id) & " ha preso la palla");
 		  ball.Move_Player(new_coord => action.Get_From);
 		  ball_holder_id := action.Get_Player_Id;

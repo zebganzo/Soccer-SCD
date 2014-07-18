@@ -2,7 +2,7 @@ with Soccer;
 
 package body Soccer is
 
-   -- Integer'Image ...TRICK!
+   -- Integer'Image 
    function I2S (Num : in Integer) return String is
       image : constant String := Integer'Image(Num);
    begin
